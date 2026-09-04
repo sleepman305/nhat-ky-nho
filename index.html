@@ -4525,9 +4525,29 @@ document.addEventListener("visibilitychange", () => {
   if (!document.hidden && $("man-ghi").classList.contains("hien")) veManGhi();
 });
 
+/* Bộ nhớ đệm ngoại tuyến.
+
+   Kèm theo hai việc để anh không bao giờ bị kẹt ở bản cũ: hỏi máy chủ
+   xem có bản mới không mỗi lần mở app, và tự tải lại đúng một lần khi
+   bản mới thật sự sẵn sàng. */
 if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+  let daTaiLai = false;
+
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    // Chặn vòng lặp: chỉ tự tải lại đúng một lần cho mỗi bản mới.
+    if (daTaiLai) return;
+    daTaiLai = true;
+    location.reload();
+  });
+
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js").catch(() => {});
+    navigator.serviceWorker.register("sw.js").then((dk) => {
+      dk.update().catch(() => {});
+      // Quay lại app sau một lúc thì ngó xem có bản mới chưa.
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) dk.update().catch(() => {});
+      });
+    }).catch(() => {});
   });
 }
 </script>

@@ -5,12 +5,19 @@
   Giữ lại toàn bộ ứng dụng trong máy sau lần mở đầu tiên, để những lần sau
   không cần mạng vẫn đọc được nhật ký.
 
-  Chiến lược: đã có trong đệm thì trả ra ngay, chưa có thì tải về rồi cất lại.
-  Hợp với app này vì nội dung app gần như không đổi, còn nhật ký thì nằm trong
-  IndexedDB chứ không đi qua đây.
+  Chia làm hai lối:
+
+    Trang chính  — HỎI MẠNG TRƯỚC. Có mạng thì luôn lấy bản mới nhất, mất
+                   mạng mới lấy bản trong đệm. Trước đây trang chính cũng
+                   theo lối "có đệm là trả ra ngay", nên bản mới đẩy lên
+                   bao nhiêu lần máy cũng không thấy.
+    Còn lại      — có trong đệm thì trả ra ngay. Phông chữ, biểu tượng gần
+                   như không đổi, hỏi mạng mỗi lần chỉ tổ chậm.
+
+  Nhật ký nằm trong IndexedDB, không đi qua đây.
 */
 
-const TEN_DEM = "nhat-ky-nho-v22";
+const TEN_DEM = "nhat-ky-nho-v23";
 
 /** Những thứ phải có sẵn ngay từ lúc cài, không chờ người dùng mở tới. */
 const CAN_TRUOC = [
@@ -43,6 +50,26 @@ self.addEventListener("activate", (sk) => {
 self.addEventListener("fetch", (sk) => {
   const yc = sk.request;
   if (yc.method !== "GET") return;
+
+  // Trang chính: hỏi mạng trước, để anh luôn có bản mới nhất.
+  const laTrang = yc.mode === "navigate" ||
+    yc.destination === "document" ||
+    /\/(index\.html)?(\?.*)?$/.test(new URL(yc.url).pathname + new URL(yc.url).search);
+
+  if (laTrang) {
+    sk.respondWith(
+      fetch(yc).then((tl) => {
+        if (tl && tl.ok) {
+          const ban = tl.clone();
+          caches.open(TEN_DEM).then((dem) => dem.put(yc, ban)).catch(() => {});
+        }
+        return tl;
+      }).catch(() =>
+        caches.match(yc).then((san) => san || caches.match("./index.html"))
+      )
+    );
+    return;
+  }
 
   sk.respondWith(
     caches.match(yc).then((san) => {
