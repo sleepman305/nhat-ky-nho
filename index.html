@@ -633,8 +633,8 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
 .lich-o .trong-cham { height: .32rem; }
 
 .lich-o.co-ghi { color: var(--chu); font-weight: 600; }
-.lich-o.co-ghi:hover { background: var(--mat-2); }
-.lich-o.co-ghi:active { transform: scale(.88); }
+button.lich-o:hover { background: var(--mat-2); }
+button.lich-o:active { transform: scale(.88); }
 
 /* Hôm nay: nền đặc, chữ ngược màu — Day One cũng đánh dấu kiểu này */
 .lich-o.hom-nay-o {
@@ -2197,9 +2197,13 @@ function veLich() {
     const co = !!ds;
     const nay = ma === maNay;
     const sau = dangThang === nayThang && d > new Date().getDate();
-    const the = co ? "button" : "div";
+
+    // Mọi ngày đã qua đều bấm được, kể cả ngày trống — có bấm vào được
+    // thì mới ghi bù cho nó được. Chỉ ngày tương lai là đứng im.
+    const bam = !sau;
+    const the = bam ? "button" : "div";
     o += `<${the} class="lich-o${co ? " co-ghi" : ""}${nay ? " hom-nay-o" : ""}${sau ? " ngoai" : ""}"`
-      + (co ? ` data-ngay="${ma}" aria-label="${d}, ${ds.length} mẩu ghi"` : "")
+      + (bam ? ` data-ngay="${ma}" aria-label="${d}${co ? `, ${ds.length} mẩu ghi` : ", chưa ghi gì"}"` : "")
       + `><span>${d}</span>`
       + (co ? `<span class="cham${ds.length >= 3 ? " day" : ""}"></span>` : `<span class="trong-cham"></span>`)
       + `</${the}>`;
@@ -2309,7 +2313,8 @@ function veTrangNgay(ma) {
   </header>`;
 
   if (!ds.length) {
-    html += `<p class="trong">Ngày này chưa ghi gì.</p>`;
+    html += `<p class="trong">Ngày này chưa ghi gì.<br>
+      Bấm <strong>Ghi vào ngày này</strong> ở dưới để viết bù.</p>`;
   }
 
   html += ds.map((g, i) => veMotMau(g, true, i)).join("");
@@ -2450,6 +2455,39 @@ let trangDangMo = 0;
 /** Đang chạy hiệu ứng lật, khoá lại kẻo bấm dồn làm rối. */
 let dangLat = false;
 
+/**
+ * Ghép các mẩu ghi trong ngày thành những đoạn văn, giữ nguyên từng chữ.
+ *
+ * Máy không thêm lời dẫn, không thêm giờ, không sửa câu nào. Việc duy nhất
+ * nó làm là chấm câu cho tròn và biết chỗ nào nên xuống đoạn: hai mẩu cách
+ * nhau quá hai tiếng thì đó là lúc ngày đã sang một khúc khác.
+ *
+ * @param {Array} ds Các mẩu ghi trong một ngày, theo thứ tự thời gian.
+ * @returns {string[]} Các đoạn văn.
+ */
+function nguyenLoi(ds) {
+  const co = ds.filter((g) => g.chu && g.chu.trim());
+  if (!co.length) return [];
+
+  const doan = [];
+  let cau = [], truoc = null;
+
+  for (const g of co) {
+    const d = new Date(g.luc);
+    let x = g.chu.trim();
+    if (!/[.!?…]$/.test(x)) x += ".";
+
+    if (truoc && (d - truoc) / 60000 > 120 && cau.length) {
+      doan.push(cau.join(" "));
+      cau = [];
+    }
+    cau.push(x);
+    truoc = d;
+  }
+  if (cau.length) doan.push(cau.join(" "));
+  return doan;
+}
+
 /** Dựng lại danh sách trang rồi hiện bìa sổ. */
 function veSach() {
   cacTrang = [...nhomTheoNgay().keys()].sort();
@@ -2491,8 +2529,10 @@ function dungToGiay(i, lop) {
   const t = doiNgay(ma);
   const ds = soGhi.filter((g) => g.ngay === ma);
 
-  // Trang sách đọc như một bài viết, không phải bảng giờ giấc.
-  const bai = tongHopNgay(ds);
+  // Trang sách chỉ chép lại nguyên lời anh đã nói, không giờ giấc,
+  // không một chữ nào của máy thêm vào. Ngắt đoạn khi hai mẩu cách nhau
+  // quá hai tiếng — đó là chỗ ngày tự nó sang một khúc khác.
+  const bai = nguyenLoi(ds);
   let noi = "";
 
   if (bai.length) {
