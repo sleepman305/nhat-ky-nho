@@ -13,7 +13,7 @@
 <meta name="theme-color" content="#16283D">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;0,7..72,700;1,7..72,400&family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;0,7..72,700;1,7..72,400&family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Cormorant+Garamond:ital,wght@1,300;1,400;1,500&display=swap">
 
 <style>
 /* ============================================================
@@ -1464,7 +1464,6 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
     <header class="dau-hom-nay">
       <p class="thu" id="thu-hom-nay"></p>
       <h1 id="ngay-hom-nay"></h1>
-      <p class="dem" id="dem-hom-nay"></p>
     </header>
 
     <div class="bang-bu" id="bang-bu" hidden>
@@ -1530,6 +1529,8 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
           <button class="nut" id="nut-huy">Bỏ</button>
         </div>
       </div>
+
+      <figure class="cau-trich" id="cau-trich" aria-live="polite"></figure>
     </div>
 
   </div>
@@ -2202,6 +2203,81 @@ async function ghiVaoSo() {
    ============================================================ */
 
 
+/* ------------------------------------------------------------
+   CÂU TRÍCH DƯỚI HÀNG NÚT
+
+   Mỗi lần mở trang lại một câu khác. Không gán tên tác giả cho câu
+   nào — trích dẫn sai người còn tệ hơn không trích, mà phần lớn
+   những câu kiểu này vốn cũng không rõ ai nói đầu tiên.
+   ------------------------------------------------------------ */
+
+const CAU_TRICH = [
+  "Đời người như một cuốn sách. Kẻ dại lật vội, người khôn đọc từng trang.",
+  "Hạnh phúc không phải là điều có sẵn. Nó đến từ chính việc mình làm.",
+  "Có những ngày chẳng có gì xảy ra. Đó cũng là một loại bình yên.",
+  "Chuyện gì rồi cũng qua. Kể cả những ngày ta tưởng mình không qua nổi.",
+  "Người ta không nhớ ngày, người ta nhớ những khoảnh khắc.",
+  "Bình an không phải là nơi không có tiếng ồn, mà là giữa ồn ào vẫn tĩnh tại trong lòng.",
+  "Buông bỏ không phải là mất đi, mà là thôi cầm nắm thứ vốn không thuộc về mình.",
+  "Quá khứ đã qua, tương lai chưa tới. Chỉ có hôm nay là thật.",
+  "Yêu thương là thứ duy nhất càng cho đi càng nhiều thêm.",
+  "Đừng vội. Hoa nào cũng có mùa của nó.",
+  "Điều khiến ta khổ không phải sự việc, mà là cách ta nghĩ về nó.",
+  "Có những người đến để ở lại. Có những người đến để dạy ta một điều rồi đi.",
+  "Sống chậm lại một chút, để kịp nhìn thấy đời mình.",
+  "Một ngày không cười là một ngày bỏ phí.",
+  "Nước chảy đá mòn, không phải vì mạnh, mà vì bền.",
+  "Người hạnh phúc không phải người có mọi thứ, mà là người biết đủ với thứ mình có.",
+  "Tâm an thì vạn sự an.",
+  "Đừng so ngày hôm nay của mình với ngày hôm qua của người khác.",
+  "Giữ lại điều tử tế, buông đi điều nặng nề.",
+  "Ta không thể đổi hướng gió, nhưng có thể đổi hướng buồm.",
+  "Những vết thương rồi cũng lành. Chỉ là cần thời gian, và cần được để yên.",
+  "Yêu một người là muốn họ hạnh phúc, kể cả khi hạnh phúc ấy không có mình.",
+  "Cuộc đời ngắn lắm. Đừng dành nó để giận ai quá lâu.",
+  "Có duyên thì gặp, có phận thì ở lại.",
+  "Điều quý nhất trên đời là hôm nay, vì hôm nay chỉ đến một lần.",
+  "Đi chậm cũng được, miễn là đừng dừng.",
+  "Trong cái tĩnh mới nghe được lòng mình nói gì.",
+  "Mọi thứ đều vô thường. Kể cả nỗi buồn này.",
+  "Người biết ơn là người giàu nhất, dù trong tay chẳng có gì.",
+  "Đừng đợi có thời gian mới sống. Hãy sống rồi thời gian sẽ có.",
+  "Ta là kết quả của những gì ta làm mỗi ngày, không phải của điều ta định làm.",
+  "Có những buổi chiều chỉ cần ngồi yên cũng thấy đủ.",
+  "Thương mình trước đã. Rồi mới thương được người.",
+  "Điều tốt đẹp cần thời gian. Cây cổ thụ nào cũng từng là hạt mầm.",
+  "Giữa muôn vàn lối đi, lối nào cũng dẫn về mình.",
+  "Đừng để ngày mai làm hỏng hôm nay.",
+  "Một câu nói tử tế có thể sưởi ấm cả ba tháng mùa đông.",
+  "Nhớ được thì nhớ điều vui. Còn điều buồn, để gió cuốn đi.",
+  "Cái gì đến sẽ đến. Việc của mình là sẵn sàng.",
+  "Sống sao cho khi nhìn lại, mình không phải tiếc.",
+  "Trăng khuyết rồi trăng lại tròn. Người buồn rồi người lại vui.",
+  "Không ai tắm hai lần trên một dòng sông.",
+  "Bàn tay tặng hoa hồng bao giờ cũng phảng phất hương thơm.",
+  "Hãy ghi lại, vì trí nhớ rồi sẽ phản bội ta.",
+  "Ngày hôm nay của ta, mai sau sẽ là ngày xưa của ta.",
+  "Cứ đi rồi sẽ đến. Cứ ghi rồi sẽ nhớ."
+];
+
+/** Câu vừa hiện, để lần sau không rút trúng ngay câu đó. */
+let cauVua = -1;
+
+/** Rút một câu trích rồi cho nó hiện ra thật nhẹ. */
+function veCauTrich() {
+  const o = $("cau-trich");
+  if (!o || !CAU_TRICH.length) return;
+
+  let i = Math.floor(Math.random() * CAU_TRICH.length);
+  if (CAU_TRICH.length > 1 && i === cauVua) i = (i + 1) % CAU_TRICH.length;
+  cauVua = i;
+
+  o.innerHTML = `<blockquote>${thoat(CAU_TRICH[i])}</blockquote>`;
+  o.classList.remove("hien-len");
+  void o.offsetWidth;
+  o.classList.add("hien-len");
+}
+
 /* ============================================================
    VẼ MÀN GHI
    ============================================================ */
@@ -2224,12 +2300,7 @@ function veManGhi() {
   $("thu-hom-nay").textContent = t.thu;
   $("ngay-hom-nay").textContent = t.dai;
 
-  const cuaNay = soGhi.filter((g) => g.ngay === ma);
-  const soAnh = cuaNay.filter((g) => g.anh).length;
 
-  $("dem-hom-nay").textContent = cuaNay.length
-    ? `${cuaNay.length} mẩu ghi${soAnh ? ` · ${soAnh} ảnh` : ""}`
-    : (ngayGhiBu ? "Ngày này chưa ghi gì" : "Chưa ghi gì hôm nay");
 
 }
 
@@ -3120,7 +3191,7 @@ function diToi(ten) {
   veThanhDuoi(ten === "ngay" ? "so" : ten);
 
   if (ten !== "ghi" && ngayGhiBu) ngayGhiBu = null;
-  if (ten === "ghi") veManGhi();
+  if (ten === "ghi") { veManGhi(); veCauTrich(); }
   if (ten === "so") { ngayDangXem = null; veMucLuc(); }
   if (ten === "lich") veLich();
   if (ten === "sach") veSach();
