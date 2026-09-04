@@ -2044,10 +2044,7 @@ async function ghiVaoSo() {
   soGhi.sort((a, b) => a.id - b.id);
   const laSua = !!dangSua;
   dongKhuSoan();
-  veManGhi();
-  if ($("man-ngay").classList.contains("hien") && ngayDangXem) veTrangNgay(ngayDangXem);
-  else if ($("man-so").classList.contains("hien")) veMucLuc();
-  else if ($("man-lich").classList.contains("hien")) veLich();
+  veLaiManDangMo();
 
   // Một nhịp rung ngắn xác nhận đã ghi. Máy nào không có thì bỏ qua.
   if (navigator.vibrate) { try { navigator.vibrate(12); } catch (e) {} }
@@ -2135,6 +2132,34 @@ function veMotMau(g, choSua = true, thuTu = 0) {
   </section>`;
 }
 
+/**
+ * Vẽ lại màn hình đang mở sau khi dữ liệu đổi.
+ *
+ * Phải hỏi xem màn nào đang hiện rồi mới vẽ: mỗi màn lấy dữ liệu một kiểu,
+ * vẽ nhầm màn thì thao tác báo là xong mà mắt vẫn thấy nội dung cũ.
+ */
+function veLaiManDangMo() {
+  const hien = (m) => $("man-" + m).classList.contains("hien");
+  if (hien("ghi")) veManGhi();
+  if (hien("so")) veMucLuc();
+  if (hien("lich")) veLich();
+  if (hien("ngay") && ngayDangXem) veTrangNgay(ngayDangXem);
+  if (hien("sach")) {
+    // Sổ đang mở giữa chừng thì dựng lại đúng trang ấy, đừng gấp lại.
+    const dangMo = !$("quyen").hidden;
+    const maCu = cacTrang[trangDangMo];
+    veSach();
+    if (dangMo && cacTrang.length) {
+      const i = cacTrang.indexOf(maCu);
+      trangDangMo = i >= 0 ? i : Math.min(trangDangMo, cacTrang.length - 1);
+      $("ke-sach").hidden = true;
+      $("quyen").hidden = false;
+      $("giay").innerHTML = dungToGiay(trangDangMo, "tren");
+      capNhatDieuSach();
+    }
+  }
+}
+
 /** Bộ đếm giờ của thanh hoàn tác đang hiện, để dọn khi có cái mới. */
 let gioHoanTac = null;
 
@@ -2181,9 +2206,7 @@ function hienHoanTac(g) {
     await luuMau(g);
     soGhi.push(g);
     soGhi.sort((a, b) => a.id - b.id);
-    veManGhi();
-    if ($("man-ngay").classList.contains("hien") && ngayDangXem) veTrangNgay(ngayDangXem);
-    else veMucLuc();
+    veLaiManDangMo();
   }, 8000);
 
   // Hết tám giây mà không ai bấm thì mới thật sự buông tấm ảnh khỏi bộ nhớ.
@@ -3147,7 +3170,7 @@ async function napTuFile(dsFile) {
   }
 
   soGhi.sort((a, b) => a.id - b.id);
-  veManGhi();
+  veLaiManDangMo();
   $("bao-cai").textContent = them
     ? `Đã nạp thêm ${them} mẩu ghi.`
     : "Không có mẩu nào mới — có lẽ đã nạp rồi.";
@@ -3322,8 +3345,7 @@ function ganSuKien() {
       // hơn hộp thoại, vì bấm nhầm vẫn lấy lại được nguyên vẹn.
       await xoaMau(id);
       soGhi = soGhi.filter((x) => x.id !== id);
-      veManGhi();
-      if (ngayDangXem) veTrangNgay(ngayDangXem);
+      veLaiManDangMo();
       hienHoanTac(g);
     }
   };
@@ -3451,7 +3473,7 @@ function ganSuKien() {
     for (const u of urlAnh.values()) URL.revokeObjectURL(u);
     urlAnh.clear();
     soGhi = [];
-    veManGhi(); veMucLuc(); veLich();
+    veLaiManDangMo();
     $("khu-xoa").hidden = true;
     $("nut-xoa-het").hidden = false;
     $("mo-ta-kho").textContent = "Đã xoá sạch.";
