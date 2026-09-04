@@ -817,7 +817,7 @@ button.lich-o:active { transform: scale(.88); }
 .khu-sach {
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  gap: 1.1rem; padding: 1.2rem 1rem 1rem;
+  gap: 1.1rem; padding: .9rem 1rem .4rem;
   /* Điểm nhìn gần hơn thì tờ giấy nghiêng ra trông có khối hẳn.
      Hạ điểm nhìn lên cao một chút, như đang cúi xuống quyển sổ. */
   perspective: 1150px;
@@ -837,10 +837,12 @@ button.lich-o:active { transform: scale(.88); }
 /* ---- Quyển sổ đã mở ---- */
 
 .quyen {
-  display: flex; flex-direction: column; align-items: center; gap: .9rem;
-  width: 100%;
+  display: flex; flex-direction: column; align-items: center;
+  width: 100%; height: 100%;
   animation: moSo .55s var(--muot) both;
 }
+/* Khoảng trống co giãn đẩy cụm nút xuống tận đáy */
+.quyen .giay { margin-bottom: auto; }
 @keyframes moSo {
   from { opacity: 0; transform: rotateY(-24deg) scale(.94); }
   to   { opacity: 1; transform: none; }
@@ -902,69 +904,43 @@ button.lich-o:active { transform: scale(.88); }
   pointer-events: none;
 }
 
-/* Trang đang lật: nhấc khỏi mặt sổ, cong lên rồi đổ sang bên kia.
-   Nhịp chậm ở hai đầu, nhanh ở giữa — đúng cách một tờ giấy thật rơi. */
+/* Trang đang lật.
+
+   Chỉ động vào transform và opacity — hai thứ duy nhất card đồ hoạ lo
+   được mà không phải vẽ lại cả trang. Trước đây em cho cả box-shadow và
+   filter vào hiệu ứng: mỗi khung hình máy phải tính lại vệt mờ quanh tờ
+   giấy, và đó chính là chỗ sinh ra cảm giác lag. */
 .to-giay.lat-toi,
 .to-giay.lat-lui {
   will-change: transform;
   z-index: 5;
+  box-shadow: 0 14px 34px rgba(0,0,0,.24);
 }
-.to-giay.lat-toi { animation: latToi .82s cubic-bezier(.38,.02,.24,1) forwards; }
-.to-giay.lat-lui { animation: latLui .82s cubic-bezier(.38,.02,.24,1) forwards; }
-.to-giay.lat-toi .bong-lat { animation: bongLat .82s cubic-bezier(.38,.02,.24,1) forwards; }
-.to-giay.lat-lui .bong-lat { animation: bongLatNguoc .82s cubic-bezier(.38,.02,.24,1) forwards; }
+.to-giay.lat-toi { animation: latToi .72s cubic-bezier(.33,0,.2,1) forwards; }
+.to-giay.lat-lui { animation: latLui .72s cubic-bezier(.33,0,.2,1) forwards; }
+.to-giay.lat-toi .bong-lat { animation: bongLat .72s linear forwards; }
+.to-giay.lat-lui .bong-lat { animation: bongLatNguoc .72s linear forwards; }
 
 @keyframes latToi {
-  0% {
-    transform: rotateY(0deg) translateZ(0) scale(1);
-    box-shadow: var(--bong-2);
-  }
-  30% {
-    transform: rotateY(-52deg) translateZ(34px) scale(1.012);
-    box-shadow: 0 18px 40px rgba(0,0,0,.3);
-  }
-  70% {
-    transform: rotateY(-126deg) translateZ(34px) scale(1.012);
-    box-shadow: 0 18px 40px rgba(0,0,0,.24);
-  }
-  100% {
-    transform: rotateY(-180deg) translateZ(0) scale(1);
-    box-shadow: 0 0 0 rgba(0,0,0,0);
-  }
+  from { transform: translate3d(0,0,0) rotateY(0deg); }
+  to   { transform: translate3d(0,0,0) rotateY(-180deg); }
 }
 @keyframes latLui {
-  0% {
-    transform: rotateY(-180deg) translateZ(0) scale(1);
-    box-shadow: 0 0 0 rgba(0,0,0,0);
-  }
-  30% {
-    transform: rotateY(-126deg) translateZ(34px) scale(1.012);
-    box-shadow: 0 18px 40px rgba(0,0,0,.24);
-  }
-  70% {
-    transform: rotateY(-52deg) translateZ(34px) scale(1.012);
-    box-shadow: 0 18px 40px rgba(0,0,0,.3);
-  }
-  100% {
-    transform: rotateY(0deg) translateZ(0) scale(1);
-    box-shadow: var(--bong-2);
-  }
+  from { transform: translate3d(0,0,0) rotateY(-180deg); }
+  to   { transform: translate3d(0,0,0) rotateY(0deg); }
 }
 
 /* Bóng đậm dần lúc tờ giấy dựng đứng, rồi nhạt đi khi nó nằm xuống */
 @keyframes bongLat {
   0%   { opacity: 0; }
-  46%  { opacity: 1; }
+  50%  { opacity: 1; }
   100% { opacity: 0; }
 }
 @keyframes bongLatNguoc {
   0%   { opacity: 0; }
-  54%  { opacity: 1; }
+  50%  { opacity: 1; }
   100% { opacity: 0; }
 }
-
-/* Tờ nằm dưới hơi tối đi khi bị tờ trên che, sáng dần lúc lộ ra */
-.to-giay.duoi { filter: brightness(.965); }
 
 /* Trang mới lộ ra bên dưới */
 .to-giay.duoi { z-index: 1; }
@@ -985,10 +961,7 @@ button.lich-o:active { transform: scale(.88); }
 /* Trang nối tiếp của cùng một ngày: tiêu đề nhạt đi cho khỏi lấn */
 .trang-tieu.mo { font-weight: 400; font-size: 1.06rem; opacity: .62; }
 .trang-noi {
-  /* Chiều cao chốt bằng bội số của dòng, do doSucChua() đo và đặt vào.
-     Để nó co giãn tự do thì dòng cuối bị xén mất nửa thân chữ. */
-  height: var(--cao-vung-chu, auto);
-  flex: 1 1 auto; overflow: hidden;
+  flex: 1 1 auto; min-height: 0; overflow: hidden;
   font-family: var(--de); font-size: .97rem;
   line-height: 1.62rem;   /* khớp đúng khoảng dòng kẻ của tờ giấy */
   text-align: justify; hyphens: auto;
@@ -1014,14 +987,19 @@ button.lich-o:active { transform: scale(.88); }
 .trang-noi .trong-trang {
   color: var(--chu-mo); font-style: italic; font-size: .9rem;
 }
+/* Số trang nằm sát mép dưới tờ giấy, như sách in */
 .trang-chan {
-  margin-top: .8rem; padding-top: .6rem;
+  flex: none;
+  margin: .5rem 0 0; padding-top: .5rem;
   border-top: 1px solid var(--vien-mo);
   font-family: var(--may); font-size: .64rem;
   color: var(--chu-mo); text-align: center;
 }
 
-.dieu-sach { display: flex; align-items: center; gap: 1.2rem; }
+.dieu-sach {
+  display: flex; align-items: center; gap: 1.2rem;
+  margin-bottom: .35rem;
+}
 .nut-lat {
   width: 2.6rem; height: 2.6rem; border-radius: 50%;
   display: grid; place-items: center;
@@ -1036,7 +1014,7 @@ button.lich-o:active { transform: scale(.88); }
   font-family: var(--may); font-size: .78rem; color: var(--chu-mo);
   font-variant-numeric: tabular-nums; min-width: 5rem; text-align: center;
 }
-.dong-so { color: var(--chu-mo); }
+.dong-so { color: var(--chu-mo); font-size: .8rem; padding: .3rem .8rem; }
 
 .bia {
   width: min(19rem, 76vw);
@@ -2656,95 +2634,85 @@ function nguyenLoi(ds) {
 }
 
 /**
- * Sức chứa một trang giấy, tính bằng ký tự.
- *
- * Con số này ĐO từ tờ giấy thật chứ không đoán: khổ giấy đổi theo
- * bề ngang máy, cỡ chữ đổi theo cài đặt hệ thống, nên đoán chừng là
- * dòng cuối bị nuốt mất — đúng lỗi anh vừa gặp.
- */
-let SUC_CHUA = 460;
-
-/**
- * Đo xem một tờ giấy chứa được bao nhiêu chữ.
- *
- * Dựng một tờ giấy ẩn, nhồi chữ mẫu vào rồi xem vùng nội dung cao mấy
- * dòng và mỗi dòng lọt mấy chữ. Trừ hao một dòng cho những dòng ngắn
- * ở cuối đoạn văn.
- */
-function doSucChua() {
-  const khung = $("giay");
-  if (!khung) return;
-
-  const tam = document.createElement("div");
-  tam.style.cssText = "position:absolute;visibility:hidden;pointer-events:none;left:-9999px";
-  tam.innerHTML = `<article class="to-giay tren">
-      <p class="trang-ngay-lon">Thứ sáu</p>
-      <h2 class="trang-tieu">Ngày 04 tháng 9 năm 2026</h2>
-      <div class="trang-noi"><p>x</p></div>
-      <p class="trang-chan">— 1 —</p>
-    </article>`;
-  khung.appendChild(tam);
-
-  const o = tam.querySelector(".trang-noi");
-  const kieu = getComputedStyle(o);
-  const caoDong = parseFloat(kieu.lineHeight) || 26;
-  const soDong = Math.max(4, Math.floor(o.clientHeight / caoDong));
-
-  // Đo bề ngang trung bình một chữ bằng chính phông của trang.
-  const bang = document.createElement("canvas").getContext("2d");
-  bang.font = `${kieu.fontSize} ${kieu.fontFamily}`;
-  const mau = "Sáng nay tôi dậy sớm hơn thường lệ và trời còn mờ hơi sương";
-  const rongChu = bang.measureText(mau).width / mau.length;
-  const chuMoiDong = Math.max(20, Math.floor(o.clientWidth / rongChu));
-
-  khung.removeChild(tam);
-
-  /* Cắt chiều cao vùng chữ đúng bằng bội số của dòng.
-     Đây là chỗ gây lỗi "mất nửa dòng": vùng chữ cao lẻ, dòng cuối chỉ
-     lọt được nửa thân chữ rồi bị mép giấy xén ngang. */
-  document.documentElement.style.setProperty("--cao-vung-chu", `${soDong * caoDong}px`);
-
-  /* Bớt hai dòng và chỉ tính chín phần mười số chữ mỗi dòng.
-     Chữ canh đều hai bên nên dòng nào cũng thưa hơn lúc đo, mà mỗi
-     đoạn văn lại kết thúc lưng chừng một dòng. */
-  SUC_CHUA = Math.max(200, Math.floor((soDong - 2) * chuMoiDong * 0.9));
-}
-
-/**
  * Cắt các đoạn văn của một ngày thành từng trang vừa khổ giấy.
  *
- * Cắt ở ranh giới câu chứ không cắt giữa chừng: một câu bị đứt đôi
- * giữa hai trang đọc rất khó chịu. Câu nào dài quá một trang thì đành
- * để nó tràn, còn hơn chặt ngang.
+ * Không ước lượng theo số ký tự nữa — cách ấy lúc thừa lúc thiếu vì chữ
+ * canh đều hai bên, cỡ chữ đổi theo cài đặt máy. Thay vào đó dựng hẳn một
+ * tờ giấy ẩn rồi rót từng câu vào, hễ tràn khỏi mép thì rút câu vừa rồi ra
+ * và sang trang. Chậm hơn một chút, nhưng trang nào cũng đầy tới dòng cuối
+ * mà không mất một chữ nào.
  *
  * @param {string[]} doan Các đoạn văn của ngày.
  * @returns {string[][]} Mỗi phần tử là các đoạn thuộc về một trang.
  */
 function catTrang(doan) {
+  if (!doan.length) return [[]];
+
+  const o = moToDo();
+  if (!o) return [doan];   // không đo được thì để nguyên một trang
+
   const trang = [];
-  let dang = [], dem = 0;
+  let dang = [];
+
+  /** Thử đổ danh sách đoạn vào tờ đo, xem có tràn không. */
+  const tran = (ds) => {
+    o.innerHTML = ds.map((d) => `<p>${thoat(d)}</p>`).join("");
+    return o.scrollHeight > o.clientHeight + 1;
+  };
 
   for (const d of doan) {
-    // Đoạn vừa vặn thì bỏ nguyên vào trang đang dựng.
-    if (dem + d.length <= SUC_CHUA) {
-      dang.push(d); dem += d.length;
-      continue;
-    }
-    // Đoạn dài quá thì tách theo câu rồi rót dần.
+    if (!tran([...dang, d])) { dang.push(d); continue; }
+
+    // Đoạn này làm tràn. Tách theo câu rồi rót dần cho đầy trang.
     const cau = d.match(/[^.!?…]+[.!?…]*\s*/g) || [d];
     let khuc = "";
     for (const c of cau) {
-      if (dem + khuc.length + c.length > SUC_CHUA && (khuc || dang.length)) {
-        if (khuc) dang.push(khuc.trim());
-        trang.push(dang);
-        dang = []; dem = 0; khuc = "";
-      }
-      khuc += c;
+      const thu = (khuc + c).trim();
+      if (!tran([...dang, thu])) { khuc += c; continue; }
+
+      // Câu này không lọt nữa: chốt trang rồi mở trang mới.
+      if (khuc.trim()) dang.push(khuc.trim());
+      if (dang.length) trang.push(dang);
+      dang = []; khuc = c;
+
+      // Câu dài hơn cả một trang thì đành để nó đứng riêng.
+      if (tran([khuc.trim()])) { trang.push([khuc.trim()]); khuc = ""; }
     }
-    if (khuc.trim()) { dang.push(khuc.trim()); dem += khuc.length; }
+    if (khuc.trim()) dang.push(khuc.trim());
   }
   if (dang.length) trang.push(dang);
+
+  dongToDo();
   return trang.length ? trang : [[]];
+}
+
+/** Tờ giấy ẩn dùng để đo, dựng một lần rồi dùng lại cho cả cuốn sổ. */
+let toDo = null;
+
+/**
+ * Mở tờ giấy đo và trả về vùng chữ của nó.
+ * @returns {HTMLElement|null} Vùng chữ, hoặc null nếu chưa dựng được khung.
+ */
+function moToDo() {
+  const khung = $("giay");
+  if (!khung) return null;
+  if (!toDo) {
+    toDo = document.createElement("div");
+    toDo.style.cssText = "position:absolute;visibility:hidden;pointer-events:none;left:0;top:0;width:100%;height:100%";
+    toDo.innerHTML = `<article class="to-giay tren">
+        <p class="trang-ngay-lon">Thứ sáu</p>
+        <h2 class="trang-tieu">Ngày 04 tháng 9 năm 2026</h2>
+        <div class="trang-noi"></div>
+        <p class="trang-chan">— 1 —</p>
+      </article>`;
+  }
+  khung.appendChild(toDo);
+  return toDo.querySelector(".trang-noi");
+}
+
+/** Cất tờ giấy đo đi sau khi dùng xong. */
+function dongToDo() {
+  if (toDo && toDo.parentNode) toDo.parentNode.removeChild(toDo);
 }
 
 /**
@@ -2754,7 +2722,6 @@ function catTrang(doan) {
  * cùng của ngày ấy, như ảnh dán ở cuối bài viết.
  */
 function veSach() {
-  doSucChua();
   const nhom = nhomTheoNgay();
   cacTrang = [];
 
@@ -2866,7 +2833,7 @@ function latTrang(buoc) {
       cu.remove();
       khung.querySelector(".to-giay").className = "to-giay tren";
       xong();
-    }, 830);
+    }, 730);
   } else {
     // Lật ngược: trang cũ đang gập bên trái, mở trả về.
     khung.insertAdjacentHTML("beforeend", dungToGiay(dich, "tren lat-lui"));
@@ -2875,7 +2842,7 @@ function latTrang(buoc) {
       khung.querySelectorAll(".to-giay").forEach((e) => { if (e !== moi) e.remove(); });
       moi.className = "to-giay tren";
       xong();
-    }, 830);
+    }, 730);
   }
 
   function xong() {
