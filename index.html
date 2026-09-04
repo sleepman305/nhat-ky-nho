@@ -418,6 +418,29 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
 }
 .xem-anh button:active { transform: scale(.88); }
 
+/* Nút hút những câu đã nói bằng Phím tắt lúc máy khoá */
+.nut-hut {
+  display: flex; align-items: center; gap: .85rem;
+  width: 100%; max-width: 22rem; text-align: left;
+  margin-top: .3rem; padding: .85rem 1rem;
+  border: 1px dashed var(--vien); border-radius: 14px;
+  background: var(--mat);
+  transition: transform .2s var(--bat), border-color .2s, box-shadow .2s;
+}
+.nut-hut:hover { border-color: var(--nhan); border-style: solid; box-shadow: var(--bong-1); }
+.nut-hut:active { transform: scale(.98); }
+.nut-hut .hinh {
+  font-size: 1.2rem; line-height: 1;
+  width: 2.4rem; height: 2.4rem; flex: none;
+  display: grid; place-items: center;
+  background: var(--nhan-nen); border-radius: 10px;
+}
+.nut-hut strong { display: block; font-size: .89rem; font-weight: 600; }
+.nut-hut em {
+  display: block; font-style: normal;
+  font-size: .77rem; color: var(--chu-mo); margin-top: .08rem;
+}
+
 /* Lối dẫn sang sổ, chỉ hiện khi hôm nay đã có mẩu ghi */
 .dan-toi-so {
   display: inline-flex; align-items: center; gap: .5rem;
@@ -1153,6 +1176,14 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
         <button class="nut" id="nut-go">⌨ Gõ tay</button>
       </div>
 
+      <button class="nut-hut" id="nut-hut">
+        <span class="hinh" aria-hidden="true">📥</span>
+        <span>
+          <strong>Lấy câu đã nói bằng Phím tắt</strong>
+          <em>Những câu nói lúc máy khoá đang chờ ở đây</em>
+        </span>
+      </button>
+
       <div id="khu-soan" hidden>
         <div class="xem-anh" id="xem-anh" hidden>
           <img id="anh-cho" alt="Ảnh sắp ghi vào nhật ký">
@@ -1868,6 +1899,87 @@ async function moiHomThu() {
   } catch (e) {
     return 0;
   }
+}
+
+/* ------------------------------------------------------------
+   HÚT CÂU TỪ BỘ NHỚ TẠM
+
+   Đây là đường duy nhất vừa ghi được lúc máy khoá, vừa không phải
+   mở trang web nào lên.
+
+   Phím tắt chỉ làm hai việc, cả hai đều chạy ngầm được: nghe anh nói,
+   rồi nối câu vào bộ nhớ tạm theo mẫu
+
+     NKN|2026-09-04 18:30:00|nội dung câu nói
+
+   Nói bao nhiêu câu cũng được, chúng xếp hàng ở đó. Lúc nào mở app,
+   chạm một nút là cả hàng về nhật ký.
+
+   Trình duyệt bắt buộc phải có cú chạm ấy mới cho đọc bộ nhớ tạm —
+   không lách được, nhưng đổi lại lúc ghi thì anh không phải làm gì.
+   ------------------------------------------------------------ */
+
+/** Nhận diện dòng do Phím tắt tạo ra. */
+const MAU_DONG = /^NKN\|(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\|([\s\S]*)$/;
+
+/**
+ * Đọc bộ nhớ tạm, lọc lấy các câu do Phím tắt cất, ghi vào nhật ký.
+ * Dòng nào không đúng mẫu thì bỏ qua, nên anh có lỡ chép thứ khác
+ * vào bộ nhớ tạm cũng không sao.
+ *
+ * @returns {Promise<{them:number, loi:string}>} Số câu đã nhận và lời báo.
+ */
+async function hutBoNhoTam() {
+  if (!navigator.clipboard || !navigator.clipboard.readText) {
+    return { them: 0, loi: "Máy này không cho app đọc bộ nhớ tạm." };
+  }
+
+  let tho = "";
+  try {
+    tho = await navigator.clipboard.readText();
+  } catch (e) {
+    return { them: 0, loi: "Chưa được phép đọc. Chạm lại rồi chọn Dán." };
+  }
+
+  if (!tho || !tho.includes("NKN|")) {
+    return { them: 0, loi: "Không có câu nào đang chờ." };
+  }
+
+  const daCo = new Set(soGhi.map((g) => g.id));
+  let them = 0;
+
+  for (const d of tho.split(/\r?\n/)) {
+    const kh = d.trim().match(MAU_DONG);
+    if (!kh) continue;
+
+    const chu = kh[2].trim();
+    if (!chu) continue;
+
+    // "2026-09-04 18:30:00" — dựng Date theo giờ máy, không lệch múi giờ.
+    const [ng, gi] = kh[1].split(" ");
+    const [nam, thg, ngy] = ng.split("-").map(Number);
+    const [h, p, s] = gi.split(":").map(Number);
+    const luc = new Date(nam, thg - 1, ngy, h, p, s);
+
+    let id = luc.getTime();
+    while (daCo.has(id)) id++;   // hai câu cùng giây thì đẩy lệch, đừng đè nhau
+
+    const m = { id, ngay: maNgay(luc), luc: luc.toISOString(), chu, anh: null };
+    await luuMau(m);
+    soGhi.push(m);
+    daCo.add(id);
+    them++;
+  }
+
+  if (!them) return { them: 0, loi: "Không có câu nào mới." };
+
+  soGhi.sort((a, b) => a.id - b.id);
+
+  // Dọn bộ nhớ tạm để lần sau khỏi nhận lại. Không dọn được cũng không sao,
+  // vì mỗi mẩu đã có mốc thời gian riêng nên không sinh bản trùng.
+  try { await navigator.clipboard.writeText(""); } catch (e) { /* bỏ qua */ }
+
+  return { them, loi: them === 1 ? "Đã nhận 1 câu" : `Đã nhận ${them} câu` };
 }
 
 /**
@@ -2991,6 +3103,26 @@ function ganSuKien() {
   }
 
   $("dan-toi-so").addEventListener("click", () => { ngayDangXem = null; diToi("so"); });
+
+  $("nut-hut").addEventListener("click", async () => {
+    const nut = $("nut-hut");
+    const chuCu = nut.querySelector("strong").textContent;
+    nut.querySelector("strong").textContent = "Đang lấy…";
+
+    const kq = await hutBoNhoTam();
+
+    nut.querySelector("strong").textContent = chuCu;
+    if (kq.them) {
+      veManGhi();
+      if ($("man-so").classList.contains("hien")) {
+        ngayDangXem ? veTrangNgay(ngayDangXem) : veMucLuc();
+      }
+      if (navigator.vibrate) { try { navigator.vibrate(12); } catch (e) {} }
+      baoNgan(kq.loi, "Xem sổ", () => { ngayDangXem = null; diToi("so"); });
+    } else {
+      baoNgan(kq.loi, "", null, 3200);
+    }
+  });
   $("ds-khoa").addEventListener("click", (e) => {
     const n = e.target.closest("[data-kieu]");
     if (!n) return;
