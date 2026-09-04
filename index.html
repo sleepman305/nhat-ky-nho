@@ -13,7 +13,7 @@
 <meta name="theme-color" content="#16283D">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;0,7..72,700;1,7..72,400&family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Dancing+Script:wght@500;600;700&family=Playfair+Display:ital,wght@1,500;1,600;1,700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;0,7..72,700;1,7..72,400&family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Dancing+Script:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;1,400;1,500&family=Quicksand:wght@400;500;600&family=Bitter:ital,wght@0,400;1,400&display=swap">
 
 <style>
 /* ============================================================
@@ -493,6 +493,105 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
 .xem-anh button:active { transform: scale(.88); }
 
 
+
+/* ---- Các ô chọn trong cài đặt ---- */
+
+.luoi-phong { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: .5rem; }
+.chon-phong {
+  border: 1px solid var(--vien); border-radius: 11px;
+  background: var(--mat); padding: .6rem .7rem;
+  text-align: left; line-height: 1.3;
+  transition: border-color .2s, transform .18s var(--bat), box-shadow .2s;
+}
+.chon-phong .thu { display: block; font-size: 1.15rem; color: var(--chu); }
+.chon-phong .ten { display: block; font-size: .7rem; color: var(--chu-mo); margin-top: .15rem; }
+.chon-phong:active { transform: scale(.97); }
+.chon-phong[aria-pressed="true"] { border-color: var(--nhan); box-shadow: 0 0 0 1px var(--nhan); }
+
+.luoi-mau { display: flex; flex-wrap: wrap; gap: .45rem; }
+.chon-mau {
+  width: 2.1rem; height: 2.1rem; border-radius: 50%;
+  border: 2px solid transparent;
+  box-shadow: inset 0 0 0 1px var(--vien);
+  position: relative;
+  transition: transform .18s var(--bat);
+}
+.chon-mau:active { transform: scale(.88); }
+.chon-mau[aria-pressed="true"] { border-color: var(--nhan); }
+.chon-mau.theo-tong {
+  background: linear-gradient(135deg, var(--chu) 50%, var(--mat) 50%);
+}
+
+.thanh-truot {
+  width: 100%; height: 1.6rem; margin: .1rem 0 0;
+  -webkit-appearance: none; appearance: none; background: none;
+}
+.thanh-truot::-webkit-slider-runnable-track {
+  height: 4px; border-radius: 2px; background: var(--mat-2);
+}
+.thanh-truot::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 1.15rem; height: 1.15rem; border-radius: 50%;
+  background: var(--nhan); margin-top: -.42rem;
+  box-shadow: var(--bong-1);
+}
+.thanh-truot::-moz-range-track { height: 4px; border-radius: 2px; background: var(--mat-2); }
+.thanh-truot::-moz-range-thumb {
+  width: 1.15rem; height: 1.15rem; border: none; border-radius: 50%;
+  background: var(--nhan);
+}
+.so-hien { color: var(--nhan); font-family: var(--may); font-size: .76rem; }
+
+.luoi-gach { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: .45rem; }
+.chon-gach {
+  border: 1px solid var(--vien); border-radius: 10px;
+  background: var(--mat); padding: .55rem .4rem;
+  display: flex; flex-direction: column; align-items: center; gap: .25rem;
+  transition: border-color .2s, transform .18s var(--bat);
+}
+.chon-gach:active { transform: scale(.96); }
+.chon-gach[aria-pressed="true"] { border-color: var(--nhan); box-shadow: 0 0 0 1px var(--nhan); }
+.chon-gach .xem {
+  display: flex; align-items: center; justify-content: center; gap: .35rem;
+  color: var(--nhan); font-size: .78rem; height: 1rem;
+}
+.chon-gach .xem i {
+  display: block; height: 1px; width: 1.1rem;
+  background: currentColor; opacity: .55;
+}
+.chon-gach .ten { font-size: .68rem; color: var(--chu-mo); }
+
+.luoi-dang { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: .5rem; }
+.chon-dang {
+  aspect-ratio: 1; border-radius: 10px;
+  border: 1px solid var(--vien); background: var(--mat);
+  display: grid; place-items: center;
+  transition: border-color .2s, transform .18s var(--bat);
+}
+.chon-dang:active { transform: scale(.9); }
+.chon-dang[aria-pressed="true"] { border-color: var(--nhan); box-shadow: 0 0 0 1px var(--nhan); }
+.chon-dang .hinh-mau {
+  width: 1.5rem; height: 1.5rem;
+  background: linear-gradient(160deg, var(--nhan-2), var(--nhan));
+}
+
+/* Bản thu nhỏ của mười hình dạng, để xem trước ngay trong cài đặt */
+.hinh-mau[data-dang="tron"]      { border-radius: 50%; }
+.hinh-mau[data-dang="bo-goc"]    { border-radius: 26%; }
+.hinh-mau[data-dang="giot-nuoc"] { border-radius: 50% 50% 50% 12%; }
+.hinh-mau[data-dang="canh-hoa"]  { border-radius: 62% 38% 55% 45% / 48% 58% 42% 52%; }
+.hinh-mau[data-dang="luc-giac"]  { clip-path: polygon(25% 3%, 75% 3%, 100% 50%, 75% 97%, 25% 97%, 0 50%); }
+.hinh-mau[data-dang="kim-cuong"] { clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+.hinh-mau[data-dang="ngoi-sao"]  { clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); }
+.hinh-mau[data-dang="song-nuoc"] { border-radius: 42% 58% 63% 37% / 52% 44% 56% 48%; }
+.hinh-mau[data-dang="vien-rong"] {
+  background: transparent; border: 2.5px solid var(--nhan); border-radius: 50%;
+}
+.hinh-mau[data-dang="nhat-thuc"] {
+  background: var(--mat); border: 2px solid var(--nhan); border-radius: 50%;
+  box-shadow: inset -7px 0 0 -3px var(--nhan);
+}
+
 /* ---- Câu trích dưới hàng nút ----
    Nét viết tay, ngoặc kép ôm hai đầu, dưới là dải hoa văn.
    Cả khối bấm được: chạm vào là đổi câu khác ngay. */
@@ -563,6 +662,95 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
 
 /* Đang soạn thì giấu câu trích đi, nhường chỗ cho việc viết */
 #khu-soan:not([hidden]) ~ .cau-trich { display: none; }
+
+
+/* ---- Mười hình dạng nút ghi âm ----
+   Phần lớn dựng bằng bo góc; mấy hình có cạnh thì cắt bằng clip-path.
+   Hình nào cắt bằng clip-path thì mất bóng đổ, nên đắp lại bằng một
+   lớp sáng bên trong. */
+
+#nut-noi[data-dang="bo-goc"]    { border-radius: 26%; }
+#nut-noi[data-dang="giot-nuoc"] { border-radius: 50% 50% 50% 12%; }
+#nut-noi[data-dang="canh-hoa"]  { border-radius: 62% 38% 55% 45% / 48% 58% 42% 52%; }
+
+#nut-noi[data-dang="luc-giac"] {
+  border-radius: 8%;
+  clip-path: polygon(25% 3%, 75% 3%, 100% 50%, 75% 97%, 25% 97%, 0 50%);
+  box-shadow: none;
+}
+#nut-noi[data-dang="kim-cuong"] {
+  border-radius: 10%;
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  box-shadow: none;
+}
+#nut-noi[data-dang="ngoi-sao"] {
+  border-radius: 6%;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%,
+                     50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  box-shadow: none;
+}
+#nut-noi[data-dang="song-nuoc"] {
+  border-radius: 42% 58% 63% 37% / 52% 44% 56% 48%;
+  animation: nuocChay 9s ease-in-out infinite;
+}
+@keyframes nuocChay {
+  0%, 100% { border-radius: 42% 58% 63% 37% / 52% 44% 56% 48%; }
+  33%      { border-radius: 58% 42% 38% 62% / 43% 57% 43% 57%; }
+  66%      { border-radius: 36% 64% 57% 43% / 61% 38% 62% 39%; }
+}
+
+/* Viền rỗng: nền trong, chỉ còn vòng viền dày */
+#nut-noi[data-dang="vien-rong"] {
+  background: transparent;
+  border: 3px solid var(--nhan);
+  color: var(--nhan);
+  box-shadow: 0 6px 22px color-mix(in srgb, var(--nhan) 18%, transparent);
+}
+#nut-noi[data-dang="vien-rong"] .song i { background: var(--nhan); }
+
+/* Nhật thực: vành sáng lệch sang một bên như lúc trăng che mặt trời */
+#nut-noi[data-dang="nhat-thuc"] {
+  background: var(--nen);
+  border: 2px solid var(--nhan);
+  color: var(--nhan);
+  box-shadow:
+    inset -14px 0 0 -6px var(--nhan),
+    0 6px 22px color-mix(in srgb, var(--nhan) 22%, transparent);
+}
+#nut-noi[data-dang="nhat-thuc"] .song i { background: var(--nhan); }
+
+@media (prefers-reduced-motion: reduce) {
+  #nut-noi[data-dang="song-nuoc"] { animation: none; }
+}
+
+/* ---- Cỡ chữ, phông chữ, màu chữ do người dùng chọn ---- */
+
+.cau-trich blockquote {
+  font-family: var(--font-quote, var(--tho));
+  font-size: calc(1.32rem * var(--co-quote, 1));
+  font-weight: var(--dam-quote, 400);
+  font-style: var(--nghieng-quote, normal);
+  color: var(--mau-quote, var(--chu));
+}
+.cau-trich .hoa-van span,
+.cau-trich .gach-chu {
+  color: var(--mau-quote, var(--nhan));
+}
+.cau-trich .gach-chu {
+  font-family: var(--font-quote, var(--tho));
+  font-size: calc(.95rem * var(--co-quote, 1));
+  letter-spacing: .12em;
+  opacity: .6;
+  margin-top: .8rem;
+  line-height: 1;
+}
+
+.trang-noi {
+  font-family: var(--font-so, var(--de));
+  font-size: calc(.97rem * var(--co-so, 1));
+  font-style: var(--nghieng-so, normal);
+  color: var(--mau-so, var(--chu));
+}
 
 /* --- Danh sách mẩu ghi, giờ nằm trong sổ --- */
 
@@ -1725,6 +1913,50 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
   <section class="phan"><h3>Tông màu</h3><div class="luoi-chu-de" id="luoi-chu-de"></div></section>
 
   <section class="phan">
+    <h3>Câu trích ở trang Viết</h3>
+
+    <label class="nhan-nho">Kiểu chữ</label>
+    <div class="luoi-phong" id="phong-quote"></div>
+
+    <label class="nhan-nho" style="margin-top:.9rem">Màu chữ</label>
+    <div class="luoi-mau" id="mau-quote"></div>
+
+    <label class="nhan-nho" for="co-quote" style="margin-top:.9rem">
+      Cỡ chữ <span class="so-hien" id="so-co-quote"></span>
+    </label>
+    <input type="range" class="thanh-truot" id="co-quote" min="70" max="180" step="5">
+
+    <label class="nhan-nho" style="margin-top:.9rem">Gạch chân</label>
+    <div class="luoi-gach" id="gach-quote"></div>
+    <input class="o-nhap" id="gach-tu-go" placeholder="Tự gõ, ví dụ  ~ ✦ ~" hidden>
+
+    <label class="nhan-nho" for="giay-doi" style="margin-top:.9rem">
+      Đổi câu sau <span class="so-hien" id="so-giay-doi"></span>
+    </label>
+    <input type="range" class="thanh-truot" id="giay-doi" min="0" max="180" step="15">
+  </section>
+
+  <section class="phan">
+    <h3>Chữ trong sổ Nhật ký nhỏ</h3>
+
+    <label class="nhan-nho">Kiểu chữ</label>
+    <div class="luoi-phong" id="phong-so"></div>
+
+    <label class="nhan-nho" style="margin-top:.9rem">Màu chữ</label>
+    <div class="luoi-mau" id="mau-so"></div>
+
+    <label class="nhan-nho" for="co-so" style="margin-top:.9rem">
+      Cỡ chữ <span class="so-hien" id="so-co-so"></span>
+    </label>
+    <input type="range" class="thanh-truot" id="co-so" min="70" max="150" step="5">
+  </section>
+
+  <section class="phan">
+    <h3>Hình dạng nút ghi âm</h3>
+    <div class="luoi-dang" id="luoi-dang"></div>
+  </section>
+
+  <section class="phan">
     <h3>Khóa nhật ký</h3>
     <div id="ds-khoa"></div>
     <div id="vung-dat-khoa"></div>
@@ -1789,8 +2021,75 @@ const MAC_DINH = {
   bia: "vai-cham",
   tong: "muc",       // sáu tông màu
   cheDo: "may",      // sang | toi | may (theo cài đặt hệ thống)
-  kieuKhoa: "khong", bamKhoa: ""
+  kieuKhoa: "khong", bamKhoa: "",
+
+  // --- Câu trích ---
+  fontQuote: "viet-tay",
+  mauQuote: "",        // rỗng = theo màu chữ của tông
+  coQuote: 1,          // hệ số cỡ chữ
+  gachQuote: "hoa-van",
+  gachTuGo: "",        // dùng khi gachQuote = "tu-go"
+  giayDoi: 30,         // giây; 0 = không tự đổi
+
+  // --- Sổ nhật ký nhỏ ---
+  fontSo: "sach-vo",
+  mauSo: "",
+  coSo: 1,
+
+  // --- Nút ghi âm ---
+  dangNut: "tron"
 };
+
+/** Năm phông chữ cho phép chọn, tất cả đều có đủ dấu tiếng Việt. */
+const PHONG = [
+  { ma: "viet-tay",  ten: "Viết tay",   css: '"Dancing Script", cursive',        canh: 1.32, dam: 400 },
+  { ma: "co-dien",   ten: "Cổ điển",    css: '"Playfair Display", Georgia, serif', canh: 1,  dam: 400, nghieng: 1 },
+  { ma: "sach-vo",   ten: "Sách vở",    css: '"Literata", Georgia, serif',       canh: .97, dam: 400 },
+  { ma: "mem-mai",   ten: "Mềm mại",    css: '"Lora", Georgia, serif',           canh: .99, dam: 400, nghieng: 1 },
+  { ma: "tron-tria", ten: "Tròn trịa",  css: '"Quicksand", system-ui, sans-serif', canh: .98, dam: 500 },
+  { ma: "chac-chan", ten: "Chắc chắn",  css: '"Bitter", Georgia, serif',         canh: .95, dam: 400 }
+];
+
+/** Mười mẫu gạch chân dưới câu trích, cộng một ô tự gõ. */
+const GACH = [
+  { ma: "hoa-van",  ten: "Hoa văn",    kieu: "vach", giua: "❦" },
+  { ma: "sao",      ten: "Ngôi sao",   kieu: "vach", giua: "✦" },
+  { ma: "hoa-thi",  ten: "Bông hoa",   kieu: "vach", giua: "✿" },
+  { ma: "kim-cuong",ten: "Kim cương",  kieu: "vach", giua: "◇" },
+  { ma: "la",       ten: "Chiếc lá",   kieu: "vach", giua: "❧" },
+  { ma: "vach",     ten: "Vạch đơn",   kieu: "chu",  giua: "—————" },
+  { ma: "ba-cham",  ten: "Ba chấm",    kieu: "chu",  giua: "· · ·" },
+  { ma: "ba-sao",   ten: "Ba sao",     kieu: "chu",  giua: "⁂" },
+  { ma: "song",     ten: "Gợn sóng",   kieu: "chu",  giua: "∿∿∿" },
+  { ma: "khong",    ten: "Không có",   kieu: "khong" },
+  { ma: "tu-go",    ten: "Tự gõ",      kieu: "tu-go" }
+];
+
+/** Mười hình dạng cho nút ghi âm. */
+const DANG_NUT = [
+  { ma: "tron",      ten: "Tròn" },
+  { ma: "bo-goc",    ten: "Bo góc" },
+  { ma: "giot-nuoc", ten: "Giọt nước" },
+  { ma: "canh-hoa",  ten: "Cánh hoa" },
+  { ma: "luc-giac",  ten: "Lục giác" },
+  { ma: "kim-cuong", ten: "Kim cương" },
+  { ma: "vien-rong", ten: "Viền rỗng" },
+  { ma: "nhat-thuc", ten: "Nhật thực" },
+  { ma: "song-nuoc", ten: "Sóng nước" },
+  { ma: "ngoi-sao",  ten: "Ngôi sao" }
+];
+
+/** Vài màu chữ pha sẵn cho câu trích và trang sổ. */
+const MAU_CHU = [
+  { ma: "",        ten: "Theo tông", mau: "" },
+  { ma: "nhan",    ten: "Màu nhấn",  mau: "var(--nhan)" },
+  { ma: "vang",    ten: "Vàng kim",  mau: "#C9A227" },
+  { ma: "hong",    ten: "Hồng phấn", mau: "#D97A93" },
+  { ma: "lam",     ten: "Xanh lam",  mau: "#4A7FB5" },
+  { ma: "tim",     ten: "Tím nhạt",  mau: "#9B7BC7" },
+  { ma: "luc",     ten: "Xanh lá",   mau: "#5F9E63" },
+  { ma: "cam",     ten: "Cam đất",   mau: "#C87A46" }
+];
 const KHOA_CH = "nhat-ky-nho:cau-hinh";
 let ch = { ...MAC_DINH };
 
@@ -2799,6 +3098,24 @@ const CAU_TRICH = [
   "Ở hiền gặp lành."
 ];
 
+/**
+ * Dựng phần gạch chân dưới câu trích theo mẫu anh chọn.
+ * @returns {string} HTML, hoặc chuỗi rỗng nếu chọn "không có".
+ */
+function veGachChan() {
+  const g = GACH.find((x) => x.ma === ch.gachQuote) || GACH[0];
+
+  if (g.kieu === "khong") return "";
+  if (g.kieu === "tu-go") {
+    const tu = (ch.gachTuGo || "").trim();
+    return tu ? `<div class="gach-chu" aria-hidden="true">${thoat(tu)}</div>` : "";
+  }
+  if (g.kieu === "chu") {
+    return `<div class="gach-chu" aria-hidden="true">${g.giua}</div>`;
+  }
+  return `<div class="hoa-van" aria-hidden="true"><i></i><span>${g.giua}</span><i></i></div>`;
+}
+
 /** Câu vừa hiện, để lần sau không rút trúng ngay câu đó. */
 let cauVua = -1;
 
@@ -2811,10 +3128,7 @@ function veCauTrich() {
   if (CAU_TRICH.length > 1 && i === cauVua) i = (i + 1) % CAU_TRICH.length;
   cauVua = i;
 
-  o.innerHTML = `<blockquote>“${thoat(CAU_TRICH[i])}”</blockquote>
-    <div class="hoa-van" aria-hidden="true">
-      <i></i><span>❦</span><i></i>
-    </div>`;
+  o.innerHTML = `<blockquote>“${thoat(CAU_TRICH[i])}”</blockquote>${veGachChan()}`;
   o.classList.remove("hien-len");
   void o.offsetWidth;
   o.classList.add("hien-len");
@@ -2827,6 +3141,8 @@ let gioDoiCau = null;
 /** Hẹn nửa phút nữa đổi sang câu khác. */
 function henDoiCau() {
   if (gioDoiCau) clearTimeout(gioDoiCau);
+  const cho = Number(ch.giayDoi);
+  if (!cho) return;   // anh chọn không tự đổi
   gioDoiCau = setTimeout(() => {
     // Chỉ đổi khi đang ở trang Viết và không vướng việc gì.
     if ($("man-ghi").classList.contains("hien") &&
@@ -2835,7 +3151,7 @@ function henDoiCau() {
     } else {
       henDoiCau();
     }
-  }, 30000);
+  }, cho * 1000);
 }
 
 /* ============================================================
@@ -3687,11 +4003,38 @@ function cheDoThuc() {
     ? "toi" : "sang";
 }
 
+/**
+ * Đổ các lựa chọn về phông, cỡ, màu chữ vào biến CSS.
+ * Gọi mỗi lần anh đổi cài đặt, để giao diện đổi theo ngay.
+ */
+function apKieuChu() {
+  const g = document.documentElement.style;
+
+  const q = PHONG.find((f) => f.ma === ch.fontQuote) || PHONG[0];
+  g.setProperty("--font-quote", q.css);
+  g.setProperty("--co-quote", (ch.coQuote || 1) * (q.canh || 1));
+  g.setProperty("--dam-quote", q.dam || 400);
+  g.setProperty("--nghieng-quote", q.nghieng ? "italic" : "normal");
+  const mq = MAU_CHU.find((m) => m.ma === ch.mauQuote);
+  g.setProperty("--mau-quote", ch.mauQuote && mq ? mq.mau : "var(--chu)");
+
+  const t = PHONG.find((f) => f.ma === ch.fontSo) || PHONG[2];
+  g.setProperty("--font-so", t.css);
+  g.setProperty("--co-so", (ch.coSo || 1) * (t.canh || 1));
+  g.setProperty("--nghieng-so", t.nghieng ? "italic" : "normal");
+  const ms = MAU_CHU.find((m) => m.ma === ch.mauSo);
+  g.setProperty("--mau-so", ch.mauSo && ms ? ms.mau : "var(--chu)");
+
+  const n = $("nut-noi");
+  if (n) n.dataset.dang = ch.dangNut || "tron";
+}
+
 /** Áp tông màu, chế độ sáng tối và bìa hiện tại lên toàn trang. */
 function apDienMao() {
   const g = document.documentElement;
   g.dataset.tong = ch.tong;
   g.dataset.cheDo = cheDoThuc();
+  apKieuChu();
   $("bia-chinh").dataset.bia = ch.bia;
   $("bia-ten").textContent = ch.tenSach || "Nhật ký nhỏ";
   $("bia-nguoi").textContent = ch.nguoi || "";
@@ -3766,7 +4109,7 @@ function moCai() {
   $("nhap-ten").value = ch.tenSach;
   $("nhap-nguoi").value = ch.nguoi;
   $("nhap-cham").value = ch.chamNgon;
-  veLuoiBia(); veCheDo(); veLuoiTong(); veKhuKhoa();
+  veLuoiBia(); veCheDo(); veLuoiTong(); veKhuChuNghia(); veKhuKhoa();
   const soAnh = soGhi.filter((g) => g.anh).length;
   $("mo-ta-kho").textContent = soGhi.length
     ? `${soGhi.length} mẩu ghi, ${nhomTheoNgay().size} ngày, ${soAnh} ảnh.`
@@ -3800,6 +4143,79 @@ function veLuoiTong() {
       <span class="dai-mau">${bo.map((m) => `<i style="background:${m}"></i>`).join("")}</span>
       <span class="ten">${c.ten}</span></button>`;
   }).join("");
+}
+
+
+/* ------------------------------------------------------------
+   CÁC Ô CHỌN VỀ CHỮ NGHĨA TRONG CÀI ĐẶT
+   ------------------------------------------------------------ */
+
+/**
+ * Vẽ lưới chọn phông chữ. Mỗi ô hiện một câu mẫu bằng chính phông ấy,
+ * để anh thấy trước chứ không phải đoán qua tên gọi.
+ * @param {string} oId Id khung chứa.
+ * @param {string} dang Mã phông đang chọn.
+ */
+function veLuoiPhong(oId, dang) {
+  $(oId).innerHTML = PHONG.map((f) =>
+    `<button class="chon-phong" data-phong="${f.ma}" aria-pressed="${f.ma === dang}">
+      <span class="thu" style="font-family:${f.css};font-style:${f.nghieng ? "italic" : "normal"};font-weight:${f.dam}">Một ngày bình yên</span>
+      <span class="ten">${f.ten}</span>
+    </button>`).join("");
+}
+
+/** Vẽ hàng chấm màu chữ. */
+function veLuoiMau(oId, dang) {
+  $(oId).innerHTML = MAU_CHU.map((m) =>
+    `<button class="chon-mau${m.ma ? "" : " theo-tong"}" data-mau="${m.ma}"
+      aria-pressed="${m.ma === (dang || "")}" title="${m.ten}"
+      ${m.mau ? `style="background:${m.mau}"` : ""}></button>`).join("");
+}
+
+/** Vẽ lưới chọn kiểu gạch chân, mỗi ô xem trước được. */
+function veLuoiGach() {
+  $("gach-quote").innerHTML = GACH.map((g) => {
+    let xem;
+    if (g.kieu === "vach") xem = `<i></i><span>${g.giua}</span><i></i>`;
+    else if (g.kieu === "chu") xem = `<span>${g.giua}</span>`;
+    else if (g.kieu === "khong") xem = `<span style="opacity:.4">–</span>`;
+    else xem = `<span style="opacity:.6">abc</span>`;
+    return `<button class="chon-gach" data-gach="${g.ma}" aria-pressed="${g.ma === ch.gachQuote}">
+      <span class="xem">${xem}</span><span class="ten">${g.ten}</span></button>`;
+  }).join("");
+
+  const tuGo = ch.gachQuote === "tu-go";
+  $("gach-tu-go").hidden = !tuGo;
+  if (tuGo) $("gach-tu-go").value = ch.gachTuGo || "";
+}
+
+/** Vẽ lưới mười hình dạng nút ghi âm. */
+function veLuoiDang() {
+  $("luoi-dang").innerHTML = DANG_NUT.map((d) =>
+    `<button class="chon-dang" data-dang-nut="${d.ma}" aria-pressed="${d.ma === ch.dangNut}" title="${d.ten}">
+      <span class="hinh-mau" data-dang="${d.ma}"></span>
+    </button>`).join("");
+}
+
+/** Đổ giá trị vào các thanh trượt và nhãn số bên cạnh. */
+function veThanhTruot() {
+  $("co-quote").value = Math.round((ch.coQuote || 1) * 100);
+  $("so-co-quote").textContent = Math.round((ch.coQuote || 1) * 100) + "%";
+  $("co-so").value = Math.round((ch.coSo || 1) * 100);
+  $("so-co-so").textContent = Math.round((ch.coSo || 1) * 100) + "%";
+  $("giay-doi").value = ch.giayDoi;
+  $("so-giay-doi").textContent = ch.giayDoi ? ch.giayDoi + " giây" : "không tự đổi";
+}
+
+/** Vẽ lại toàn bộ khu chọn chữ nghĩa trong cài đặt. */
+function veKhuChuNghia() {
+  veLuoiPhong("phong-quote", ch.fontQuote);
+  veLuoiPhong("phong-so", ch.fontSo);
+  veLuoiMau("mau-quote", ch.mauQuote);
+  veLuoiMau("mau-so", ch.mauSo);
+  veLuoiGach();
+  veLuoiDang();
+  veThanhTruot();
 }
 
 const KIEU_KHOA = [
@@ -4507,6 +4923,84 @@ function ganSuKien() {
     const n = e.target.closest("[data-kieu]");
     if (!n) return;
     ch.kieuKhoa = n.dataset.kieu; ch.bamKhoa = ""; luuCauHinh(); veKhuKhoa();
+  });
+
+
+  /* --- Chữ nghĩa: phông, màu, cỡ, gạch chân, hình nút --- */
+
+  /** Lưu lựa chọn rồi cập nhật giao diện ngay, khỏi phải đóng cài đặt. */
+  const chonXong = (veLai) => {
+    luuCauHinh();
+    apKieuChu();
+    if (veLai) veLai();
+    if ($("man-ghi").classList.contains("hien")) veCauTrich();
+  };
+
+  $("phong-quote").addEventListener("click", (e) => {
+    const n = e.target.closest("[data-phong]");
+    if (!n) return;
+    ch.fontQuote = n.dataset.phong;
+    chonXong(() => veLuoiPhong("phong-quote", ch.fontQuote));
+  });
+
+  $("phong-so").addEventListener("click", (e) => {
+    const n = e.target.closest("[data-phong]");
+    if (!n) return;
+    ch.fontSo = n.dataset.phong;
+    chonXong(() => veLuoiPhong("phong-so", ch.fontSo));
+  });
+
+  $("mau-quote").addEventListener("click", (e) => {
+    const n = e.target.closest("[data-mau]");
+    if (!n) return;
+    ch.mauQuote = n.dataset.mau;
+    chonXong(() => veLuoiMau("mau-quote", ch.mauQuote));
+  });
+
+  $("mau-so").addEventListener("click", (e) => {
+    const n = e.target.closest("[data-mau]");
+    if (!n) return;
+    ch.mauSo = n.dataset.mau;
+    chonXong(() => veLuoiMau("mau-so", ch.mauSo));
+  });
+
+  $("gach-quote").addEventListener("click", (e) => {
+    const n = e.target.closest("[data-gach]");
+    if (!n) return;
+    ch.gachQuote = n.dataset.gach;
+    chonXong(veLuoiGach);
+  });
+
+  $("gach-tu-go").addEventListener("input", (e) => {
+    ch.gachTuGo = e.target.value;
+    chonXong(null);
+  });
+
+  $("luoi-dang").addEventListener("click", (e) => {
+    const n = e.target.closest("[data-dang-nut]");
+    if (!n) return;
+    ch.dangNut = n.dataset.dangNut;
+    chonXong(veLuoiDang);
+  });
+
+  $("co-quote").addEventListener("input", (e) => {
+    ch.coQuote = Number(e.target.value) / 100;
+    $("so-co-quote").textContent = e.target.value + "%";
+    luuCauHinh(); apKieuChu();
+  });
+
+  $("co-so").addEventListener("input", (e) => {
+    ch.coSo = Number(e.target.value) / 100;
+    $("so-co-so").textContent = e.target.value + "%";
+    luuCauHinh(); apKieuChu();
+  });
+
+  $("giay-doi").addEventListener("input", (e) => {
+    ch.giayDoi = Number(e.target.value);
+    $("so-giay-doi").textContent = ch.giayDoi ? ch.giayDoi + " giây" : "không tự đổi";
+    luuCauHinh();
+    if (gioDoiCau) { clearTimeout(gioDoiCau); gioDoiCau = null; }
+    henDoiCau();
   });
 
   $("nut-xuat").addEventListener("click", xuatRaFile);
