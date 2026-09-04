@@ -334,23 +334,46 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
 
 #nut-noi {
   position: relative; z-index: 2;
-  width: 7.2rem; height: 7.2rem;
+  width: 6.6rem; height: 6.6rem;
   border-radius: 50%;
   background: linear-gradient(160deg, var(--nhan-2), var(--nhan));
   color: #fff;
   display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: .25rem;
+  align-items: center; justify-content: center;
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.28),
     0 6px 18px color-mix(in srgb, var(--nhan) 34%, transparent),
     0 14px 40px color-mix(in srgb, var(--nhan) 22%, transparent);
   transition: transform .22s var(--bat), box-shadow .3s var(--muot);
-  font-weight: 600; font-size: .86rem; letter-spacing: -.005em;
 }
 :root[data-tong="than-chi"] #nut-noi { color: var(--nen); }
 #nut-noi .bieu {
   display: grid; place-items: center;
-  transition: transform .25s var(--bat);
+  transition: transform .3s var(--bat), opacity .25s;
+}
+#nut-noi.dang-nghe .bieu { opacity: 0; transform: scale(.6); position: absolute; }
+
+/* Năm vạch sóng nhấp nhô — chỉ hiện khi đang nghe */
+#nut-noi .song {
+  display: none; align-items: center; gap: .28rem; height: 2.2rem;
+}
+#nut-noi.dang-nghe .song { display: flex; }
+#nut-noi .song i {
+  display: block; width: .26rem; border-radius: 999px;
+  background: currentColor;
+  animation: vachSong 1s ease-in-out infinite;
+}
+#nut-noi .song i:nth-child(1) { height: .8rem;  animation-delay: 0s; }
+#nut-noi .song i:nth-child(2) { height: 1.5rem; animation-delay: .16s; }
+#nut-noi .song i:nth-child(3) { height: 2.1rem; animation-delay: .32s; }
+#nut-noi .song i:nth-child(4) { height: 1.5rem; animation-delay: .48s; }
+#nut-noi .song i:nth-child(5) { height: .8rem;  animation-delay: .64s; }
+@keyframes vachSong {
+  0%, 100% { transform: scaleY(.35); opacity: .55; }
+  50%      { transform: scaleY(1);   opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #nut-noi .song i { animation: none; }
 }
 #nut-noi .bieu svg {
   width: 2rem; height: 2rem;
@@ -369,11 +392,7 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
     0 8px 24px color-mix(in srgb, var(--nhan) 46%, transparent),
     0 18px 52px color-mix(in srgb, var(--nhan) 30%, transparent);
 }
-#nut-noi.dang-nghe { animation: tho 1.8s ease-in-out infinite; }
-@keyframes tho {
-  0%, 100% { transform: scale(1.02); }
-  50%      { transform: scale(1.07); }
-}
+
 
 /* Ba nút phụ: chỉ còn biểu tượng, tròn đều nhau */
 .hang-phu { display: flex; gap: .85rem; }
@@ -491,13 +510,13 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
 .mau {
   display: grid;
   grid-template-columns: 3.4rem minmax(0, 1fr);
-  gap: 0 .95rem;
+  gap: 0 1.35rem;
   padding: .8rem 0;
   position: relative;
 }
 .mau::before {
   content: ""; position: absolute;
-  left: 3.05rem; top: 1.55rem; bottom: -.8rem;
+  left: 4.075rem; top: 1.55rem; bottom: -.8rem;
   width: 1px; background: var(--vien-mo);
 }
 .mau:last-child::before { display: none; }
@@ -508,9 +527,10 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
   font-variant-numeric: tabular-nums;
   text-align: right; position: relative;
 }
+/* Chấm nằm đúng giữa khoảng trống hai cột, không lấn sang chữ */
 .mau .gio::after {
   content: ""; position: absolute;
-  right: -1.17rem; top: .5rem;
+  right: -.885rem; top: .52rem;
   width: .42rem; height: .42rem; border-radius: 50%;
   background: var(--nhan);
   box-shadow: 0 0 0 3px var(--nen);
@@ -518,7 +538,8 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
 
 .mau .loi {
   font-family: var(--de); font-size: 1rem; line-height: 1.7;
-  margin: 0; text-wrap: pretty; overflow-wrap: anywhere;
+  margin: 0; overflow-wrap: anywhere;
+  text-align: justify; hyphens: auto;
 }
 .mau img {
   display: block; width: 100%; max-width: 15rem;
@@ -1359,7 +1380,7 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
 
     <div class="san-ghi">
       <div class="o-nut">
-        <button id="nut-noi">
+        <button id="nut-noi" aria-label="Ghi bằng giọng nói">
           <span class="bieu" aria-hidden="true">
             <svg viewBox="0 0 24 24">
               <rect x="9" y="2.6" width="6" height="11.2" rx="3"/>
@@ -1367,7 +1388,7 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
               <path d="M12 19.8v2.1"/>
             </svg>
           </span>
-          <span id="chu-nut-noi">Chạm để nói</span>
+          <span class="song" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
         </button>
       </div>
 
@@ -1860,7 +1881,27 @@ function dongKhuSoan() {
   boAnhCho();
   dangSua = null;
   $("nut-luu").textContent = "Ghi vào nhật ký";
-  $("chu-nut-noi").textContent = "Chạm để nói";
+}
+
+/**
+ * Thời gian im lặng trước khi tự tắt micro, tính bằng mili giây.
+ * Năm giây: đủ để anh nghĩ giữa câu, chưa đủ lâu để thành đãng trí.
+ */
+const IM_LANG_TOI_DA = 5000;
+
+/** Chuỗi chữ đã chốt trong lần ghi này, tách khỏi phần anh tự gõ. */
+let chuChot = "";
+
+/** Phần chữ có sẵn trong ô trước khi bật micro. */
+let chuCu = "";
+
+/** Bộ đếm im lặng. */
+let gioImLang = null;
+
+/** Hẹn lại giờ tắt máy sau mỗi lần nghe được tiếng. */
+function hoanTatMic() {
+  if (gioImLang) clearTimeout(gioImLang);
+  gioImLang = setTimeout(() => { if (dangNghe) dungNghe(); }, IM_LANG_TOI_DA);
 }
 
 /** Bật micro và đổ chữ thẳng vào ô soạn khi anh nói. */
@@ -1879,35 +1920,63 @@ function batDauNghe() {
   mayNghe.continuous = true;
   mayNghe.interimResults = true;
 
-  // Giữ lại phần đã gõ trước đó để lời nói nối vào chứ không đè lên.
-  const daCo = $("o-loi").value;
-  let chot = "";
+  chuCu = $("o-loi").value;
+  chuChot = "";
 
   mayNghe.onresult = (sk) => {
     let tam = "";
     for (let i = sk.resultIndex; i < sk.results.length; i++) {
       const doan = sk.results[i][0].transcript;
-      if (sk.results[i].isFinal) chot += doan;
-      else tam += doan;
+      if (sk.results[i].isFinal) {
+        // Bộ nhận giọng trả về từng khúc trần trụi, không kèm dấu cách.
+        // Không tự chèn thì các khúc dính liền thành một chữ dài vô nghĩa.
+        chuChot = noiCoCach(chuChot, doan);
+      } else {
+        tam = noiCoCach(tam, doan);
+      }
     }
-    $("o-loi").value = (daCo ? daCo + " " : "") + chot + tam;
+    datChuVaoO(noiCoCach(noiCoCach(chuCu, chuChot), tam));
+    hoanTatMic();
   };
 
   mayNghe.onerror = () => dungNghe();
-  mayNghe.onend = () => {
-    dangNghe = false;
-    $("nut-noi").classList.remove("dang-nghe");
-    $("chu-nut-noi").textContent = "Nói tiếp";
-  };
+  mayNghe.onend = () => dungNghe();
 
   try {
     mayNghe.start();
     dangNghe = true;
     $("nut-noi").classList.add("dang-nghe");
-    $("chu-nut-noi").textContent = "Đang nghe…";
+    hoanTatMic();
   } catch (e) {
     dangNghe = false;
   }
+}
+
+/**
+ * Nối hai mẩu chữ, tự thêm dấu cách khi cần.
+ * Không thêm cách sau dấu mở ngoặc hay trước dấu chấm câu.
+ * @param {string} a Phần đứng trước.
+ * @param {string} b Phần nối vào.
+ * @returns {string}
+ */
+function noiCoCach(a, b) {
+  if (!a) return b;
+  if (!b) return a;
+  if (/\s$/.test(a) || /^\s/.test(b)) return a + b;
+  if (/[([{"'“‘]$/.test(a)) return a + b;
+  if (/^[,.;:!?)\]}"'”’]/.test(b)) return a + b;
+  return a + " " + b;
+}
+
+/**
+ * Đặt chữ vào ô soạn rồi cuộn xuống dòng cuối.
+ * Không cuộn thì chữ mới chạy khuất dưới đáy ô, anh nói mà không thấy gì.
+ * @param {string} chu
+ */
+function datChuVaoO(chu) {
+  const o = $("o-loi");
+  o.value = chu;
+  o.scrollTop = o.scrollHeight;
 }
 
 /**
@@ -1917,6 +1986,7 @@ function batDauNghe() {
  * `onend` của máy cũ sẽ bắn muộn và tắt luôn lần ghi mới vừa bật.
  */
 function dungNghe() {
+  if (gioImLang) { clearTimeout(gioImLang); gioImLang = null; }
   if (mayNghe) {
     try {
       mayNghe.onresult = null;
@@ -3354,6 +3424,14 @@ function ganSuKien() {
     else $("o-loi").focus();
   });
 
+  // Anh tự gõ hoặc bôi đen sửa giữa lúc đang nói: lấy đó làm mốc mới,
+  // nếu không phần vừa sửa sẽ bị bản chụp cũ ghi đè lên.
+  $("o-loi").addEventListener("input", () => {
+    if (!dangNghe) return;
+    chuCu = $("o-loi").value;
+    chuChot = "";
+  });
+
   $("nut-luu").addEventListener("click", ghiVaoSo);
   $("nut-huy").addEventListener("click", dongKhuSoan);
 
@@ -3564,11 +3642,6 @@ apDienMao();
 veThanhDuoi("ghi");
 ganSuKien();
 
-if (!BoNghe) {
-  // Không có bộ nhận giọng thì nút vẫn dùng được, chỉ đổi lời mời:
-  // chạm nút sẽ mở ô gõ, anh bấm micro trên bàn phím iPhone là xong.
-  $("chu-nut-noi").textContent = "Chạm để viết";
-}
 
 (async () => {
   soGhi = await docHet();
