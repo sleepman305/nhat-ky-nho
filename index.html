@@ -817,7 +817,7 @@ button.lich-o:active { transform: scale(.88); }
 .khu-sach {
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  gap: 1.1rem; padding: .9rem 1rem .4rem;
+  gap: 1.1rem; padding: .8rem .8rem .4rem;
   /* Điểm nhìn gần hơn thì tờ giấy nghiêng ra trông có khối hẳn.
      Hạ điểm nhìn lên cao một chút, như đang cúi xuống quyển sổ. */
   perspective: 1150px;
@@ -838,11 +838,11 @@ button.lich-o:active { transform: scale(.88); }
 
 .quyen {
   display: flex; flex-direction: column; align-items: center;
-  width: 100%; height: 100%;
+  width: 100%; height: 100%; gap: .7rem;
   animation: moSo .55s var(--muot) both;
 }
 /* Khoảng trống co giãn đẩy cụm nút xuống tận đáy */
-.quyen .giay { margin-bottom: auto; }
+/* Giấy tự giãn, không cần khoảng trống đẩy nữa. */
 @keyframes moSo {
   from { opacity: 0; transform: rotateY(-24deg) scale(.94); }
   to   { opacity: 1; transform: none; }
@@ -851,8 +851,12 @@ button.lich-o:active { transform: scale(.88); }
 /* Khối giấy: các trang xếp chồng, lật quanh mép trái */
 .giay {
   position: relative;
-  width: min(22rem, 88vw);
-  aspect-ratio: 3 / 4.1;
+  width: min(22rem, 92vw);
+  /* Trước đây khoá tỷ lệ 3/4.1 nên tờ giấy lùn, phí mất khoảng trống
+     phía dưới. Giờ cho nó cao hết chỗ còn lại, chứa được nhiều chữ hơn
+     mà vẫn chừa đúng chỗ cho cụm nút. */
+  flex: 1 1 auto;
+  min-height: 0;
   transform-style: preserve-3d;
   /* Khoá bố cục lại: thêm bớt tờ giấy giữa chừng mà không khoá thì
      cả khung tính lại kích thước, sinh ra cú giật ngay đầu hiệu ứng. */
@@ -999,6 +1003,44 @@ button.lich-o:active { transform: scale(.88); }
 .dieu-sach {
   display: flex; align-items: center; gap: 1.2rem;
   margin-bottom: .35rem;
+}
+
+/* Nút sửa nép ở góc tờ giấy, mờ đi cho khỏi chiếm mắt lúc đang đọc */
+.nut-sua-trang {
+  position: absolute; top: .7rem; right: .7rem;
+  width: 1.9rem; height: 1.9rem; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--mat-2);
+  opacity: .45;
+  transition: opacity .2s, transform .18s var(--bat), background .2s;
+}
+.nut-sua-trang svg {
+  width: .95rem; height: .95rem;
+  fill: none; stroke: var(--chu-nhat);
+  stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+}
+.nut-sua-trang:hover { opacity: 1; background: var(--nhan-nen); }
+.nut-sua-trang:active { transform: scale(.88); }
+
+/* Đang sửa: vùng chữ sáng lên và có viền, để anh biết mình đang gõ vào đâu */
+.trang-noi[contenteditable="true"],
+.trang-noi[contenteditable="plaintext-only"] {
+  outline: none;
+  background: color-mix(in srgb, var(--nhan) 5%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--nhan) 30%, transparent);
+  border-radius: 6px;
+  padding: .35rem .45rem;
+  margin: -.35rem -.45rem;
+  overflow-y: auto;
+}
+.to-giay.dang-sua { z-index: 6; }
+.to-giay.dang-sua .nut-sua-trang { opacity: 1; background: var(--nhan); }
+.to-giay.dang-sua .nut-sua-trang svg { stroke: #fff; }
+:root[data-tong="than-chi"] .to-giay.dang-sua .nut-sua-trang svg { stroke: var(--nen); }
+
+/* Thanh nút khi đang sửa, thay chỗ cụm lật trang */
+.thanh-sua {
+  display: flex; gap: .6rem; align-items: center;
 }
 .nut-lat {
   width: 2.6rem; height: 2.6rem; border-radius: 50%;
@@ -1563,10 +1605,14 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
     <!-- Sổ đã mở: các trang lật -->
     <div class="quyen" id="quyen" hidden>
       <div class="giay" id="giay"></div>
-      <div class="dieu-sach">
+      <div class="dieu-sach" id="dieu-sach">
         <button class="nut-lat" id="lat-lui" aria-label="Trang trước">‹</button>
         <span class="so-trang" id="so-trang"></span>
         <button class="nut-lat" id="lat-toi" aria-label="Trang sau">›</button>
+      </div>
+      <div class="thanh-sua" id="thanh-sua" hidden>
+        <button class="nut chinh" id="sua-xong">Xong</button>
+        <button class="nut" id="sua-thoi">Bỏ sửa</button>
       </div>
       <button class="nut nho dong-so" id="dong-so">Gấp sổ lại</button>
     </div>
@@ -2601,6 +2647,39 @@ let trangDangMo = 0;
 let dangLat = false;
 
 /**
+ * Ghép các mẩu ghi thành đoạn văn, MỖI MẨU BỌC TRONG MỘT THẺ MANG ID.
+ *
+ * Nhìn thì vẫn liền mạch như một bài viết, nhưng bên trong từng câu vẫn
+ * nhớ nó thuộc mẩu ghi nào. Nhờ vậy anh sửa chữ ngay trên trang sổ thì
+ * app biết phải cập nhật đúng mẩu, không đụng tới mốc thời gian.
+ *
+ * @param {Array} ds Các mẩu ghi trong một ngày, theo thứ tự thời gian.
+ * @returns {Array<Array<{id:number, chu:string}>>} Các đoạn, mỗi đoạn là
+ *   danh sách mẩu góp mặt trong đó.
+ */
+function nguyenLoiCoDau(ds) {
+  const co = ds.filter((g) => g.chu && g.chu.trim());
+  if (!co.length) return [];
+
+  const doan = [];
+  let cum = [], truoc = null;
+
+  for (const g of co) {
+    const d = new Date(g.luc);
+    let x = g.chu.trim();
+    if (!/[.!?…]$/.test(x)) x += ".";
+
+    if (truoc && (d - truoc) / 60000 > 120 && cum.length) {
+      doan.push(cum); cum = [];
+    }
+    cum.push({ id: g.id, chu: x });
+    truoc = d;
+  }
+  if (cum.length) doan.push(cum);
+  return doan;
+}
+
+/**
  * Ghép các mẩu ghi trong ngày thành những đoạn văn, giữ nguyên từng chữ.
  *
  * Máy không thêm lời dẫn, không thêm giờ, không sửa câu nào. Việc duy nhất
@@ -2654,36 +2733,44 @@ function catTrang(doan) {
   const trang = [];
   let dang = [];
 
-  /** Thử đổ danh sách đoạn vào tờ đo, xem có tràn không. */
+  /** Thử đổ danh sách đoạn vào tờ đo, xem có tràn khỏi mép không. */
   const tran = (ds) => {
-    o.innerHTML = ds.map((d) => `<p>${thoat(d)}</p>`).join("");
+    o.innerHTML = veCacDoan(ds);
     return o.scrollHeight > o.clientHeight + 1;
   };
 
   for (const d of doan) {
     if (!tran([...dang, d])) { dang.push(d); continue; }
 
-    // Đoạn này làm tràn. Tách theo câu rồi rót dần cho đầy trang.
-    const cau = d.match(/[^.!?…]+[.!?…]*\s*/g) || [d];
-    let khuc = "";
-    for (const c of cau) {
-      const thu = (khuc + c).trim();
-      if (!tran([...dang, thu])) { khuc += c; continue; }
-
-      // Câu này không lọt nữa: chốt trang rồi mở trang mới.
-      if (khuc.trim()) dang.push(khuc.trim());
+    // Đoạn này làm tràn: rót từng mẩu một cho tới khi hết chỗ.
+    let cum = [];
+    for (const m of d) {
+      if (!tran([...dang, [...cum, m]])) { cum.push(m); continue; }
+      if (cum.length) dang.push(cum);
       if (dang.length) trang.push(dang);
-      dang = []; khuc = c;
-
-      // Câu dài hơn cả một trang thì đành để nó đứng riêng.
-      if (tran([khuc.trim()])) { trang.push([khuc.trim()]); khuc = ""; }
+      dang = []; cum = [m];
+      // Mẩu dài hơn cả một trang thì đành để nó đứng riêng.
+      if (tran([cum])) { trang.push([cum]); cum = []; }
     }
-    if (khuc.trim()) dang.push(khuc.trim());
+    if (cum.length) dang.push(cum);
   }
   if (dang.length) trang.push(dang);
 
   dongToDo();
   return trang.length ? trang : [[]];
+}
+
+/**
+ * Dựng HTML các đoạn văn, mỗi mẩu ghi bọc trong một thẻ mang id riêng.
+ * @param {Array<Array<{id:number, chu:string}>>} doan
+ * @returns {string}
+ */
+function veCacDoan(doan) {
+  return doan.map((cum) =>
+    `<p>` + cum.map((m) =>
+      `<span class="mau-chu" data-id="${m.id}">${thoat(m.chu)}</span>`
+    ).join(" ") + `</p>`
+  ).join("");
 }
 
 /** Tờ giấy ẩn dùng để đo, dựng một lần rồi dùng lại cho cả cuốn sổ. */
@@ -2727,7 +2814,7 @@ function veSach() {
 
   for (const ma of [...nhom.keys()].sort()) {
     const ds = nhom.get(ma);
-    const cac = catTrang(nguyenLoi(ds));
+    const cac = catTrang(nguyenLoiCoDau(ds));
     const anh = ds.filter((g) => urlCuaAnh(g));
 
     cac.forEach((doan, i) => {
@@ -2780,9 +2867,7 @@ function dungToGiay(i, lop) {
   // các trang sau ghi "tiếp theo" cho khỏi tưởng sang ngày khác.
   const dau = tr.phan === 1;
 
-  let noi = tr.doan.length
-    ? tr.doan.map((d) => `<p>${thoat(d)}</p>`).join("")
-    : "";
+  let noi = tr.doan.length ? veCacDoan(tr.doan) : "";
 
   if (tr.anh.length) {
     noi += `<div class="anh-dan">` + tr.anh.map((g) =>
@@ -2798,8 +2883,112 @@ function dungToGiay(i, lop) {
          <h2 class="trang-tieu mo">Ngày ${String(t.ngay).padStart(2, "0")} tháng ${t.thang}</h2>`}
     <div class="trang-noi">${noi}</div>
     <p class="trang-chan">${tr.tong > 1 ? `${tr.phan}/${tr.tong} · ` : ""}— ${i + 1} —</p>
+    ${tr.doan.length ? `<button class="nut-sua-trang" data-sua-trang aria-label="Sửa chữ trên trang này" title="Sửa chữ">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M16.4 3.9a2.1 2.1 0 0 1 3 3L8.6 17.7l-4 1 1-4z"/>
+        <path d="M14.6 5.7l3.7 3.7"/>
+      </svg>
+    </button>` : ""}
     <span class="bong-lat" aria-hidden="true"></span>
   </article>`;
+}
+
+/* ------------------------------------------------------------
+   SỬA CHỮ NGAY TRÊN TRANG SỔ
+
+   Mỗi mẩu ghi nằm trong một thẻ riêng mang id, nên sửa chữ nào là
+   app biết cập nhật đúng mẩu ấy — mốc thời gian, ảnh kèm theo đều
+   giữ nguyên. Mẩu nào bị xoá sạch chữ thì coi như anh muốn bỏ nó.
+   ------------------------------------------------------------ */
+
+/** Đang mở chế độ sửa trên trang sổ hay không. */
+let dangSuaTrang = false;
+
+/** Bật chế độ sửa cho tờ giấy đang mở. */
+function moSuaTrang() {
+  const to = $("giay").querySelector(".to-giay.tren");
+  if (!to) return;
+  const o = to.querySelector(".trang-noi");
+  if (!o) return;
+
+  dangSuaTrang = true;
+  to.classList.add("dang-sua");
+
+  // plaintext-only giữ nguyên các thẻ mang id bên trong; máy nào chưa
+  // hỗ trợ thì lùi về chế độ thường, chấp nhận rủi ro thẻ bị xáo.
+  o.setAttribute("contenteditable", "plaintext-only");
+  if (o.contentEditable !== "plaintext-only") o.setAttribute("contenteditable", "true");
+
+  o.focus();
+  $("dieu-sach").hidden = true;
+  $("thanh-sua").hidden = false;
+}
+
+/**
+ * Đóng chế độ sửa.
+ * @param {boolean} luu true thì ghi lại thay đổi, false thì bỏ qua.
+ */
+async function dongSuaTrang(luu) {
+  const to = $("giay").querySelector(".to-giay.tren");
+  const o = to && to.querySelector(".trang-noi");
+  dangSuaTrang = false;
+
+  if (o) {
+    o.removeAttribute("contenteditable");
+    if (to) to.classList.remove("dang-sua");
+  }
+  $("dieu-sach").hidden = false;
+  $("thanh-sua").hidden = true;
+
+  if (!luu || !o) { if (!luu) veLaiTrangSach(); return; }
+
+  // Gom chữ mới theo từng mẩu. Mẩu nào không còn thẻ, hoặc thẻ rỗng,
+  // nghĩa là anh đã xoá nó đi.
+  const tr = cacTrang[trangDangMo];
+  const cuaTrang = new Set();
+  for (const cum of (tr ? tr.doan : [])) for (const m of cum) cuaTrang.add(m.id);
+
+  const moi = new Map();
+  o.querySelectorAll(".mau-chu").forEach((e) => {
+    const id = Number(e.dataset.id);
+    if (!id) return;
+    const chu = (e.textContent || "").trim();
+    moi.set(id, moi.has(id) ? (moi.get(id) + " " + chu).trim() : chu);
+  });
+
+  let doi = 0;
+  for (const id of cuaTrang) {
+    const g = soGhi.find((x) => x.id === id);
+    if (!g) continue;
+    const chuMoi = (moi.get(id) || "").trim();
+
+    if (!chuMoi && !g.anh) {
+      await xoaMau(id);
+      soGhi = soGhi.filter((x) => x.id !== id);
+      doi++;
+    } else if (chuMoi !== (g.chu || "").trim()) {
+      g.chu = chuMoi;
+      await luuMau(g);
+      doi++;
+    }
+  }
+
+  veLaiTrangSach();
+  if (doi) baoNgan(doi === 1 ? "Đã sửa 1 mẩu ghi" : `Đã sửa ${doi} mẩu ghi`, "", null, 2600);
+}
+
+/** Dựng lại cuốn sổ nhưng giữ người đọc ở đúng trang đang mở. */
+function veLaiTrangSach() {
+  const cu = cacTrang[trangDangMo];
+  veSach();
+  if (!cacTrang.length) { gapSo(); return; }
+  const i = cu ? cacTrang.findIndex((t) => t.ma === cu.ma && t.phan === cu.phan) : -1;
+  const j = i >= 0 ? i : (cu ? cacTrang.findIndex((t) => t.ma === cu.ma) : -1);
+  trangDangMo = Math.max(0, Math.min(j >= 0 ? j : trangDangMo, cacTrang.length - 1));
+  $("ke-sach").hidden = true;
+  $("quyen").hidden = false;
+  $("giay").innerHTML = dungToGiay(trangDangMo, "tren");
+  capNhatDieuSach();
 }
 
 /** Cập nhật nút lật và số trang. */
@@ -2814,7 +3003,7 @@ function capNhatDieuSach() {
  * @param {number} buoc +1 sang trang sau, -1 về trang trước.
  */
 function latTrang(buoc) {
-  if (dangLat) return;
+  if (dangLat || dangSuaTrang) return;
   const dich = trangDangMo + buoc;
   if (dich < 0 || dich >= cacTrang.length) return;
 
@@ -3501,6 +3690,13 @@ function ganSuKien() {
     if (e.key === "Enter" || e.key === " ") { e.preventDefault(); moSo(); }
   });
   $("dong-so").addEventListener("click", gapSo);
+  $("sua-xong").addEventListener("click", () => dongSuaTrang(true));
+  $("sua-thoi").addEventListener("click", () => dongSuaTrang(false));
+  $("giay").addEventListener("click", (e) => {
+    if (e.target.closest("[data-sua-trang]")) {
+      dangSuaTrang ? dongSuaTrang(true) : moSuaTrang();
+    }
+  });
   $("lat-lui").addEventListener("click", () => latTrang(-1));
   $("lat-toi").addEventListener("click", () => latTrang(1));
 
@@ -3510,6 +3706,7 @@ function ganSuKien() {
     batX = e.touches[0].clientX; batY = e.touches[0].clientY;
   }, { passive: true });
   $("giay").addEventListener("touchend", (e) => {
+    if (dangSuaTrang) return;
     const dx = e.changedTouches[0].clientX - batX;
     const dy = e.changedTouches[0].clientY - batY;
     // Chỉ tính là lật khi vuốt ngang dứt khoát, để không cướp thao tác cuộn dọc.
