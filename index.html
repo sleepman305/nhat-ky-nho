@@ -872,19 +872,28 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
 }
 .trang-noi {
   flex: 1; overflow-y: auto;
-  font-family: var(--de); font-size: .96rem; line-height: 1.62rem;
+  font-family: var(--de); font-size: .97rem;
+  line-height: 1.62rem;   /* khớp đúng khoảng dòng kẻ của tờ giấy */
+  text-align: justify; hyphens: auto;
 }
-.trang-noi .doan-gio {
-  font-family: var(--may); font-size: .72rem; color: var(--nhan);
-  display: block; margin-top: .8rem;
+.trang-noi p { margin: 0 0 1.62rem; text-wrap: pretty; }
+.trang-noi p:last-of-type { margin-bottom: 0; }
+/* Thụt đầu dòng từ đoạn thứ hai, như sách in */
+.trang-noi p + p { text-indent: 1.4em; }
+
+.trang-noi .anh-dan {
+  display: flex; flex-wrap: wrap; gap: .5rem;
+  margin: 1.2rem 0 0;
 }
-.trang-noi .doan-gio:first-child { margin-top: 0; }
-.trang-noi p { margin: 0; text-wrap: pretty; }
-.trang-noi img {
-  display: block; width: 100%; max-width: 11rem;
-  border-radius: 6px; margin: .5rem 0;
-  border: 1px solid var(--vien-mo);
+.trang-noi .anh-dan img {
+  display: block; width: calc(50% - .25rem);
+  border-radius: 3px;
+  border: 4px solid var(--mat);
+  box-shadow: 0 1px 3px rgba(0,0,0,.22);
+  transform: rotate(-1.2deg);
 }
+.trang-noi .anh-dan img:nth-child(even) { transform: rotate(1.4deg); }
+.trang-noi .anh-dan img:only-child { width: 72%; }
 .trang-noi .trong-trang {
   color: var(--chu-mo); font-style: italic; font-size: .9rem;
 }
@@ -2374,35 +2383,84 @@ function veTrangNgay(ma) {
  */
 function tongHopNgay(ds) {
   const co = ds.filter((g) => g.chu && g.chu.trim());
-  if (co.length < 2) return [];
+  if (!co.length) return [];
 
-  /** Tên buổi theo giờ, để câu dẫn nghe tự nhiên. */
-  const buoi = (h) => h < 5 ? "đêm" : h < 11 ? "sáng" : h < 14 ? "trưa"
-    : h < 18 ? "chiều" : h < 22 ? "tối" : "khuya";
+  /** Tên buổi trong ngày, dùng để mở đầu mỗi đoạn. */
+  const tenBuoi = (h) =>
+    h < 5  ? { ma: "dem",   mo: "Đêm hôm ấy" } :
+    h < 8  ? { ma: "sang1", mo: "Sáng sớm" } :
+    h < 11 ? { ma: "sang2", mo: "Buổi sáng" } :
+    h < 14 ? { ma: "trua",  mo: "Giữa trưa" } :
+    h < 18 ? { ma: "chieu", mo: "Buổi chiều" } :
+    h < 22 ? { ma: "toi",   mo: "Tối đến" } :
+             { ma: "khuya", mo: "Khuya" };
+
+  /** Đọc giờ theo lối nói, "6 giờ 40" nghe người hơn "06:40". */
+  const gioChu = (d) => {
+    const h = d.getHours(), p = d.getMinutes();
+    return p === 0 ? `${h} giờ` : p === 30 ? `${h} giờ rưỡi` : `${h} giờ ${p}`;
+  };
+
+  /**
+   * Sửa một mẩu ghi thành mệnh đề nối được vào câu:
+   * hạ chữ đầu xuống thường, và chấm câu cho tròn.
+   * Không đổi một chữ nào trong lời anh đã nói.
+   */
+  const menhDe = (chu) => {
+    let x = chu.trim();
+    // Chữ đầu là tên riêng hoặc viết hoa cả cụm thì để nguyên.
+    if (!/^[A-ZĐÀÁẢÃẠÂẦẤẨẪẬĂẰẮẲẴẶÈÉẺẼẸÊỀẾỂỄỆÌÍỈĨỊÒÓỎÕỌÔỒỐỔỖỘƠỜỚỞỠỢÙÚỦŨỤƯỪỨỬỮỰỲÝỶỸỴ][a-zà-ỹ]/.test(x)) {
+      // giữ nguyên
+    } else {
+      x = x.charAt(0).toLowerCase() + x.slice(1);
+    }
+    if (!/[.!?…]$/.test(x)) x += ".";
+    return x;
+  };
 
   const doan = [];
-  let buoiTruoc = "", cau = [];
+  let buoiTruoc = "", cau = [], lanNoi = 0, gioTruoc = null;
 
   for (const g of co) {
     const d = new Date(g.luc);
-    const b = buoi(d.getHours());
-    let noi = g.chu.trim();
-    noi = noi.charAt(0).toLowerCase() + noi.slice(1);
-    if (!/[.!?…]$/.test(noi)) noi += ".";
+    const b = tenBuoi(d.getHours());
+    const noi = menhDe(g.chu);
 
-    if (b !== buoiTruoc) {
+    if (b.ma !== buoiTruoc) {
       if (cau.length) { doan.push(cau.join(" ")); cau = []; }
-      const hoa = b.charAt(0).toUpperCase() + b.slice(1);
-      cau.push(`${hoa}, lúc ${maGio(d)}, ${noi}`);
-      buoiTruoc = b;
+      cau.push(`${b.mo}, lúc ${gioChu(d)}, ${noi}`);
+      buoiTruoc = b.ma;
+      lanNoi = 0;
     } else {
-      cau.push(`Đến ${maGio(d)}, ${noi}`);
+      // Khoảng cách giữa hai mẩu quyết định lời dẫn — gần thì "một lúc sau",
+      // xa thì "mãi tới", còn lại thì xoay vòng cho khỏi lặp.
+      const cach = gioTruoc ? (d - gioTruoc) / 60000 : 0;
+      let dan;
+      if (cach > 0 && cach <= 25) {
+        dan = ["Một lúc sau", "Ngay sau đó", "Rồi"][lanNoi % 3];
+        cau.push(`${dan}, ${noi}`);
+      } else if (cach >= 180) {
+        cau.push(`Mãi tới ${gioChu(d)}, ${noi}`);
+      } else {
+        dan = ["Đến", "Rồi tới", "Sang"][lanNoi % 3];
+        cau.push(`${dan} ${gioChu(d)}, ${noi}`);
+      }
+      lanNoi++;
     }
+    gioTruoc = d;
   }
   if (cau.length) doan.push(cau.join(" "));
 
-  const soAnh = ds.filter((g) => g.anh).length;
-  if (soAnh) doan.push(`Ngày này còn giữ lại ${soAnh} tấm ảnh.`);
+  // Câu khép ngày, chỉ thêm khi ngày đã đủ dài để có cái mà khép lại.
+  if (co.length >= 3) {
+    const cuoi = new Date(co[co.length - 1].luc);
+    const soAnh = ds.filter((g) => g.anh).length;
+    let ket = `Ngày khép lại lúc ${gioChu(cuoi)}`;
+    ket += soAnh === 1 ? ", để lại một tấm ảnh."
+         : soAnh > 1 ? `, để lại ${soAnh} tấm ảnh.`
+         : ", với ngần ấy điều đã kịp giữ lại.";
+    doan.push(ket);
+  }
 
   return doan;
 }
@@ -2467,14 +2525,27 @@ function dungToGiay(i, lop) {
   const t = doiNgay(ma);
   const ds = soGhi.filter((g) => g.ngay === ma);
 
+  // Trang sách đọc như một bài viết, không phải bảng giờ giấc.
+  const bai = tongHopNgay(ds);
   let noi = "";
-  for (const g of ds) {
-    noi += `<span class="doan-gio">${maGio(new Date(g.luc))}</span>`;
-    const url = urlCuaAnh(g);
-    if (url) noi += `<img src="${url}" alt="" loading="lazy">`;
-    if (g.chu) noi += `<p>${thoat(g.chu)}</p>`;
+
+  if (bai.length) {
+    noi = bai.map((d) => `<p>${thoat(d)}</p>`).join("");
+    // Ảnh trong ngày xếp xuống dưới bài, như ảnh dán vào sổ.
+    const anh = ds.filter((g) => urlCuaAnh(g));
+    if (anh.length) {
+      noi += `<div class="anh-dan">` + anh.map((g) =>
+        `<img src="${urlCuaAnh(g)}" alt="Ảnh chụp lúc ${maGio(new Date(g.luc))}" loading="lazy">`
+      ).join("") + `</div>`;
+    }
+  } else {
+    const chiAnh = ds.filter((g) => urlCuaAnh(g));
+    noi = chiAnh.length
+      ? `<p>Ngày này không nói gì, chỉ giữ lại ${chiAnh.length === 1 ? "một tấm ảnh" : chiAnh.length + " tấm ảnh"}.</p>`
+        + `<div class="anh-dan">` + chiAnh.map((g) =>
+          `<img src="${urlCuaAnh(g)}" alt="" loading="lazy">`).join("") + `</div>`
+      : `<p class="trong-trang">Ngày này chỉ có im lặng.</p>`;
   }
-  if (!noi) noi = `<p class="trong-trang">Ngày này chỉ có im lặng.</p>`;
 
   return `<article class="to-giay ${lop}" data-trang="${i}">
     <p class="trang-ngay-lon">${t.thu}</p>
