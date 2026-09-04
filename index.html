@@ -536,6 +536,90 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
 }
 .o-tim:focus { border-color: var(--nhan); box-shadow: 0 0 0 3px var(--nhan-nen); outline: none; }
 
+/* ---- Lịch tháng ---- */
+
+#lich { padding: 1rem 1rem .4rem; }
+
+.lich-hop {
+  background: var(--mat);
+  border: 1px solid var(--vien-mo);
+  border-radius: 16px;
+  padding: .9rem .9rem 1rem;
+  box-shadow: var(--bong-1);
+}
+
+.lich-dinh {
+  display: flex; align-items: center; gap: .5rem;
+  margin-bottom: .8rem;
+}
+.lich-dinh .thang-nam {
+  font-family: var(--de); font-weight: 600; font-size: 1.02rem;
+  margin: 0 auto 0 .25rem; letter-spacing: -.01em;
+}
+.lich-dinh button {
+  width: 2rem; height: 2rem; border-radius: 8px;
+  display: grid; place-items: center;
+  color: var(--chu-nhat); font-size: 1rem;
+  transition: background .15s, transform .15s var(--bat);
+}
+.lich-dinh button:hover { background: var(--mat-2); }
+.lich-dinh button:active { transform: scale(.9); }
+.lich-dinh button[disabled] { opacity: .3; cursor: default; }
+
+.lich-tuan {
+  display: grid; grid-template-columns: repeat(7, 1fr);
+  gap: .1rem; margin-bottom: .3rem;
+}
+.lich-tuan span {
+  text-align: center;
+  font-family: var(--may); font-size: .6rem;
+  letter-spacing: .08em; text-transform: uppercase;
+  color: var(--chu-mo); padding: .2rem 0;
+}
+
+.lich-luoi { display: grid; grid-template-columns: repeat(7, 1fr); gap: .12rem; }
+
+.lich-o {
+  aspect-ratio: 1;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: .12rem;
+  border-radius: 9px;
+  font-family: var(--may); font-size: .82rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--chu-nhat);
+  position: relative;
+  transition: background .15s, transform .18s var(--bat);
+}
+.lich-o.trong { visibility: hidden; }
+.lich-o.ngoai { color: var(--chu-mo); opacity: .35; }
+
+/* Chấm dưới số: ngày ấy có nhật ký */
+.lich-o .cham {
+  width: .3rem; height: .3rem; border-radius: 50%;
+  background: var(--do);
+}
+.lich-o.co-ghi { color: var(--chu); font-weight: 500; }
+.lich-o.co-ghi:hover { background: var(--mat-2); }
+.lich-o.co-ghi:active { transform: scale(.9); }
+
+/* Hôm nay: viền tròn quanh số */
+.lich-o.hom-nay-o { color: var(--nhan); font-weight: 600; }
+.lich-o.hom-nay-o::before {
+  content: ""; position: absolute;
+  width: 1.9rem; height: 1.9rem; border-radius: 50%;
+  border: 1.5px solid var(--nhan);
+  top: 50%; left: 50%; transform: translate(-50%, calc(-50% - .21rem));
+}
+
+.lich-chan {
+  margin-top: .75rem; padding-top: .7rem;
+  border-top: 1px solid var(--vien-mo);
+  display: flex; align-items: center; gap: .45rem;
+  font-size: .76rem; color: var(--chu-mo);
+}
+.lich-chan .cham { width: .3rem; height: .3rem; border-radius: 50%; background: var(--do); }
+
 .nhom-thang { padding: 0 1rem; }
 .ten-thang {
   font-family: var(--may); font-size: .64rem; letter-spacing: .16em;
@@ -581,6 +665,31 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
   font-size: clamp(1.5rem, 5.2vw, 2rem);
   margin: .15rem 0 0; letter-spacing: -.025em;
 }
+
+/* Nút gọi bản tổng hợp — trước đây bài tự hiện nên chẳng ai để ý là có */
+.nut-tong-hop {
+  display: flex; align-items: center; gap: .9rem;
+  width: 100%; text-align: left;
+  margin-top: 2rem; padding: .95rem 1.1rem;
+  border: 1px solid var(--vien); border-radius: 14px;
+  background: var(--mat);
+  box-shadow: var(--bong-1);
+  transition: transform .2s var(--bat), box-shadow .2s, border-color .2s;
+}
+.nut-tong-hop:hover { border-color: var(--nhan); box-shadow: var(--bong-2); }
+.nut-tong-hop:active { transform: scale(.985); }
+.nut-tong-hop .hinh {
+  font-size: 1.3rem; line-height: 1;
+  width: 2.6rem; height: 2.6rem; flex: none;
+  display: grid; place-items: center;
+  background: var(--nhan-nen); border-radius: 10px;
+}
+.nut-tong-hop strong { display: block; font-size: .95rem; font-weight: 600; }
+.nut-tong-hop em {
+  display: block; font-style: normal;
+  font-size: .8rem; color: var(--chu-mo); margin-top: .1rem;
+}
+.nut-tong-hop[hidden] { display: none; }
 
 .tong-hop {
   margin-top: 2.2rem;
@@ -1081,6 +1190,7 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
     <input type="search" class="o-tim" id="o-tim" placeholder="Tìm trong nhật ký" aria-label="Tìm trong nhật ký">
   </div>
   <div class="than">
+    <section id="lich" aria-label="Lịch nhật ký"></section>
     <div id="hom-nay-so" class="hom-nay"></div>
     <div id="muc-luc"></div>
     <article id="trang-ngay" hidden></article>
@@ -1679,6 +1789,87 @@ async function ghiVaoSo() {
    tải lại không ghi trùng. Anh không phải chạm thêm nút nào.
    ============================================================ */
 
+/* ------------------------------------------------------------
+   CẦU NỐI GIỮA SAFARI VÀ APP TRÊN MÀN HÌNH CHÍNH
+
+   iOS cất IndexedDB của Safari và của app-trên-màn-hình-chính ở hai
+   kho riêng, không nhìn thấy nhau. Nhưng từ iOS 14 thì CacheStorage
+   lại DÙNG CHUNG. Ta mượn đúng chỗ đó làm hòm thư:
+
+     Phím tắt → Safari mở, bỏ câu vào hòm → báo "đã ghi" rồi thôi
+     Mở app  → app moi hòm ra, cất vào nhật ký thật, dọn hòm
+
+   Nhờ vậy anh vẫn giữ nút màn hình khoá, mà app chính thì chạy
+   toàn màn hình như một ứng dụng thật.
+   ------------------------------------------------------------ */
+
+const HOM_THU = "nhat-ky-nho-hom-thu";
+const DIA_CHI_THU = "/__hom-thu__";
+
+/** App đang chạy toàn màn hình (mở từ biểu tượng) hay trong Safari? */
+const chayToanManHinh =
+  window.navigator.standalone === true ||
+  (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
+
+/**
+ * Bỏ một câu vào hòm thư chung để app moi ra sau.
+ * @param {string} chu Câu vừa nói.
+ * @returns {Promise<boolean>} false nếu trình duyệt không cho dùng hòm thư.
+ */
+async function boVaoHom(chu) {
+  if (!window.caches) return false;
+  try {
+    const hom = await caches.open(HOM_THU);
+    const cu = await hom.match(DIA_CHI_THU);
+    const ds = cu ? await cu.json() : [];
+    ds.push({ luc: new Date().toISOString(), chu });
+    await hom.put(DIA_CHI_THU, new Response(JSON.stringify(ds),
+      { headers: { "Content-Type": "application/json" } }));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+/**
+ * Moi hết thư trong hòm ra, cất vào nhật ký rồi dọn sạch hòm.
+ * Chạy mỗi lần mở app, nên câu nói lúc nào cũng về đúng chỗ.
+ * @returns {Promise<number>} Số mẩu vừa nhận được.
+ */
+async function moiHomThu() {
+  if (!window.caches) return 0;
+  try {
+    const hom = await caches.open(HOM_THU);
+    const cu = await hom.match(DIA_CHI_THU);
+    if (!cu) return 0;
+
+    const ds = await cu.json();
+    await hom.delete(DIA_CHI_THU);
+    if (!Array.isArray(ds) || !ds.length) return 0;
+
+    const daCo = new Set(soGhi.map((g) => g.id));
+    let them = 0;
+
+    for (const t of ds) {
+      const luc = new Date(t.luc);
+      let id = luc.getTime();
+      // Hai câu nói cùng một mili giây thì đẩy lệch đi, đừng đè lên nhau.
+      while (daCo.has(id)) id++;
+      const m = { id, ngay: maNgay(luc), luc: luc.toISOString(),
+                  chu: (t.chu || "").trim(), anh: null };
+      if (!m.chu) continue;
+      await luuMau(m);
+      soGhi.push(m);
+      daCo.add(id);
+      them++;
+    }
+    soGhi.sort((a, b) => a.id - b.id);
+    return them;
+  } catch (e) {
+    return 0;
+  }
+}
+
 /**
  * Đọc câu Phím tắt gửi tới qua đường dẫn rồi ghi thẳng vào nhật ký.
  * @returns {Promise<boolean>} true nếu vừa ghi được một mẩu từ Phím tắt.
@@ -1697,6 +1888,17 @@ async function nhanTuPhimTat() {
   history.replaceState(null, "", location.pathname + location.search);
 
   if (!chu) return false;
+
+  // Đang ở Safari thì chỉ bỏ vào hòm thư, đừng cất vào kho riêng của Safari —
+  // kho đó app trên màn hình chính không bao giờ đọc tới.
+  if (!chayToanManHinh) {
+    const duoc = await boVaoHom(chu);
+    if (duoc) {
+      if (navigator.vibrate) { try { navigator.vibrate(12); } catch (e) {} }
+      return true;
+    }
+    // Hòm thư hỏng thì thà cất vào kho Safari còn hơn để mất câu nói.
+  }
 
   const luc = new Date();
   const m = { id: luc.getTime(), ngay: maNgay(luc), luc: luc.toISOString(), chu, anh: null };
@@ -1851,6 +2053,65 @@ function hienHoanTac(g) {
 
 let tuKhoa = "", ngayDangXem = null;
 
+/** Tháng đang xem trên lịch. Đặt về ngày mùng 1 cho gọn phép tính. */
+let thangLich = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+
+/**
+ * Vẽ lịch tháng đang xem. Ngày nào có nhật ký thì có một chấm đỏ dưới số.
+ *
+ * Lịch bắt đầu từ thứ hai chứ không phải chủ nhật — cách người Việt
+ * vẫn đọc lịch.
+ */
+function veLich() {
+  const nhom = nhomTheoNgay();
+  const nam = thangLich.getFullYear(), thang = thangLich.getMonth();
+  const maNay = maNgay(new Date());
+
+  // getDay trả 0 cho chủ nhật; đổi để thứ hai thành cột đầu tiên.
+  const dauThang = new Date(nam, thang, 1);
+  const lech = (dauThang.getDay() + 6) % 7;
+  const soNgay = new Date(nam, thang + 1, 0).getDate();
+
+  // Không cho lật quá tháng hiện tại — tương lai thì chưa có gì để xem.
+  const nayThang = new Date().getFullYear() * 12 + new Date().getMonth();
+  const dangThang = nam * 12 + thang;
+
+  let o = "";
+  for (let i = 0; i < lech; i++) o += `<div class="lich-o trong"></div>`;
+
+  for (let d = 1; d <= soNgay; d++) {
+    const ma = `${nam}-${String(thang + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+    const co = nhom.has(ma);
+    const nay = ma === maNay;
+    const sau = dangThang === nayThang && d > new Date().getDate();
+    o += `<${co ? "button" : "div"} class="lich-o${co ? " co-ghi" : ""}${nay ? " hom-nay-o" : ""}${sau ? " ngoai" : ""}"
+      ${co ? `data-ngay="${ma}" title="${nhom.get(ma).length} mẩu ghi"` : ""}>
+      <span>${d}</span>${co ? '<span class="cham"></span>' : '<span style="height:.3rem"></span>'}
+      </${co ? "button" : "div"}>`;
+  }
+
+  const soNgayCoGhi = [...nhom.keys()].filter((k) => {
+    const [n, t] = k.split("-").map(Number);
+    return n === nam && t === thang + 1;
+  }).length;
+
+  $("lich").innerHTML = `<div class="lich-hop">
+    <div class="lich-dinh">
+      <button id="lich-lui" aria-label="Tháng trước">‹</button>
+      <p class="thang-nam">${THANG[thang]} ${nam}</p>
+      <button id="lich-toi" aria-label="Tháng sau" ${dangThang >= nayThang ? "disabled" : ""}>›</button>
+    </div>
+    <div class="lich-tuan">
+      <span>H</span><span>B</span><span>T</span><span>N</span><span>S</span><span>B</span><span>CN</span>
+    </div>
+    <div class="lich-luoi">${o}</div>
+    <div class="lich-chan">
+      <span class="cham"></span>
+      <span>${soNgayCoGhi ? `${soNgayCoGhi} ngày có nhật ký trong tháng này` : "Tháng này chưa ghi ngày nào"}</span>
+    </div>
+  </div>`;
+}
+
 /** Vẽ mục lục các ngày, nhóm theo tháng, có lọc theo từ tìm kiếm. */
 function veMucLuc() {
   ngayDangXem = null;
@@ -1859,6 +2120,10 @@ function veMucLuc() {
   $("hom-nay-so").hidden = false;
   $("nut-lui-so").hidden = true;
   $("ten-so").textContent = "Sổ nhật ký";
+
+  // Đang tìm kiếm thì giấu lịch đi, để kết quả không bị đẩy xuống dưới.
+  $("lich").hidden = !!tuKhoa;
+  if (!tuKhoa) veLich();
 
   const nhom = nhomTheoNgay();
   const maNay = maNgay(new Date());
@@ -1925,6 +2190,7 @@ function veTrangNgay(ma) {
   ngayDangXem = ma;
   $("muc-luc").hidden = true;
   $("hom-nay-so").hidden = true;
+  $("lich").hidden = true;
   $("trang-ngay").hidden = false;
   $("nut-lui-so").hidden = false;
 
@@ -1941,8 +2207,20 @@ function veTrangNgay(ma) {
 
   const bai = tongHopNgay(ds);
   if (bai.length) {
-    html += `<section class="tong-hop"><h2>Ngày hôm ấy</h2>
-      ${bai.map((d) => `<p>${thoat(d)}</p>`).join("")}</section>`;
+    html += `<button class="nut-tong-hop" id="nut-tong-hop" data-ngay="${ma}">
+        <span class="hinh" aria-hidden="true">✍</span>
+        <span>
+          <strong>Viết thành bài nhật ký</strong>
+          <em>Nối ${ds.filter((g) => g.chu).length} mẩu rời thành một trang liền mạch</em>
+        </span>
+      </button>
+      <section class="tong-hop" id="khu-tong-hop" hidden>
+        <h2>Ngày hôm ấy</h2>
+        ${bai.map((d) => `<p>${thoat(d)}</p>`).join("")}
+      </section>`;
+  } else if (ds.filter((g) => g.chu).length === 1) {
+    html += `<p class="trong" style="padding:1.5rem 1rem">
+      Ngày này mới có một mẩu ghi — chưa đủ để nối thành bài.</p>`;
   }
 
   $("trang-ngay").innerHTML = html;
@@ -2639,10 +2917,32 @@ function ganSuKien() {
   $("hom-nay-so").addEventListener("click", banMau);
   $("trang-ngay").addEventListener("click", banMau);
 
+  // Bấm nút thì bài tổng hợp mới hiện ra, và nút tự lui đi.
+  $("trang-ngay").addEventListener("click", (e) => {
+    if (!e.target.closest("#nut-tong-hop")) return;
+    const khu = $("khu-tong-hop");
+    if (khu) { khu.hidden = false; khu.scrollIntoView({ behavior: "smooth", block: "nearest" }); }
+    $("nut-tong-hop").hidden = true;
+  });
+
   // Sổ
   $("muc-luc").addEventListener("click", (e) => {
     const n = e.target.closest("[data-ngay]");
     if (n) veTrangNgay(n.dataset.ngay);
+  });
+
+  // Lịch: lật tháng, hoặc chạm vào ngày có chấm để mở ngày đó.
+  $("lich").addEventListener("click", (e) => {
+    if (e.target.closest("#lich-lui")) {
+      thangLich = new Date(thangLich.getFullYear(), thangLich.getMonth() - 1, 1);
+      veLich(); return;
+    }
+    if (e.target.closest("#lich-toi")) {
+      thangLich = new Date(thangLich.getFullYear(), thangLich.getMonth() + 1, 1);
+      veLich(); return;
+    }
+    const o = e.target.closest("[data-ngay]");
+    if (o) veTrangNgay(o.dataset.ngay);
   });
   $("nut-lui-so").addEventListener("click", veMucLuc);
   $("o-tim").addEventListener("input", (e) => {
@@ -2786,6 +3086,9 @@ if (!BoNghe) {
 (async () => {
   soGhi = await docHet();
 
+  // Moi hòm thư trước: những câu nói qua Phím tắt đang chờ ở đó.
+  const nhan = await moiHomThu();
+
   const coKhoa = ch.kieuKhoa !== "khong" && ch.bamKhoa;
   const cauMoi = (location.hash.match(/[#&]them=([^&]*)/) || [])[1];
 
@@ -2801,7 +3104,25 @@ if (!BoNghe) {
 
   if (coKhoa) hienManKhoa();
   else diToi("ghi");
+
+  if (nhan) {
+    baoNgan(nhan === 1 ? "Nhận thêm 1 câu đã nói lúc trước"
+                       : `Nhận thêm ${nhan} câu đã nói lúc trước`,
+            "Xem sổ", () => { ngayDangXem = null; diToi("so"); }, 6000);
+  }
 })();
+
+// Quay lại app sau khi dùng Phím tắt: moi hòm thư lần nữa cho câu mới về kịp.
+document.addEventListener("visibilitychange", async () => {
+  if (document.hidden) return;
+  const n = await moiHomThu();
+  if (!n) return;
+  veManGhi();
+  if ($("man-so").classList.contains("hien")) {
+    ngayDangXem ? veTrangNgay(ngayDangXem) : veMucLuc();
+  }
+  baoNgan(n === 1 ? "Nhận thêm 1 câu vừa nói" : `Nhận thêm ${n} câu vừa nói`, "", null, 3500);
+});
 
 // Phím tắt mở lại app khi app đang chạy sẵn: chỉ đường dẫn đổi, trang không tải lại.
 window.addEventListener("hashchange", async () => {
