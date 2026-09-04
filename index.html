@@ -351,31 +351,27 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
   display: grid; place-items: center;
   transition: transform .3s var(--bat), opacity .25s;
 }
-#nut-noi .song { display: none; }
-
-/* Lời nhắc dưới nút lớn */
-.loi-nhac {
-  margin: -.2rem 0 0; font-size: .82rem; color: var(--chu-mo);
-  text-align: center;
+/* Năm vạch sóng nhấp nhô trên nút lớn — chỉ hiện khi đang nghe */
+#nut-noi .song {
+  display: none; align-items: center; gap: .28rem; height: 2.2rem;
 }
-.loi-nhac strong { color: var(--nhan); font-weight: 600; }
-
-/* Nút phụ đang thu: năm vạch sóng nhấp nhô thay cho biểu tượng */
-#nut-go.dang-nghe {
-  background: var(--nhan); border-color: var(--nhan);
-}
-#nut-go.dang-nghe svg {
+#nut-noi.dang-nghe .song { display: flex; }
+#nut-noi .song i {
+  display: block; width: .26rem; border-radius: 999px;
+  background: currentColor;
   animation: vachSong 1s ease-in-out infinite;
-  transform-origin: center;
-  stroke: #fff;
 }
-:root[data-tong="than-chi"] #nut-go.dang-nghe svg { stroke: var(--nen); }
+#nut-noi .song i:nth-child(1) { height: .8rem;  animation-delay: 0s; }
+#nut-noi .song i:nth-child(2) { height: 1.5rem; animation-delay: .16s; }
+#nut-noi .song i:nth-child(3) { height: 2.1rem; animation-delay: .32s; }
+#nut-noi .song i:nth-child(4) { height: 1.5rem; animation-delay: .48s; }
+#nut-noi .song i:nth-child(5) { height: .8rem;  animation-delay: .64s; }
 @keyframes vachSong {
-  0%, 100% { transform: scaleY(.6);  opacity: .7; }
-  50%      { transform: scaleY(1.1); opacity: 1; }
+  0%, 100% { transform: scaleY(.35); opacity: .55; }
+  50%      { transform: scaleY(1);   opacity: 1; }
 }
 @media (prefers-reduced-motion: reduce) {
-  #nut-go.dang-nghe svg { animation: none; }
+  #nut-noi .song i { animation: none; }
 }
 #nut-noi .bieu svg {
   width: 2rem; height: 2rem;
@@ -822,7 +818,10 @@ button.lich-o:active { transform: scale(.88); }
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   gap: 1.1rem; padding: 1.2rem 1rem 1rem;
-  perspective: 1600px;
+  /* Điểm nhìn gần hơn thì tờ giấy nghiêng ra trông có khối hẳn.
+     Hạ điểm nhìn lên cao một chút, như đang cúi xuống quyển sổ. */
+  perspective: 1150px;
+  perspective-origin: 50% 42%;
 }
 
 .ke-sach {
@@ -853,6 +852,9 @@ button.lich-o:active { transform: scale(.88); }
   width: min(22rem, 88vw);
   aspect-ratio: 3 / 4.1;
   transform-style: preserve-3d;
+  /* Khoá bố cục lại: thêm bớt tờ giấy giữa chừng mà không khoá thì
+     cả khung tính lại kích thước, sinh ra cú giật ngay đầu hiệu ứng. */
+  contain: layout style;
 }
 
 .to-giay {
@@ -870,7 +872,26 @@ button.lich-o:active { transform: scale(.88); }
   overflow: hidden;
   transform-origin: left center;
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-style: preserve-3d;
   display: flex; flex-direction: column;
+}
+
+/* Lớp bóng phủ lên mặt giấy khi nó nghiêng đi.
+   Không có lớp này thì tờ giấy trông như tấm bìa phẳng bị xoay,
+   chứ không ra tờ giấy đang cong lên. */
+.to-giay .bong-lat {
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    linear-gradient(90deg,
+      rgba(0,0,0,.34) 0%,
+      rgba(0,0,0,.14) 14%,
+      rgba(0,0,0,0) 38%,
+      rgba(255,255,255,.10) 62%,
+      rgba(0,0,0,.06) 88%);
 }
 
 /* Mép gáy sẫm hơn, cho ra cảm giác giấy dính vào gáy sổ */
@@ -881,21 +902,69 @@ button.lich-o:active { transform: scale(.88); }
   pointer-events: none;
 }
 
-/* Trang đang lật: cong lên rồi đổ sang bên kia */
-.to-giay.lat-toi { animation: latToi .62s cubic-bezier(.45,.05,.35,1) forwards; }
-.to-giay.lat-lui { animation: latLui .62s cubic-bezier(.45,.05,.35,1) forwards; }
+/* Trang đang lật: nhấc khỏi mặt sổ, cong lên rồi đổ sang bên kia.
+   Nhịp chậm ở hai đầu, nhanh ở giữa — đúng cách một tờ giấy thật rơi. */
+.to-giay.lat-toi,
+.to-giay.lat-lui {
+  will-change: transform;
+  z-index: 5;
+}
+.to-giay.lat-toi { animation: latToi .82s cubic-bezier(.38,.02,.24,1) forwards; }
+.to-giay.lat-lui { animation: latLui .82s cubic-bezier(.38,.02,.24,1) forwards; }
+.to-giay.lat-toi .bong-lat { animation: bongLat .82s cubic-bezier(.38,.02,.24,1) forwards; }
+.to-giay.lat-lui .bong-lat { animation: bongLatNguoc .82s cubic-bezier(.38,.02,.24,1) forwards; }
 
 @keyframes latToi {
-  0%   { transform: rotateY(0deg);   box-shadow: var(--bong-2); }
-  35%  { transform: rotateY(-42deg) translateZ(14px); }
-  100% { transform: rotateY(-172deg) translateZ(0);
-         box-shadow: 0 0 0 rgba(0,0,0,0); opacity: .1; }
+  0% {
+    transform: rotateY(0deg) translateZ(0) scale(1);
+    box-shadow: var(--bong-2);
+  }
+  30% {
+    transform: rotateY(-52deg) translateZ(34px) scale(1.012);
+    box-shadow: 0 18px 40px rgba(0,0,0,.3);
+  }
+  70% {
+    transform: rotateY(-126deg) translateZ(34px) scale(1.012);
+    box-shadow: 0 18px 40px rgba(0,0,0,.24);
+  }
+  100% {
+    transform: rotateY(-180deg) translateZ(0) scale(1);
+    box-shadow: 0 0 0 rgba(0,0,0,0);
+  }
 }
 @keyframes latLui {
-  0%   { transform: rotateY(-172deg); opacity: .1; }
-  65%  { transform: rotateY(-42deg) translateZ(14px); opacity: 1; }
-  100% { transform: rotateY(0deg); box-shadow: var(--bong-2); opacity: 1; }
+  0% {
+    transform: rotateY(-180deg) translateZ(0) scale(1);
+    box-shadow: 0 0 0 rgba(0,0,0,0);
+  }
+  30% {
+    transform: rotateY(-126deg) translateZ(34px) scale(1.012);
+    box-shadow: 0 18px 40px rgba(0,0,0,.24);
+  }
+  70% {
+    transform: rotateY(-52deg) translateZ(34px) scale(1.012);
+    box-shadow: 0 18px 40px rgba(0,0,0,.3);
+  }
+  100% {
+    transform: rotateY(0deg) translateZ(0) scale(1);
+    box-shadow: var(--bong-2);
+  }
 }
+
+/* Bóng đậm dần lúc tờ giấy dựng đứng, rồi nhạt đi khi nó nằm xuống */
+@keyframes bongLat {
+  0%   { opacity: 0; }
+  46%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes bongLatNguoc {
+  0%   { opacity: 0; }
+  54%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Tờ nằm dưới hơi tối đi khi bị tờ trên che, sáng dần lúc lộ ra */
+.to-giay.duoi { filter: brightness(.965); }
 
 /* Trang mới lộ ra bên dưới */
 .to-giay.duoi { z-index: 1; }
@@ -916,7 +985,10 @@ button.lich-o:active { transform: scale(.88); }
 /* Trang nối tiếp của cùng một ngày: tiêu đề nhạt đi cho khỏi lấn */
 .trang-tieu.mo { font-weight: 400; font-size: 1.06rem; opacity: .62; }
 .trang-noi {
-  flex: 1; overflow: hidden;
+  /* Chiều cao chốt bằng bội số của dòng, do doSucChua() đo và đặt vào.
+     Để nó co giãn tự do thì dòng cuối bị xén mất nửa thân chữ. */
+  height: var(--cao-vung-chu, auto);
+  flex: 1 1 auto; overflow: hidden;
   font-family: var(--de); font-size: .97rem;
   line-height: 1.62rem;   /* khớp đúng khoảng dòng kẻ của tờ giấy */
   text-align: justify; hyphens: auto;
@@ -1392,7 +1464,6 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
           </span>
           <span class="song" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
         </button>
-        <p class="loi-nhac" id="loi-nhac">Chạm rồi bấm <strong>🎤</strong> trên bàn phím</p>
       </div>
 
       <div class="hang-phu">
@@ -1409,10 +1480,10 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
             <path d="M3.4 16.7l4.4-4.2a2 2 0 0 1 2.7-.05l3.4 3.05a2 2 0 0 0 2.6.03l1.9-1.6a2 2 0 0 1 2.6.02l1.6 1.4"/>
           </svg>
         </button>
-        <button class="nut-tron" id="nut-go" aria-label="Thu bằng bộ nhận giọng của trình duyệt" title="Thu tự động, tự tắt sau 5 giây im lặng">
+        <button class="nut-tron" id="nut-go" aria-label="Gõ tay" title="Gõ tay">
           <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 11v2"/><path d="M8 8.5v7"/><path d="M12 5.5v13"/>
-            <path d="M16 8.5v7"/><path d="M20 11v2"/>
+            <path d="M16.4 3.9a2.1 2.1 0 0 1 3 3L8.6 17.7l-4 1 1-4z"/>
+            <path d="M14.6 5.7l3.7 3.7"/>
           </svg>
         </button>
         <button class="nut-tron" id="nut-cai-ghi" aria-label="Cài đặt" title="Cài đặt">
@@ -1964,7 +2035,7 @@ function batDauNghe() {
   try {
     mayNghe.start();
     dangNghe = true;
-    $("nut-go").classList.add("dang-nghe");
+    $("nut-noi").classList.add("dang-nghe");
     hoanTatMic();
   } catch (e) {
     dangNghe = false;
@@ -2020,7 +2091,7 @@ function dungNghe() {
     mayNghe = null;
   }
   dangNghe = false;
-  $("nut-go").classList.remove("dang-nghe");
+  $("nut-noi").classList.remove("dang-nghe");
 }
 
 /** Gỡ ảnh đang chờ khỏi khu soạn. */
@@ -2628,8 +2699,15 @@ function doSucChua() {
 
   khung.removeChild(tam);
 
-  // Bớt một dòng: đoạn văn hiếm khi kết thúc đúng mép phải.
-  SUC_CHUA = Math.max(220, (soDong - 1) * chuMoiDong);
+  /* Cắt chiều cao vùng chữ đúng bằng bội số của dòng.
+     Đây là chỗ gây lỗi "mất nửa dòng": vùng chữ cao lẻ, dòng cuối chỉ
+     lọt được nửa thân chữ rồi bị mép giấy xén ngang. */
+  document.documentElement.style.setProperty("--cao-vung-chu", `${soDong * caoDong}px`);
+
+  /* Bớt hai dòng và chỉ tính chín phần mười số chữ mỗi dòng.
+     Chữ canh đều hai bên nên dòng nào cũng thưa hơn lúc đo, mà mỗi
+     đoạn văn lại kết thúc lưng chừng một dòng. */
+  SUC_CHUA = Math.max(200, Math.floor((soDong - 2) * chuMoiDong * 0.9));
 }
 
 /**
@@ -2753,6 +2831,7 @@ function dungToGiay(i, lop) {
          <h2 class="trang-tieu mo">Ngày ${String(t.ngay).padStart(2, "0")} tháng ${t.thang}</h2>`}
     <div class="trang-noi">${noi}</div>
     <p class="trang-chan">${tr.tong > 1 ? `${tr.phan}/${tr.tong} · ` : ""}— ${i + 1} —</p>
+    <span class="bong-lat" aria-hidden="true"></span>
   </article>`;
 }
 
@@ -2779,12 +2858,15 @@ function latTrang(buoc) {
     // Trang mới nằm sẵn bên dưới, trang cũ đổ sang trái để lộ nó ra.
     khung.insertAdjacentHTML("afterbegin", dungToGiay(dich, "duoi"));
     const cu = khung.querySelector(".to-giay.tren");
+    // Chờ trình duyệt vẽ xong tờ mới rồi mới khởi động hiệu ứng —
+    // chạy ngay thì khung hình đầu tiên bị bỏ qua, thành ra giật một cái.
+    void cu.offsetWidth;
     cu.classList.add("lat-toi");
     setTimeout(() => {
       cu.remove();
       khung.querySelector(".to-giay").className = "to-giay tren";
       xong();
-    }, 620);
+    }, 830);
   } else {
     // Lật ngược: trang cũ đang gập bên trái, mở trả về.
     khung.insertAdjacentHTML("beforeend", dungToGiay(dich, "tren lat-lui"));
@@ -2793,7 +2875,7 @@ function latTrang(buoc) {
       khung.querySelectorAll(".to-giay").forEach((e) => { if (e !== moi) e.remove(); });
       moi.className = "to-giay tren";
       xong();
-    }, 620);
+    }, 830);
   }
 
   function xong() {
@@ -3475,20 +3557,16 @@ function ganSuKien() {
   });
 
   // Nút thu âm
-  // Nút tròn lớn: mở ô soạn và bật bàn phím, để anh dùng bộ đọc chính tả
-  // của Apple — nó tự chấm câu, tự viết hoa, và không hỏi xin quyền lần nào.
   $("nut-noi").addEventListener("click", () => {
-    if (dangNghe) dungNghe();
-    if ($("khu-soan").hidden) moKhuSoan(false);
+    if (dangNghe) { dungNghe(); return; }
+    if ($("khu-soan").hidden) moKhuSoan(true);
+    else if (BoNghe) batDauNghe();
     else $("o-loi").focus();
   });
 
-  // Nút phụ: bộ nhận giọng của trình duyệt — thô hơn nhưng tự chạy,
-  // tự tắt sau năm giây im lặng, không phải chạm bàn phím.
   $("nut-go").addEventListener("click", () => {
-    if (dangNghe) { dungNghe(); return; }
-    if ($("khu-soan").hidden) moKhuSoan(true);
-    else batDauNghe();
+    if ($("khu-soan").hidden) moKhuSoan(false);
+    else $("o-loi").focus();
   });
 
   // Anh tự gõ hoặc bôi đen sửa giữa lúc đang nói: lấy đó làm mốc mới,
@@ -3712,7 +3790,6 @@ function ganSuKien() {
 
 napCauHinh();
 apDienMao();
-if (!BoNghe) $("nut-go").hidden = true;
 veThanhDuoi("ghi");
 ganSuKien();
 
