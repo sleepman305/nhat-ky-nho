@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cài Nhật ký nhỏ</title>
+<meta name="theme-color" content="#16283D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:wght@600;700&family=Be+Vietnam+Pro:wght@300;400;500;600&display=swap">
+<style>
+/* Trang này chỉ có một việc: đưa hai file phím tắt vào máy anh.
+   Phải ép tải bằng JavaScript vì Safari nhìn vào ruột file .shortcut
+   thấy toàn chữ nên tự ý mở ra đọc thay vì tải về. */
+
+:root {
+  --nen: #EEF1F3; --nen-2: #F8FAFB; --mat: #FFFFFF;
+  --chu: #16283D; --mo: #6B7C8B; --vien: #D5DCE1;
+  --nhan: #0E7C7B; --nhan-2: #14A09E; --nhan-nen: #DFEFEE;
+  --hp: #B5651D; --hp-nen: #FAEEE0; --do: #A8492C;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --nen: #0A1019; --nen-2: #101923; --mat: #16202B;
+    --chu: #DFE7EE; --mo: #7A8C9C; --vien: #2A3B4C;
+    --nhan: #4FBFB8; --nhan-2: #6FD8D1; --nhan-nen: #123634;
+    --hp: #E0A055; --hp-nen: #33240F; --do: #E08267;
+  }
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body {
+  margin: 0;
+  padding: calc(2rem + env(safe-area-inset-top)) 1.25rem calc(3rem + env(safe-area-inset-bottom));
+  background:
+    radial-gradient(70% 45% at 15% 0%, var(--nen-2), transparent 70%),
+    radial-gradient(60% 40% at 90% 4%, var(--nhan-nen), transparent 62%),
+    var(--nen);
+  color: var(--chu);
+  font-family: "Be Vietnam Pro", system-ui, -apple-system, sans-serif;
+  font-size: 15px; line-height: 1.62;
+  min-height: 100vh;
+}
+.khung { max-width: 32rem; margin: 0 auto; }
+
+h1 {
+  font-family: Literata, Georgia, serif; font-weight: 700;
+  font-size: clamp(1.5rem, 6vw, 1.95rem);
+  margin: 0 0 .5rem; letter-spacing: -.025em; text-wrap: balance;
+}
+.dan { color: var(--mo); margin: 0 0 2rem; }
+
+.the {
+  background: var(--mat); border: 1px solid var(--vien);
+  border-radius: 16px; padding: 1.3rem 1.35rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,.05), 0 10px 28px rgba(0,0,0,.07);
+}
+.stt {
+  font-family: ui-monospace, Consolas, monospace; font-size: .66rem;
+  letter-spacing: .17em; text-transform: uppercase; color: var(--nhan);
+  margin: 0 0 .3rem;
+}
+.the h2 {
+  font-family: Literata, Georgia, serif; font-size: 1.16rem;
+  margin: 0 0 .4rem; letter-spacing: -.015em;
+}
+.the p { margin: 0 0 1rem; font-size: .92rem; color: var(--mo); }
+
+.nut {
+  display: flex; align-items: center; justify-content: center; gap: .5rem;
+  width: 100%; padding: .85rem 1rem;
+  border: none; border-radius: 12px;
+  background: linear-gradient(165deg, var(--nhan-2), var(--nhan));
+  color: #fff; font: inherit; font-weight: 600; font-size: .98rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,.12);
+  transition: transform .18s cubic-bezier(.34,1.4,.5,1), opacity .2s;
+  cursor: pointer;
+}
+.nut:active { transform: scale(.97); }
+.nut[disabled] { opacity: .6; cursor: default; }
+.nut.xong { background: var(--nhan-nen); color: var(--nhan); }
+
+.buoc {
+  margin: .9rem 0 0; padding-left: 1.2rem;
+  font-size: .89rem; line-height: 1.85; color: var(--chu);
+}
+.buoc strong { color: var(--nhan); }
+
+.khoi {
+  border-left: 3px solid var(--hp); background: var(--hp-nen);
+  padding: .95rem 1.1rem; border-radius: 0 10px 10px 0;
+  margin-top: 1.75rem; font-size: .89rem;
+}
+.khoi.do { border-left-color: var(--do); background: color-mix(in srgb, var(--do) 12%, var(--mat)); }
+.khoi p { margin: 0 0 .55rem; }
+.khoi p:last-child { margin: 0; }
+.khoi strong { color: var(--hp); }
+.khoi.do strong { color: var(--do); }
+
+.ky { font-family: Literata, serif; font-style: italic; color: var(--mo);
+      margin-top: 2.5rem; font-size: .88rem; text-align: center; }
+</style>
+</head>
+<body>
+<div class="khung">
+  <h1>Cài Nhật ký nhỏ</h1>
+  <p class="dan">Bấm hai nút dưới đây theo thứ tự. Mỗi nút tải về một phím tắt.</p>
+
+  <div class="the">
+    <p class="stt">Một</p>
+    <h2>Phím tắt “Ghi nhật ký”</h2>
+    <p>Nghe anh nói rồi ghi thẳng vào nhật ký. Đây là thứ làm nên tất cả.</p>
+    <button class="nut" data-tep="ghi-nhat-ky.shortcut" data-ten="Ghi nhat ky.shortcut">
+      Tải phím tắt Ghi nhật ký
+    </button>
+    <ol class="buoc">
+      <li>Safari hỏi tải file → chạm <strong>Tải xuống</strong></li>
+      <li>Chạm mũi tên tải xuống ở thanh địa chỉ, rồi chạm vào file</li>
+      <li>Chạm <strong>Thêm Phím tắt</strong></li>
+    </ol>
+  </div>
+
+  <div class="the">
+    <p class="stt">Hai</p>
+    <h2>Phím tắt “Nhật ký nhỏ”</h2>
+    <p>Chỉ để mở app. Dùng làm biểu tượng ngoài màn hình chính.</p>
+    <button class="nut" data-tep="mo-nhat-ky.shortcut" data-ten="Nhat ky nho.shortcut">
+      Tải phím tắt Mở nhật ký
+    </button>
+    <ol class="buoc">
+      <li>Thêm vào Phím tắt như trên</li>
+      <li>Mở app <strong>Phím tắt</strong>, giữ ngón tay vào nó</li>
+      <li>Chọn <strong>Chia sẻ → Thêm vào Màn hình chính</strong></li>
+    </ol>
+  </div>
+
+  <div class="khoi">
+    <p><strong>Gắn “Ghi nhật ký” vào chỗ dễ với nhất:</strong></p>
+    <p><strong>Nút màn hình khoá</strong> — giữ vào màn hình khoá → Tuỳ chỉnh → Màn hình khoá →
+       bấm dấu trừ ở nút đèn pin → dấu cộng → tìm Phím tắt → chọn Ghi nhật ký</p>
+    <p><strong>Gõ lưng máy</strong> — Cài đặt → Trợ năng → Cảm ứng → Chạm mặt sau → Chạm hai lần</p>
+    <p><strong>Nút tác vụ</strong> — Cài đặt → Nút tác vụ → vuốt tới Phím tắt</p>
+    <p><strong>Siri</strong> — không cần cài gì, cứ nói “Này Siri, ghi nhật ký”</p>
+  </div>
+
+  <div class="khoi do">
+    <p><strong>Nếu trước đó anh đã Thêm vào Màn hình chính từ Safari thì gỡ cái đó đi.</strong></p>
+    <p>iPhone cất dữ liệu của app-trên-màn-hình-chính và của Safari ở hai kho riêng biệt.
+       Phím tắt chỉ mở được Safari, nên giữ cả hai thì câu anh nói rơi vào kho này
+       còn app lại đọc kho kia.</p>
+    <p>Biểu tượng ngoài màn hình chính thì dùng phím tắt số <strong>hai</strong> — nhìn y hệt,
+       mà dữ liệu về chung một chỗ.</p>
+  </div>
+
+  <p class="ky">Nhật ký nhỏ · by SirV</p>
+</div>
+
+<script>
+"use strict";
+
+/**
+ * Ép Safari tải file phím tắt về máy.
+ *
+ * Không dùng thẻ liên kết thẳng tới file được: Safari ngó vào ruột file
+ * .shortcut, thấy toàn chữ nên tự ý mở ra đọc thay vì tải. Tải bằng
+ * JavaScript rồi dựng lại thành khối nhị phân thì nó hết đường đoán.
+ *
+ * @param {HTMLButtonElement} nut Nút vừa bấm, mang sẵn tên file trong data.
+ */
+async function taiVe(nut) {
+  const tep = nut.dataset.tep;
+  const ten = nut.dataset.ten;
+  const chuCu = nut.textContent.trim();
+
+  nut.disabled = true;
+  nut.textContent = "Đang tải…";
+
+  try {
+    const tl = await fetch(tep, { cache: "no-store" });
+    if (!tl.ok) throw new Error("khong tai duoc");
+    const du = await tl.arrayBuffer();
+
+    // octet-stream để Safari không đoán kiểu file theo nội dung nữa.
+    const khoi = new Blob([du], { type: "application/octet-stream" });
+    const dc = URL.createObjectURL(khoi);
+
+    const a = document.createElement("a");
+    a.href = dc;
+    a.download = ten;
+    a.rel = "noopener";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(dc), 4000);
+
+    nut.classList.add("xong");
+    nut.textContent = "Đã tải — mở file để thêm";
+  } catch (e) {
+    nut.textContent = "Không tải được, thử lại";
+    nut.disabled = false;
+  }
+}
+
+document.querySelectorAll(".nut[data-tep]").forEach((n) => {
+  n.addEventListener("click", () => taiVe(n));
+});
+</script>
+</body>
+</html>
