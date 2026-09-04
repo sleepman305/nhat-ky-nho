@@ -800,7 +800,7 @@ button.lich-o:active { transform: scale(.88); }
 .khu-sach {
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  gap: 1.2rem; padding: .5rem 1rem 1.5rem;
+  gap: 1.1rem; padding: 1.2rem 1rem 1rem;
   perspective: 1600px;
 }
 
@@ -887,13 +887,15 @@ button.lich-o:active { transform: scale(.88); }
 }
 .trang-tieu {
   font-family: var(--de); font-weight: 700;
-  font-size: 1.28rem; letter-spacing: -.02em;
-  margin: 0 0 1rem; line-height: 1.2;
-  padding-bottom: .7rem;
+  font-size: 1.24rem; letter-spacing: -.02em;
+  margin: 0 0 .95rem; line-height: 1.2;
+  padding-bottom: .65rem;
   border-bottom: 1px solid var(--vien-mo);
 }
+/* Trang nối tiếp của cùng một ngày: tiêu đề nhạt đi cho khỏi lấn */
+.trang-tieu.mo { font-weight: 400; font-size: 1.06rem; opacity: .62; }
 .trang-noi {
-  flex: 1; overflow-y: auto;
+  flex: 1; overflow: hidden;
   font-family: var(--de); font-size: .97rem;
   line-height: 1.62rem;   /* khớp đúng khoảng dòng kẻ của tờ giấy */
   text-align: justify; hyphens: auto;
@@ -1395,6 +1397,12 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
             <path d="M14.6 5.7l3.7 3.7"/>
           </svg>
         </button>
+        <button class="nut-tron" id="nut-cai-ghi" aria-label="Cài đặt" title="Cài đặt">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="3.1"/>
+            <path d="M19.1 14.2a1.6 1.6 0 0 0 .32 1.76l.06.06a1.9 1.9 0 1 1-2.7 2.7l-.05-.06a1.6 1.6 0 0 0-1.77-.32 1.6 1.6 0 0 0-.97 1.46v.17a1.9 1.9 0 1 1-3.8 0v-.09a1.6 1.6 0 0 0-1.05-1.46 1.6 1.6 0 0 0-1.76.32l-.06.06a1.9 1.9 0 1 1-2.7-2.7l.06-.06a1.6 1.6 0 0 0 .32-1.76 1.6 1.6 0 0 0-1.46-.97h-.17a1.9 1.9 0 1 1 0-3.8h.09a1.6 1.6 0 0 0 1.46-1.05 1.6 1.6 0 0 0-.32-1.76l-.06-.06a1.9 1.9 0 1 1 2.7-2.7l.06.06a1.6 1.6 0 0 0 1.76.32h.08A1.6 1.6 0 0 0 10.2 3.9v-.17a1.9 1.9 0 1 1 3.8 0v.09a1.6 1.6 0 0 0 .97 1.46 1.6 1.6 0 0 0 1.77-.32l.05-.06a1.9 1.9 0 1 1 2.7 2.7l-.06.06a1.6 1.6 0 0 0-.32 1.76v.08a1.6 1.6 0 0 0 1.46.97h.17a1.9 1.9 0 1 1 0 3.8h-.09a1.6 1.6 0 0 0-1.46.97z"/>
+          </svg>
+        </button>
       </div>
 
 
@@ -1467,22 +1475,11 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
 
 <!-- ============ MÀN NHẬT KÝ NHỎ — quyển sổ lật trang ============ -->
 <div class="man" id="man-sach">
-  <header class="dinh trong-suot">
-    <span class="ten" id="ten-sach">Nhật ký nhỏ</span>
-    <button class="nut-banh-rang" id="nut-cai-bia" aria-label="Cài đặt">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
-        <path d="M19.4 13a7.6 7.6 0 0 0 0-2l2-1.6-2-3.4-2.4 1a7.6 7.6 0 0 0-1.7-1L15 3.4h-4l-.3 2.6c-.6.3-1.2.6-1.7 1l-2.4-1-2 3.4L6.6 11a7.6 7.6 0 0 0 0 2l-2 1.6 2 3.4 2.4-1c.5.4 1.1.7 1.7 1l.3 2.6h4l.3-2.6c.6-.3 1.2-.6 1.7-1l2.4 1 2-3.4-2-1.6z"/>
-      </svg>
-    </button>
-  </header>
-
   <div class="than khu-sach">
     <!-- Bìa đóng: bấm để mở sổ -->
     <div class="ke-sach" id="ke-sach">
       <div class="bia" id="bia-chinh" data-bia="vai-cham" role="button" tabindex="0">
         <div class="bia-trong">
-          <p class="bia-cua">Nhật ký</p>
           <h1 class="bia-ten" id="bia-ten">Nhật ký nhỏ</h1>
           <p class="bia-nguoi" id="bia-nguoi"></p>
         </div>
@@ -2090,11 +2087,13 @@ function veLaiManDangMo() {
   if (hien("sach")) {
     // Sổ đang mở giữa chừng thì dựng lại đúng trang ấy, đừng gấp lại.
     const dangMo = !$("quyen").hidden;
-    const maCu = cacTrang[trangDangMo];
+    const cu = cacTrang[trangDangMo];
     veSach();
     if (dangMo && cacTrang.length) {
-      const i = cacTrang.indexOf(maCu);
-      trangDangMo = i >= 0 ? i : Math.min(trangDangMo, cacTrang.length - 1);
+      // Giữ người đọc ở đúng ngày cũ, dù số trang có xê dịch sau khi sửa.
+      const i = cu ? cacTrang.findIndex((t) => t.ma === cu.ma && t.phan === cu.phan) : -1;
+      const j = i >= 0 ? i : (cu ? cacTrang.findIndex((t) => t.ma === cu.ma) : -1);
+      trangDangMo = j >= 0 ? j : Math.min(trangDangMo, cacTrang.length - 1);
       $("ke-sach").hidden = true;
       $("quyen").hidden = false;
       $("giay").innerHTML = dungToGiay(trangDangMo, "tren");
@@ -2488,16 +2487,83 @@ function nguyenLoi(ds) {
   return doan;
 }
 
-/** Dựng lại danh sách trang rồi hiện bìa sổ. */
-function veSach() {
-  cacTrang = [...nhomTheoNgay().keys()].sort();
-  const co = cacTrang.length > 0;
+/**
+ * Sức chứa một trang giấy, tính bằng ký tự.
+ *
+ * Trang cao khoảng 13 dòng, mỗi dòng vừa chừng 42 chữ cái. Để dư một
+ * chút cho những dòng ngắn ở cuối đoạn, nếu không chữ tràn xuống dưới
+ * mép giấy mà không ai thấy.
+ */
+const SUC_CHUA = 560;
 
+/**
+ * Cắt các đoạn văn của một ngày thành từng trang vừa khổ giấy.
+ *
+ * Cắt ở ranh giới câu chứ không cắt giữa chừng: một câu bị đứt đôi
+ * giữa hai trang đọc rất khó chịu. Câu nào dài quá một trang thì đành
+ * để nó tràn, còn hơn chặt ngang.
+ *
+ * @param {string[]} doan Các đoạn văn của ngày.
+ * @returns {string[][]} Mỗi phần tử là các đoạn thuộc về một trang.
+ */
+function catTrang(doan) {
+  const trang = [];
+  let dang = [], dem = 0;
+
+  for (const d of doan) {
+    // Đoạn vừa vặn thì bỏ nguyên vào trang đang dựng.
+    if (dem + d.length <= SUC_CHUA) {
+      dang.push(d); dem += d.length;
+      continue;
+    }
+    // Đoạn dài quá thì tách theo câu rồi rót dần.
+    const cau = d.match(/[^.!?…]+[.!?…]*\s*/g) || [d];
+    let khuc = "";
+    for (const c of cau) {
+      if (dem + khuc.length + c.length > SUC_CHUA && (khuc || dang.length)) {
+        if (khuc) dang.push(khuc.trim());
+        trang.push(dang);
+        dang = []; dem = 0; khuc = "";
+      }
+      khuc += c;
+    }
+    if (khuc.trim()) { dang.push(khuc.trim()); dem += khuc.length; }
+  }
+  if (dang.length) trang.push(dang);
+  return trang.length ? trang : [[]];
+}
+
+/**
+ * Dựng lại toàn bộ trang sách rồi hiện bìa.
+ *
+ * Một ngày có thể chiếm nhiều trang. Ảnh của ngày dồn xuống trang cuối
+ * cùng của ngày ấy, như ảnh dán ở cuối bài viết.
+ */
+function veSach() {
+  const nhom = nhomTheoNgay();
+  cacTrang = [];
+
+  for (const ma of [...nhom.keys()].sort()) {
+    const ds = nhom.get(ma);
+    const cac = catTrang(nguyenLoi(ds));
+    const anh = ds.filter((g) => urlCuaAnh(g));
+
+    cac.forEach((doan, i) => {
+      cacTrang.push({
+        ma, doan,
+        phan: i + 1,
+        tong: cac.length,
+        anh: i === cac.length - 1 ? anh : []   // ảnh dán ở trang cuối của ngày
+      });
+    });
+  }
+
+  const co = cacTrang.length > 0;
   $("ke-sach").hidden = false;
   $("quyen").hidden = true;
   $("loi-moi-mo").textContent = co
     ? `Chạm vào sổ để mở · ${cacTrang.length} trang`
-    : "Sổ còn trắng. Sang thẻ Viết nhật ký để bắt đầu.";
+    : "Sổ còn trắng. Sang thẻ Viết để bắt đầu.";
   $("bia-chinh").style.pointerEvents = co ? "" : "none";
 }
 
@@ -2524,40 +2590,32 @@ function gapSo() {
  * @returns {string}
  */
 function dungToGiay(i, lop) {
-  const ma = cacTrang[i];
-  if (!ma) return "";
-  const t = doiNgay(ma);
-  const ds = soGhi.filter((g) => g.ngay === ma);
+  const tr = cacTrang[i];
+  if (!tr) return "";
+  const t = doiNgay(tr.ma);
 
-  // Trang sách chỉ chép lại nguyên lời anh đã nói, không giờ giấc,
-  // không một chữ nào của máy thêm vào. Ngắt đoạn khi hai mẩu cách nhau
-  // quá hai tiếng — đó là chỗ ngày tự nó sang một khúc khác.
-  const bai = nguyenLoi(ds);
-  let noi = "";
+  // Ngày dài chiếm nhiều trang: chỉ trang đầu mang tiêu đề ngày,
+  // các trang sau ghi "tiếp theo" cho khỏi tưởng sang ngày khác.
+  const dau = tr.phan === 1;
 
-  if (bai.length) {
-    noi = bai.map((d) => `<p>${thoat(d)}</p>`).join("");
-    // Ảnh trong ngày xếp xuống dưới bài, như ảnh dán vào sổ.
-    const anh = ds.filter((g) => urlCuaAnh(g));
-    if (anh.length) {
-      noi += `<div class="anh-dan">` + anh.map((g) =>
-        `<img src="${urlCuaAnh(g)}" alt="Ảnh chụp lúc ${maGio(new Date(g.luc))}" loading="lazy">`
-      ).join("") + `</div>`;
-    }
-  } else {
-    const chiAnh = ds.filter((g) => urlCuaAnh(g));
-    noi = chiAnh.length
-      ? `<p>Ngày này không nói gì, chỉ giữ lại ${chiAnh.length === 1 ? "một tấm ảnh" : chiAnh.length + " tấm ảnh"}.</p>`
-        + `<div class="anh-dan">` + chiAnh.map((g) =>
-          `<img src="${urlCuaAnh(g)}" alt="" loading="lazy">`).join("") + `</div>`
-      : `<p class="trong-trang">Ngày này chỉ có im lặng.</p>`;
+  let noi = tr.doan.length
+    ? tr.doan.map((d) => `<p>${thoat(d)}</p>`).join("")
+    : "";
+
+  if (tr.anh.length) {
+    noi += `<div class="anh-dan">` + tr.anh.map((g) =>
+      `<img src="${urlCuaAnh(g)}" alt="" loading="lazy">`).join("") + `</div>`;
   }
+  if (!noi) noi = `<p class="trong-trang">Ngày này chỉ có im lặng.</p>`;
 
   return `<article class="to-giay ${lop}" data-trang="${i}">
-    <p class="trang-ngay-lon">${t.thu}</p>
-    <h2 class="trang-tieu">Ngày ${String(t.ngay).padStart(2, "0")} tháng ${t.thang} năm ${t.nam}</h2>
+    ${dau
+      ? `<p class="trang-ngay-lon">${t.thu}</p>
+         <h2 class="trang-tieu">Ngày ${String(t.ngay).padStart(2, "0")} tháng ${t.thang} năm ${t.nam}</h2>`
+      : `<p class="trang-ngay-lon">tiếp theo</p>
+         <h2 class="trang-tieu mo">Ngày ${String(t.ngay).padStart(2, "0")} tháng ${t.thang}</h2>`}
     <div class="trang-noi">${noi}</div>
-    <p class="trang-chan">— ${i + 1} —</p>
+    <p class="trang-chan">${tr.tong > 1 ? `${tr.phan}/${tr.tong} · ` : ""}— ${i + 1} —</p>
   </article>`;
 }
 
@@ -2637,9 +2695,7 @@ function apDienMao() {
   g.dataset.cheDo = cheDoThuc();
   $("bia-chinh").dataset.bia = ch.bia;
   $("bia-ten").textContent = ch.tenSach || "Nhật ký nhỏ";
-  const tuoi = tinhTuoi();
-  $("bia-nguoi").textContent = ch.nguoi
-    ? (tuoi !== null ? `${ch.nguoi} · ${tuoi} tuổi` : ch.nguoi) : "";
+  $("bia-nguoi").textContent = ch.nguoi || "";
   $("bia-cham").innerHTML = ch.chamNgon.trim()
     ? `<hr class="bia-vach">${thoat(ch.chamNgon)}` : "";
   // Đổi luôn màu thanh trạng thái iPhone cho khớp nền app.
@@ -2662,7 +2718,7 @@ const CAC_O = [
     '<path d="M4 6.5h16"/><path d="M4 12h16"/><path d="M4 17.5h10"/>' },
   { ma: "lich", ten: "Lịch", hinh:
     '<rect x="3.2" y="4.8" width="17.6" height="16" rx="2.4"/><path d="M3.2 9.6h17.6"/><path d="M8 3.2v3.2"/><path d="M16 3.2v3.2"/>' },
-  { ma: "sach", ten: "Sổ tay", hinh:
+  { ma: "sach", ten: "Nhật ký nhỏ", hinh:
     '<path d="M4.5 4.2h11.8a2.5 2.5 0 0 1 2.5 2.5v13.1H7a2.5 2.5 0 0 1-2.5-2.5z"/><path d="M8.2 4.2v15.6"/>' }
 ];
 
@@ -3388,7 +3444,7 @@ function ganSuKien() {
 
   // Cài đặt
   $("nut-cai-so").addEventListener("click", moCai);
-  $("nut-cai-bia").addEventListener("click", moCai);
+  $("nut-cai-ghi").addEventListener("click", moCai);
   $("nut-dong-cai").addEventListener("click", dongCai);
   $("tam-che").addEventListener("click", dongCai);
 
