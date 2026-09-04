@@ -157,6 +157,9 @@
   --de: "Literata", ui-serif, Georgia, serif;
   --than: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", sans-serif;
   --may: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  /* Chữ cho câu trích: nét viết tay bay bổng. Lùi về serif nghiêng nếu
+     máy chưa tải kịp — cả hai đều có đủ dấu tiếng Việt. */
+  --tho: "Dancing Script", "Playfair Display", "Literata", Georgia, cursive;
   --tren: env(safe-area-inset-top, 0px);
   --duoi: env(safe-area-inset-bottom, 0px);
 
@@ -488,6 +491,77 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
 }
 .xem-anh button:active { transform: scale(.88); }
 
+
+/* ---- Câu trích dưới hàng nút ----
+   Nét viết tay, ngoặc kép ôm hai đầu, dưới là dải hoa văn.
+   Cả khối bấm được: chạm vào là đổi câu khác ngay. */
+
+.cau-trich {
+  margin: 1.5rem 0 0;
+  padding: .5rem .8rem;
+  max-width: 22rem;
+  text-align: center;
+  min-height: 6.6rem;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  cursor: pointer;
+  border-radius: 14px;
+  transition: background .2s;
+  -webkit-user-select: none; user-select: none;
+}
+.cau-trich:active { background: color-mix(in srgb, var(--nhan) 7%, transparent); }
+
+.cau-trich blockquote {
+  font-family: var(--tho);
+  font-weight: 600;
+  font-size: 1.72rem;
+  line-height: 1.42;
+  color: var(--chu);
+  margin: 0;
+  width: 100%;
+  text-wrap: balance;
+}
+
+/* Dải hoa văn: hai vạch vuốt nhòe hai đầu, giữa là một bông nhỏ.
+   Dựng bằng lưới ngang nên luôn nằm chính giữa. */
+.cau-trich .hoa-van {
+  display: flex; align-items: center; justify-content: center;
+  gap: .65rem;
+  width: 100%;
+  margin-top: .85rem;
+}
+.cau-trich .hoa-van i {
+  display: block; height: 1px; width: 2.8rem;
+  background: linear-gradient(90deg, transparent, var(--nhan));
+  opacity: .55;
+}
+.cau-trich .hoa-van i:last-child {
+  background: linear-gradient(90deg, var(--nhan), transparent);
+}
+.cau-trich .hoa-van span {
+  font-family: var(--de);
+  font-size: .82rem; line-height: 1;
+  color: var(--nhan); opacity: .75;
+}
+
+/* Hiện lên từ tốn: mờ dần vào, nhích lên một chút */
+.cau-trich.hien-len blockquote {
+  animation: cauHien 1s cubic-bezier(.22,.8,.3,1) both;
+}
+.cau-trich.hien-len .hoa-van {
+  animation: cauHien .8s cubic-bezier(.22,.8,.3,1) .35s both;
+}
+@keyframes cauHien {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cau-trich.hien-len blockquote,
+  .cau-trich.hien-len .hoa-van { animation: none; opacity: 1; }
+}
+
+/* Đang soạn thì giấu câu trích đi, nhường chỗ cho việc viết */
+#khu-soan:not([hidden]) ~ .cau-trich { display: none; }
 
 /* --- Danh sách mẩu ghi, giờ nằm trong sổ --- */
 
