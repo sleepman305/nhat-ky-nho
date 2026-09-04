@@ -1,0 +1,1927 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nhật ký nhỏ</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Nhật ký nhỏ">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#16283D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;0,7..72,700;1,7..72,400&family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+/* ============================================================
+   NHẬT KÝ NHỎ — by SirV
+
+   Một file, chạy được ngoại tuyến, tự ghi âm và tự cất.
+   Không có file trung gian, không phải nhập xuất gì cả.
+   Mọi mẩu ghi nằm trong IndexedDB của chính máy này.
+   ============================================================ */
+
+:root,
+:root[data-chu-de="muc-giay"] {
+  --nen: #F2F4F5; --mat: #FFFFFF; --mat-2: #E9EDEF;
+  --chu: #16283D; --chu-nhat: #3B546F; --chu-mo: #6B7C8B;
+  --vien: #D5DCE1; --vien-mo: #E6EAED;
+  --nhan: #0E7C7B; --nhan-nen: #E0EFEE; --do: #A8492C;
+  --bong: 0 1px 2px rgba(22,40,61,.05), 0 8px 24px rgba(22,40,61,.06);
+}
+:root[data-chu-de="dem-sau"] {
+  --nen: #0D141C; --mat: #16202B; --mat-2: #1E2B39;
+  --chu: #DFE7EE; --chu-nhat: #A9BCCC; --chu-mo: #7A8C9C;
+  --vien: #2A3B4C; --vien-mo: #202E3C;
+  --nhan: #4FBFB8; --nhan-nen: #123634; --do: #E08267;
+  --bong: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+}
+:root[data-chu-de="co-ua"] {
+  --nen: #EFE7D8; --mat: #FAF5EC; --mat-2: #E5DAC5;
+  --chu: #3B2E1E; --chu-nhat: #5E4B33; --chu-mo: #8A7458;
+  --vien: #D5C7AC; --vien-mo: #E4DAC7;
+  --nhan: #96602A; --nhan-nen: #EDDFC8; --do: #9A3B23;
+  --bong: 0 1px 2px rgba(59,46,30,.06), 0 8px 24px rgba(59,46,30,.08);
+}
+:root[data-chu-de="hoa-dao"] {
+  --nen: #F7EDEE; --mat: #FFF9F9; --mat-2: #F0DEE0;
+  --chu: #40222A; --chu-nhat: #653A45; --chu-mo: #96707A;
+  --vien: #E4C9CD; --vien-mo: #EFDCDF;
+  --nhan: #B04766; --nhan-nen: #F5DDE3; --do: #A03A2E;
+  --bong: 0 1px 2px rgba(64,34,42,.05), 0 8px 24px rgba(64,34,42,.07);
+}
+:root[data-chu-de="reu-da"] {
+  --nen: #E6EAE2; --mat: #F4F7F0; --mat-2: #D8DFD1;
+  --chu: #232E23; --chu-nhat: #41513F; --chu-mo: #6E7C6A;
+  --vien: #C4CEBB; --vien-mo: #DBE2D4;
+  --nhan: #4A6B3E; --nhan-nen: #DDE6D5; --do: #94512A;
+  --bong: 0 1px 2px rgba(35,46,35,.05), 0 8px 24px rgba(35,46,35,.07);
+}
+:root[data-chu-de="than-chi"] {
+  --nen: #EDEDEC; --mat: #FBFBFA; --mat-2: #DEDEDC;
+  --chu: #1F1F1E; --chu-nhat: #454544; --chu-mo: #777776;
+  --vien: #CDCDCB; --vien-mo: #E2E2E0;
+  --nhan: #1F1F1E; --nhan-nen: #DEDEDC; --do: #8A3A2A;
+  --bong: 0 1px 2px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.06);
+}
+
+:root {
+  --de: "Literata", ui-serif, Georgia, serif;
+  --than: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --may: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  --tren: env(safe-area-inset-top, 0px);
+  --duoi: env(safe-area-inset-bottom, 0px);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--nen);
+  color: var(--chu);
+  font-family: var(--than);
+  font-size: 15px;
+  line-height: 1.6;
+  overscroll-behavior-y: none;
+  -webkit-font-smoothing: antialiased;
+}
+button, input, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; background: none; border: none; padding: 0; }
+:focus-visible { outline: 2px solid var(--nhan); outline-offset: 2px; border-radius: 6px; }
+[hidden] { display: none !important; }
+
+.nut {
+  display: inline-flex; align-items: center; justify-content: center; gap: .45rem;
+  padding: .58rem 1.05rem; border-radius: 9px;
+  border: 1px solid var(--vien); background: var(--mat);
+  font-weight: 500; font-size: .92rem;
+  transition: background .15s, transform .1s;
+}
+.nut:active { transform: scale(.97); }
+.nut.chinh { background: var(--nhan); border-color: var(--nhan); color: #fff; }
+:root[data-chu-de="than-chi"] .nut.chinh { color: #FBFBFA; }
+.nut.nho { padding: .35rem .7rem; font-size: .85rem; }
+.nut[disabled] { opacity: .5; cursor: default; }
+
+/* ============ Khung màn hình ============ */
+
+.man {
+  position: fixed;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  padding-top: var(--tren);
+}
+.man.hien { display: flex; }
+
+.dinh {
+  display: flex; align-items: center; gap: .6rem;
+  padding: .7rem 1rem;
+  border-bottom: 1px solid var(--vien-mo);
+  flex: none;
+}
+.dinh .ten { font-family: var(--de); font-weight: 600; font-size: 1.02rem; margin-right: auto; }
+
+.than { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+
+/* Thanh điều hướng dưới cùng */
+.chan {
+  flex: none;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid var(--vien-mo);
+  background: var(--mat);
+  padding-bottom: var(--duoi);
+}
+.chan button {
+  padding: .65rem .3rem calc(.65rem);
+  font-size: .74rem;
+  color: var(--chu-mo);
+  display: flex; flex-direction: column; align-items: center; gap: .18rem;
+  font-weight: 500;
+}
+.chan button[aria-current="true"] { color: var(--nhan); }
+.chan .hinh { font-size: 1.15rem; line-height: 1; }
+
+/* ============ MÀN GHI ============ */
+
+#man-ghi .than {
+  display: flex;
+  flex-direction: column;
+}
+
+.dau-hom-nay {
+  padding: 1.5rem 1.25rem .5rem;
+  text-align: center;
+  flex: none;
+}
+.dau-hom-nay .thu {
+  font-family: var(--may); font-size: .68rem; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--nhan); margin: 0 0 .25rem;
+}
+.dau-hom-nay h1 {
+  font-family: var(--de); font-weight: 700;
+  font-size: clamp(1.35rem, 5.5vw, 1.7rem);
+  margin: 0; letter-spacing: -.015em;
+}
+.dau-hom-nay .dem { color: var(--chu-mo); font-size: .85rem; margin: .3rem 0 0; }
+
+/* Vùng nút thu âm */
+.san-ghi {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .9rem;
+  padding: 1.5rem 1.25rem 1.25rem;
+}
+
+#nut-noi {
+  width: 8.5rem; height: 8.5rem;
+  border-radius: 50%;
+  background: var(--nhan);
+  color: #fff;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: .3rem;
+  box-shadow: 0 6px 22px color-mix(in srgb, var(--nhan) 38%, transparent);
+  transition: transform .14s, box-shadow .2s;
+  font-weight: 600; font-size: .92rem;
+}
+:root[data-chu-de="than-chi"] #nut-noi { color: #FBFBFA; }
+#nut-noi .bieu { font-size: 2rem; line-height: 1; }
+#nut-noi:active { transform: scale(.95); }
+
+#nut-noi.dang-nghe {
+  animation: tho 1.6s ease-in-out infinite;
+}
+@keyframes tho {
+  0%, 100% { box-shadow: 0 6px 22px color-mix(in srgb, var(--nhan) 38%, transparent); }
+  50%      { box-shadow: 0 6px 22px color-mix(in srgb, var(--nhan) 38%, transparent),
+                         0 0 0 14px color-mix(in srgb, var(--nhan) 12%, transparent); }
+}
+@media (prefers-reduced-motion: reduce) { #nut-noi.dang-nghe { animation: none; } }
+
+.hang-phu { display: flex; gap: .6rem; }
+
+/* Ô soạn lời, hiện khi đang ghi */
+#khu-soan {
+  width: 100%;
+  max-width: 30rem;
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+}
+#o-loi {
+  width: 100%;
+  min-height: 5.5rem;
+  padding: .8rem .9rem;
+  border-radius: 11px;
+  border: 1px solid var(--vien);
+  background: var(--mat);
+  font-family: var(--de);
+  font-size: 1.02rem;
+  line-height: 1.6;
+  resize: none;
+}
+#o-loi::placeholder { color: var(--chu-mo); font-family: var(--than); font-size: .93rem; }
+
+.xem-anh {
+  position: relative;
+  align-self: flex-start;
+  border-radius: 9px;
+  overflow: hidden;
+  border: 1px solid var(--vien);
+  max-width: 8rem;
+}
+.xem-anh img { display: block; width: 100%; height: auto; }
+.xem-anh button {
+  position: absolute; top: .25rem; right: .25rem;
+  width: 1.5rem; height: 1.5rem; border-radius: 50%;
+  background: rgba(0,0,0,.6); color: #fff; font-size: .8rem;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* Danh sách mẩu ghi hôm nay */
+.hom-nay {
+  flex: 1;
+  padding: .5rem 1.25rem 2rem;
+  border-top: 1px solid var(--vien-mo);
+  margin-top: .5rem;
+}
+.nhan-muc {
+  font-family: var(--may); font-size: .66rem; letter-spacing: .15em;
+  text-transform: uppercase; color: var(--chu-mo);
+  margin: 1rem 0 .6rem;
+}
+
+.mau {
+  display: grid;
+  grid-template-columns: 3.3rem minmax(0, 1fr);
+  gap: 0 .9rem;
+  padding: .75rem 0;
+  border-top: 1px solid var(--vien-mo);
+}
+.mau:first-of-type { border-top: none; }
+.mau .gio {
+  font-family: var(--may); font-size: .8rem;
+  color: var(--nhan); padding-top: .22rem;
+  font-variant-numeric: tabular-nums;
+}
+.mau .loi {
+  font-family: var(--de); font-size: 1rem; line-height: 1.68;
+  margin: 0; text-wrap: pretty; overflow-wrap: anywhere;
+}
+.mau img {
+  display: block; width: 100%; max-width: 15rem;
+  border-radius: 9px; border: 1px solid var(--vien-mo);
+  margin-bottom: .45rem;
+}
+.mau .sua {
+  font-size: .78rem; color: var(--chu-mo);
+  margin-top: .3rem; display: inline-flex; gap: .75rem;
+}
+.mau .sua button { color: var(--chu-mo); text-decoration: underline; text-underline-offset: 2px; }
+
+.trong {
+  text-align: center; color: var(--chu-mo);
+  padding: 2.5rem 1rem; font-size: .93rem;
+}
+
+/* ============ MÀN SỔ ============ */
+
+#man-so .than { padding: 0 0 2rem; }
+
+.o-tim {
+  width: 100%;
+  padding: .5rem .85rem;
+  border-radius: 999px;
+  border: 1px solid var(--vien);
+  background: var(--mat);
+  font-size: .9rem;
+}
+
+.nhom-thang { padding: 0 1rem; }
+.ten-thang {
+  font-family: var(--may); font-size: .66rem; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--chu-mo);
+  margin: 1.4rem 0 .5rem .3rem;
+}
+.the-ngay {
+  display: flex; align-items: baseline; gap: .7rem;
+  width: 100%; text-align: left;
+  padding: .7rem .8rem;
+  border-radius: 10px;
+  border: 1px solid var(--vien-mo);
+  background: var(--mat);
+  margin-bottom: .5rem;
+}
+.the-ngay .so {
+  font-family: var(--may); font-size: 1.05rem; font-weight: 500;
+  font-variant-numeric: tabular-nums; color: var(--nhan);
+  min-width: 1.7rem;
+}
+.the-ngay .tom {
+  flex: 1; min-width: 0;
+  font-size: .89rem; color: var(--chu-nhat);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.the-ngay .dau { font-size: .72rem; color: var(--chu-mo); }
+
+/* Trang một ngày */
+#trang-ngay { padding: 1.25rem 1.25rem 3rem; max-width: 40rem; margin: 0 auto; }
+.dau-trang { margin-bottom: 1.5rem; }
+.dau-trang h1 {
+  font-family: var(--de); font-weight: 700;
+  font-size: clamp(1.5rem, 5vw, 2rem);
+  margin: .2rem 0 0; letter-spacing: -.02em;
+}
+
+.tong-hop {
+  margin-top: 2rem;
+  padding: 1.25rem 1.3rem;
+  background: var(--mat);
+  border: 1px solid var(--vien-mo);
+  border-radius: 12px;
+  box-shadow: var(--bong);
+}
+.tong-hop h2 {
+  font-family: var(--may); font-size: .66rem; letter-spacing: .15em;
+  text-transform: uppercase; color: var(--chu-mo);
+  font-weight: 500; margin: 0 0 .8rem;
+}
+.tong-hop p {
+  font-family: var(--de); font-size: 1.02rem; line-height: 1.78;
+  margin: 0; text-wrap: pretty;
+}
+.tong-hop p + p { margin-top: .8rem; }
+
+/* ============ MÀN BÌA ============ */
+
+#man-bia .than {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 1.5rem; padding: 2rem 1.25rem;
+}
+
+.bia {
+  width: min(19rem, 76vw);
+  aspect-ratio: 3 / 4.35;
+  border-radius: 4px 10px 10px 4px;
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: 2.3rem 1.7rem 1.9rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,.14), 0 18px 44px rgba(0,0,0,.22);
+  color: var(--bia-chu, #fff);
+  text-align: center;
+}
+.bia::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 14px;
+  background: linear-gradient(90deg, rgba(0,0,0,.34), rgba(0,0,0,.05) 62%, rgba(255,255,255,.09));
+}
+.bia-trong { position: relative; z-index: 2; }
+.bia-cua {
+  font-family: var(--may); font-size: .64rem; letter-spacing: .2em;
+  text-transform: uppercase; opacity: .62; margin: 0 0 .8rem;
+}
+.bia-ten {
+  font-family: var(--de); font-weight: 700;
+  font-size: clamp(1.6rem, 6vw, 2rem);
+  line-height: 1.15; margin: 0; letter-spacing: -.015em; text-wrap: balance;
+}
+.bia-nguoi { font-family: var(--de); font-size: .98rem; margin: 1.2rem 0 0; }
+.bia-cham {
+  font-family: var(--de); font-style: italic;
+  font-size: .92rem; line-height: 1.65; opacity: .82;
+  margin: 0; position: relative; z-index: 2; text-wrap: pretty;
+}
+.bia-vach { width: 2.2rem; height: 1px; background: currentColor; opacity: .4; margin: 1rem auto; border: 0; }
+
+.bia[data-bia="vai-cham"] { --bia-chu: #F3EFE6;
+  background: radial-gradient(circle at 30% 20%, rgba(255,255,255,.07), transparent 55%),
+    repeating-linear-gradient(0deg, rgba(0,0,0,.055) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(0,0,0,.055) 0 1px, transparent 1px 3px),
+    linear-gradient(155deg, #2E4A5C, #1B2E3B 68%); }
+.bia[data-bia="da-nau"] { --bia-chu: #F2E3C6;
+  background: radial-gradient(ellipse at 50% 30%, rgba(255,241,209,.11), transparent 62%),
+    repeating-linear-gradient(112deg, rgba(0,0,0,.05) 0 2px, transparent 2px 6px),
+    linear-gradient(160deg, #6B3F26, #40230F 74%); }
+.bia[data-bia="giay-tho"] { --bia-chu: #4A3B29;
+  background: repeating-linear-gradient(48deg, rgba(120,92,58,.05) 0 1px, transparent 1px 4px),
+    radial-gradient(circle at 70% 78%, rgba(160,126,80,.14), transparent 58%),
+    linear-gradient(168deg, #DCC9A6, #C9B189 76%); }
+.bia[data-bia="troi-dem"] { --bia-chu: #E8EDF6;
+  background: radial-gradient(1.4px 1.4px at 22% 18%, rgba(255,255,255,.9), transparent),
+    radial-gradient(1.1px 1.1px at 68% 12%, rgba(255,255,255,.72), transparent),
+    radial-gradient(1.6px 1.6px at 82% 34%, rgba(255,255,255,.85), transparent),
+    radial-gradient(1px 1px at 38% 44%, rgba(255,255,255,.6), transparent),
+    radial-gradient(1.3px 1.3px at 14% 62%, rgba(255,255,255,.75), transparent),
+    radial-gradient(1.5px 1.5px at 88% 84%, rgba(255,255,255,.8), transparent),
+    radial-gradient(ellipse at 50% 108%, rgba(94,132,182,.42), transparent 62%),
+    linear-gradient(178deg, #0A1428, #17294A 70%, #233C63); }
+.bia[data-bia="son-mai"] { --bia-chu: #F6E7C8;
+  background: radial-gradient(ellipse at 28% 24%, rgba(246,231,200,.13), transparent 56%),
+    repeating-linear-gradient(45deg, rgba(0,0,0,.05) 0 3px, transparent 3px 9px),
+    linear-gradient(150deg, #7C1F1C, #4A0F10 76%); }
+.bia[data-bia="toi-gian"] { --bia-chu: #22201D;
+  background: linear-gradient(170deg, #FAF8F4, #EBE7DF 82%);
+  box-shadow: 0 1px 3px rgba(0,0,0,.09), 0 16px 36px rgba(0,0,0,.13); }
+.bia[data-bia="toi-gian"]::before { background: linear-gradient(90deg, rgba(0,0,0,.11), transparent 70%); }
+
+/* ============ BẢNG CÀI ĐẶT ============ */
+
+#tam-che { position: fixed; inset: 0; z-index: 40; background: rgba(8,14,20,.45); }
+.bang {
+  position: fixed; z-index: 50; inset: 0 0 0 auto;
+  width: min(27rem, 100%);
+  background: var(--nen);
+  border-left: 1px solid var(--vien);
+  overflow-y: auto;
+  padding: calc(1.3rem + var(--tren)) 1.3rem calc(3rem + var(--duoi));
+}
+.bang-dinh { display: flex; align-items: center; margin-bottom: 1.6rem; }
+.bang-dinh h2 { font-family: var(--de); font-size: 1.22rem; margin: 0; margin-right: auto; }
+
+.phan { margin-bottom: 2rem; }
+.phan > h3 {
+  font-family: var(--may); font-size: .66rem; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--chu-mo); font-weight: 500;
+  margin: 0 0 .8rem;
+}
+.o-nhap {
+  display: block; width: 100%;
+  padding: .58rem .8rem; border-radius: 9px;
+  border: 1px solid var(--vien); background: var(--mat);
+  margin-bottom: .65rem;
+}
+textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); line-height: 1.6; }
+.nhan-nho { display: block; font-size: .8rem; color: var(--chu-mo); margin-bottom: .25rem; }
+
+.luoi-bia { display: grid; grid-template-columns: repeat(3, 1fr); gap: .65rem; }
+.chon-bia {
+  width: 100%; aspect-ratio: 3 / 4.35;
+  border-radius: 3px 6px 6px 3px;
+  border: 2px solid transparent;
+  position: relative; overflow: hidden; padding: 0; display: block;
+  box-shadow: 0 1px 2px rgba(0,0,0,.12), 0 4px 10px rgba(0,0,0,.12);
+}
+.chon-bia::before { width: 6px; }
+.chon-bia[aria-pressed="true"] { border-color: var(--nhan); }
+.chon-bia .ten-bia {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  font-size: .6rem; padding: .5rem .2rem .25rem;
+  background: linear-gradient(transparent, rgba(0,0,0,.62)); color: #fff; font-weight: 500;
+}
+
+.luoi-chu-de { display: grid; grid-template-columns: repeat(auto-fill, minmax(6.2rem, 1fr)); gap: .5rem; }
+.chon-chu-de {
+  border: 1px solid var(--vien); border-radius: 9px; padding: .55rem;
+  background: var(--mat); display: flex; flex-direction: column; gap: .4rem; text-align: left;
+}
+.chon-chu-de[aria-pressed="true"] { border-color: var(--nhan); box-shadow: 0 0 0 1px var(--nhan); }
+.chon-chu-de .ten { font-size: .78rem; font-weight: 500; }
+.dai-mau { display: flex; height: 1.1rem; border-radius: 4px; overflow: hidden; }
+.dai-mau i { flex: 1; }
+
+.hang-chon {
+  display: flex; align-items: center; gap: .6rem;
+  padding: .6rem .75rem; border: 1px solid var(--vien); border-radius: 9px;
+  background: var(--mat); margin-bottom: .45rem; width: 100%; text-align: left;
+}
+.hang-chon[aria-pressed="true"] { border-color: var(--nhan); background: var(--nhan-nen); }
+.hang-chon .phu { color: var(--chu-mo); font-size: .78rem; display: block; }
+
+.ghi-chu { font-size: .82rem; color: var(--chu-mo); margin: .55rem 0 0; line-height: 1.55; }
+.hang-nut { display: flex; gap: .55rem; flex-wrap: wrap; }
+.bao { font-size: .85rem; color: var(--nhan); margin: .55rem 0 0; min-height: 1.2em; }
+
+/* ============ MÀN KHÓA ============ */
+
+#man-khoa { align-items: center; justify-content: center; padding: 1.5rem; }
+.hop-khoa { width: min(21rem, 100%); text-align: center; }
+.hop-khoa h2 { font-family: var(--de); font-size: 1.3rem; margin: 0 0 .3rem; }
+.hop-khoa .phu { color: var(--chu-mo); font-size: .88rem; margin: 0 0 1.6rem; }
+.day-cham { display: flex; justify-content: center; gap: .7rem; margin-bottom: 1.6rem; }
+.day-cham span {
+  width: .8rem; height: .8rem; border-radius: 50%;
+  border: 1.5px solid var(--vien); transition: background .12s, transform .12s;
+}
+.day-cham span.day { background: var(--nhan); border-color: var(--nhan); transform: scale(1.12); }
+.ban-phim { display: grid; grid-template-columns: repeat(3, 1fr); gap: .7rem; max-width: 14rem; margin: 0 auto; }
+.ban-phim button {
+  aspect-ratio: 1; border-radius: 50%;
+  border: 1px solid var(--vien); background: var(--mat);
+  font-family: var(--may); font-size: 1.1rem;
+  display: flex; align-items: center; justify-content: center;
+}
+.ban-phim button.chu { font-family: var(--than); font-size: .8rem; }
+#luoi-hinh-ve { width: min(14rem, 68vw); aspect-ratio: 1; margin: 0 auto 1.3rem; touch-action: none; display: block; }
+#o-mat-khau { width: 100%; padding: .62rem .85rem; border-radius: 9px; border: 1px solid var(--vien); background: var(--mat); margin-bottom: .9rem; text-align: center; }
+.bao-loi { color: var(--do); font-size: .86rem; margin: .9rem 0 0; min-height: 1.3em; }
+
+/* ============ IN SÁCH ============ */
+
+#khu-in { display: none; }
+
+@media print {
+  @page { size: A5; margin: 16mm 14mm 18mm; }
+  body { background: #fff; color: #000; }
+  .man, .bang, #tam-che { display: none !important; }
+  #khu-in { display: block !important; }
+  .bia-in {
+    height: calc(100vh - 34mm); display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+    page-break-after: always; border: 1.5pt double #000; padding: 14mm;
+  }
+  .bia-in h1 { font-family: var(--de); font-size: 30pt; margin: 0 0 6mm; }
+  .bia-in .cham { font-family: var(--de); font-style: italic; font-size: 12pt; max-width: 78%; line-height: 1.7; }
+  .bia-in .nguoi { font-family: var(--de); font-size: 13pt; margin-top: 10mm; }
+  .bia-in .khoang { font-family: var(--may); font-size: 9pt; margin-top: 3mm; letter-spacing: .1em; }
+  .ngay-in { page-break-before: always; }
+  .ngay-in:first-of-type { page-break-before: avoid; }
+  .ngay-in h2 { font-family: var(--de); font-size: 16pt; margin: 0 0 1mm; border-bottom: .5pt solid #000; padding-bottom: 2mm; }
+  .ngay-in .thu-in { font-family: var(--may); font-size: 7.5pt; letter-spacing: .12em; text-transform: uppercase; margin: 0 0 5mm; }
+  .mau-in { display: flex; gap: 5mm; margin-bottom: 4mm; page-break-inside: avoid; }
+  .mau-in .gio-in { font-family: var(--may); font-size: 8.5pt; min-width: 12mm; padding-top: .6mm; }
+  .mau-in p { font-family: var(--de); font-size: 11pt; line-height: 1.62; margin: 0; }
+  .mau-in img { max-width: 62mm; max-height: 55mm; margin-bottom: 2mm; display: block; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============ MÀN KHÓA ============ -->
+<div class="man" id="man-khoa">
+  <div class="than" style="display:flex;align-items:center;justify-content:center;padding:1.5rem">
+    <div class="hop-khoa">
+      <h2 id="tieu-khoa">Nhật ký nhỏ</h2>
+      <p class="phu" id="phu-khoa">Nhập mã để mở</p>
+      <div id="vung-pin" hidden>
+        <div class="day-cham" id="day-cham"></div>
+        <div class="ban-phim" id="ban-phim"></div>
+      </div>
+      <div id="vung-hinh-ve" hidden><canvas id="luoi-hinh-ve" width="300" height="300"></canvas></div>
+      <div id="vung-mat-khau" hidden>
+        <input type="password" id="o-mat-khau" placeholder="Mật khẩu" autocomplete="current-password">
+        <button class="nut chinh" id="nut-mo-mk">Mở nhật ký</button>
+      </div>
+      <p class="bao-loi" id="bao-loi-khoa"></p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MÀN GHI ============ -->
+<div class="man hien" id="man-ghi">
+  <div class="than">
+    <header class="dau-hom-nay">
+      <p class="thu" id="thu-hom-nay"></p>
+      <h1 id="ngay-hom-nay"></h1>
+      <p class="dem" id="dem-hom-nay"></p>
+    </header>
+
+    <div class="san-ghi">
+      <button id="nut-noi">
+        <span class="bieu" aria-hidden="true">🎙</span>
+        <span id="chu-nut-noi">Chạm để nói</span>
+      </button>
+
+      <div class="hang-phu">
+        <button class="nut" id="nut-chup">📷 Chụp ảnh</button>
+        <button class="nut" id="nut-go">⌨ Gõ tay</button>
+      </div>
+
+      <div id="khu-soan" hidden>
+        <div class="xem-anh" id="xem-anh" hidden>
+          <img id="anh-cho" alt="Ảnh sắp ghi vào nhật ký">
+          <button id="nut-bo-anh" aria-label="Bỏ ảnh">✕</button>
+        </div>
+        <textarea id="o-loi" placeholder="Đang nghe… hoặc chạm vào đây rồi bấm nút micro trên bàn phím" rows="3"></textarea>
+        <div class="hang-nut">
+          <button class="nut chinh" id="nut-luu" style="flex:1">Ghi vào nhật ký</button>
+          <button class="nut" id="nut-huy">Bỏ</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="hom-nay">
+      <p class="nhan-muc">Hôm nay</p>
+      <div id="ds-hom-nay"></div>
+    </div>
+  </div>
+
+  <nav class="chan">
+    <button data-di="ghi" aria-current="true"><span class="hinh">✎</span>Ghi</button>
+    <button data-di="so"><span class="hinh">📖</span>Sổ</button>
+    <button data-di="bia"><span class="hinh">📔</span>Bìa</button>
+  </nav>
+</div>
+
+<!-- ============ MÀN SỔ ============ -->
+<div class="man" id="man-so">
+  <header class="dinh">
+    <button class="nut nho" id="nut-lui-so" hidden>‹ Lui</button>
+    <span class="ten" id="ten-so">Sổ nhật ký</span>
+    <button class="nut nho" id="nut-cai-so">Cài đặt</button>
+  </header>
+  <div style="padding:.7rem 1rem 0;flex:none">
+    <input type="search" class="o-tim" id="o-tim" placeholder="Tìm trong nhật ký" aria-label="Tìm trong nhật ký">
+  </div>
+  <div class="than">
+    <div id="muc-luc"></div>
+    <article id="trang-ngay" hidden></article>
+  </div>
+  <nav class="chan">
+    <button data-di="ghi"><span class="hinh">✎</span>Ghi</button>
+    <button data-di="so" aria-current="true"><span class="hinh">📖</span>Sổ</button>
+    <button data-di="bia"><span class="hinh">📔</span>Bìa</button>
+  </nav>
+</div>
+
+<!-- ============ MÀN BÌA ============ -->
+<div class="man" id="man-bia">
+  <div class="than">
+    <div class="bia" id="bia-chinh" data-bia="vai-cham">
+      <div class="bia-trong">
+        <p class="bia-cua">Nhật ký</p>
+        <h1 class="bia-ten" id="bia-ten">Nhật ký nhỏ</h1>
+        <p class="bia-nguoi" id="bia-nguoi"></p>
+      </div>
+      <p class="bia-cham" id="bia-cham"></p>
+    </div>
+    <button class="nut" id="nut-cai-bia">Cài đặt</button>
+  </div>
+  <nav class="chan">
+    <button data-di="ghi"><span class="hinh">✎</span>Ghi</button>
+    <button data-di="so"><span class="hinh">📖</span>Sổ</button>
+    <button data-di="bia" aria-current="true"><span class="hinh">📔</span>Bìa</button>
+  </nav>
+</div>
+
+<!-- ============ CÀI ĐẶT ============ -->
+<div id="tam-che" hidden></div>
+<aside class="bang" id="bang-cai" hidden aria-label="Cài đặt">
+  <div class="bang-dinh">
+    <h2>Cài đặt</h2>
+    <button class="nut nho" id="nut-dong-cai">Đóng</button>
+  </div>
+
+  <section class="phan">
+    <h3>Trang bìa</h3>
+    <label class="nhan-nho" for="nhap-ten">Tên cuốn nhật ký</label>
+    <input class="o-nhap" id="nhap-ten" placeholder="Nhật ký nhỏ">
+    <label class="nhan-nho" for="nhap-nguoi">Tên của anh</label>
+    <input class="o-nhap" id="nhap-nguoi" placeholder="SirV">
+    <label class="nhan-nho" for="nhap-nam">Năm sinh</label>
+    <input class="o-nhap" id="nhap-nam" type="number" inputmode="numeric" placeholder="1990">
+    <label class="nhan-nho" for="nhap-cham">Châm ngôn</label>
+    <textarea class="o-nhap" id="nhap-cham" placeholder="Câu anh muốn thấy mỗi lần mở nhật ký"></textarea>
+  </section>
+
+  <section class="phan"><h3>Chọn bìa</h3><div class="luoi-bia" id="luoi-bia"></div></section>
+  <section class="phan"><h3>Chủ đề màu</h3><div class="luoi-chu-de" id="luoi-chu-de"></div></section>
+
+  <section class="phan">
+    <h3>Khóa nhật ký</h3>
+    <div id="ds-khoa"></div>
+    <div id="vung-dat-khoa"></div>
+    <p class="ghi-chu" id="ghi-chu-khoa"></p>
+  </section>
+
+  <section class="phan">
+    <h3>Sao lưu</h3>
+    <div class="hang-nut">
+      <button class="nut chinh" id="nut-xuat">Xuất ra file</button>
+      <button class="nut" id="nut-nhap">Nạp từ file</button>
+      <button class="nut" id="nut-in">In thành sách</button>
+    </div>
+    <input type="file" id="o-nhap-file" accept=".zip,.md,.json" multiple hidden>
+    <p class="ghi-chu">
+      Xuất ra một file <code>.zip</code> gồm nhật ký dạng chữ và toàn bộ ảnh. Anh cất
+      vào đâu tuỳ ý — app không tự gửi đi đâu cả. Nạp lại được trên máy khác.
+    </p>
+    <p class="bao" id="bao-cai"></p>
+  </section>
+
+  <section class="phan">
+    <h3>Kho trong máy</h3>
+    <p class="ghi-chu" id="mo-ta-kho" style="margin-top:0"></p>
+    <button class="nut" id="nut-xoa-het">Xoá sạch nhật ký</button>
+    <p class="ghi-chu">Xoá là mất hẳn. Nên xuất ra file trước khi làm việc này.</p>
+  </section>
+</aside>
+
+<input type="file" id="o-chup" accept="image/*" capture="environment" hidden>
+<div id="khu-in" aria-hidden="true"></div>
+
+<script>
+"use strict";
+
+/* ============================================================
+   CẤU HÌNH
+   ============================================================ */
+
+const MAC_DINH = {
+  tenSach: "Nhật ký nhỏ", nguoi: "", namSinh: "", chamNgon: "",
+  bia: "vai-cham", chuDe: "muc-giay", kieuKhoa: "khong", bamKhoa: ""
+};
+const KHOA_CH = "nhat-ky-nho:cau-hinh";
+let ch = { ...MAC_DINH };
+
+const BIA = [
+  { ma: "vai-cham", ten: "Vải gân" }, { ma: "da-nau", ten: "Da nâu" },
+  { ma: "giay-tho", ten: "Giấy thô" }, { ma: "troi-dem", ten: "Trời đêm" },
+  { ma: "son-mai", ten: "Sơn mài" }, { ma: "toi-gian", ten: "Tối giản" }
+];
+const CHU_DE = [
+  { ma: "muc-giay", ten: "Mực giấy", mau: ["#F2F4F5", "#16283D", "#0E7C7B"] },
+  { ma: "dem-sau", ten: "Đêm sâu", mau: ["#0D141C", "#DFE7EE", "#4FBFB8"] },
+  { ma: "co-ua", ten: "Cỏ úa", mau: ["#EFE7D8", "#3B2E1E", "#96602A"] },
+  { ma: "hoa-dao", ten: "Hoa đào", mau: ["#F7EDEE", "#40222A", "#B04766"] },
+  { ma: "reu-da", ten: "Rêu đá", mau: ["#E6EAE2", "#232E23", "#4A6B3E"] },
+  { ma: "than-chi", ten: "Than chì", mau: ["#EDEDEC", "#1F1F1E", "#777776"] }
+];
+const THU = ["Chủ nhật", "Thứ hai", "Thứ ba", "Thứ tư", "Thứ năm", "Thứ sáu", "Thứ bảy"];
+const THANG = ["Tháng một", "Tháng hai", "Tháng ba", "Tháng tư", "Tháng năm", "Tháng sáu",
+  "Tháng bảy", "Tháng tám", "Tháng chín", "Tháng mười", "Tháng mười một", "Tháng mười hai"];
+
+const $ = (id) => document.getElementById(id);
+const thoat = (s) => String(s).replace(/[&<>"']/g,
+  (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+/** Nạp cấu hình đã lưu. Hỏng hoặc bị chặn thì dùng mặc định, app vẫn chạy. */
+function napCauHinh() {
+  try {
+    const t = localStorage.getItem(KHOA_CH);
+    if (t) ch = { ...MAC_DINH, ...JSON.parse(t) };
+  } catch (e) { /* bỏ qua */ }
+}
+function luuCauHinh() {
+  try { localStorage.setItem(KHOA_CH, JSON.stringify(ch)); } catch (e) { /* bỏ qua */ }
+}
+
+/**
+ * Băm mã khóa để không lưu mã gốc dưới dạng chữ thường.
+ * Đây là rào cản với người tò mò cầm máy, không phải mã hóa cấp bảo mật.
+ * @param {string} s Mã người dùng nhập.
+ * @returns {string} Chuỗi hex 16 ký tự.
+ */
+function bam(s) {
+  const x = "nhat-ky-nho:" + s;
+  let a = 0x811c9dc5, b = 0xc9dc5118;
+  for (let i = 0; i < x.length; i++) {
+    const c = x.charCodeAt(i);
+    a ^= c; a = Math.imul(a, 0x01000193) >>> 0;
+    b ^= c + i; b = Math.imul(b, 0x85ebca6b) >>> 0;
+  }
+  return a.toString(16).padStart(8, "0") + b.toString(16).padStart(8, "0");
+}
+
+/* ============================================================
+   KHO DỮ LIỆU
+
+   Toàn bộ nhật ký nằm trong IndexedDB của chính máy này. Không có
+   file trung gian, không phải nhập xuất gì để dùng hằng ngày —
+   ghi xong là nằm sẵn đó, mở app ra là thấy.
+
+   Mỗi mẩu ghi: { id, luc, chu, anh }
+     id  — mốc thời gian tính bằng mili giây, dùng luôn làm khóa
+     luc — chuỗi ISO, giữ cả múi giờ máy lúc ghi
+     chu — lời anh nói hoặc gõ
+     anh — Blob ảnh, hoặc null
+   ============================================================ */
+
+const TEN_KHO = "nhat-ky-nho-so", NGAN = "ghi";
+
+/** Mở kho, tạo mới nếu chưa có. @returns {Promise<IDBDatabase|null>} */
+function moKho() {
+  return new Promise((xong) => {
+    if (!window.indexedDB) { xong(null); return; }
+    let yc;
+    try { yc = indexedDB.open(TEN_KHO, 1); } catch (e) { xong(null); return; }
+    yc.onupgradeneeded = () => {
+      const db = yc.result;
+      if (!db.objectStoreNames.contains(NGAN)) {
+        db.createObjectStore(NGAN, { keyPath: "id" }).createIndex("ngay", "ngay");
+      }
+    };
+    yc.onsuccess = () => xong(yc.result);
+    yc.onerror = () => xong(null);
+  });
+}
+
+/**
+ * Thêm hoặc sửa một mẩu ghi.
+ * @param {{id:number, ngay:string, luc:string, chu:string, anh:(Blob|null)}} m Mẩu ghi.
+ */
+async function luuMau(m) {
+  const db = await moKho();
+  if (!db) return;
+  try {
+    await new Promise((xong, hong) => {
+      const gd = db.transaction(NGAN, "readwrite");
+      gd.objectStore(NGAN).put(m);
+      gd.oncomplete = xong; gd.onerror = hong;
+    });
+  } finally { db.close(); }
+}
+
+/** Xoá một mẩu ghi theo id. @param {number} id */
+async function xoaMau(id) {
+  const db = await moKho();
+  if (!db) return;
+  try {
+    await new Promise((xong) => {
+      const gd = db.transaction(NGAN, "readwrite");
+      gd.objectStore(NGAN).delete(id);
+      gd.oncomplete = xong; gd.onerror = xong;
+    });
+  } finally { db.close(); }
+}
+
+/** Đọc toàn bộ mẩu ghi, cũ trước mới sau. @returns {Promise<Array>} */
+async function docHet() {
+  const db = await moKho();
+  if (!db) return [];
+  try {
+    const ds = await new Promise((xong) => {
+      const yc = db.transaction(NGAN, "readonly").objectStore(NGAN).getAll();
+      yc.onsuccess = () => xong(yc.result || []);
+      yc.onerror = () => xong([]);
+    });
+    return ds.sort((a, b) => a.id - b.id);
+  } finally { db.close(); }
+}
+
+/** Xoá sạch kho. */
+async function xoaKho() {
+  const db = await moKho();
+  if (!db) return;
+  try {
+    await new Promise((xong) => {
+      const gd = db.transaction(NGAN, "readwrite");
+      gd.objectStore(NGAN).clear();
+      gd.oncomplete = xong; gd.onerror = xong;
+    });
+  } finally { db.close(); }
+}
+
+/** Toàn bộ mẩu ghi đang có trong bộ nhớ, giữ đồng bộ với kho. */
+let soGhi = [];
+
+/** Ảnh đã tạo URL tạm: id mẩu → URL. Thu hồi khi vẽ lại để khỏi rò bộ nhớ. */
+let urlAnh = new Map();
+
+/**
+ * Lấy URL hiển thị của ảnh trong một mẩu ghi, tạo mới nếu chưa có.
+ * @param {object} m Mẩu ghi.
+ * @returns {string|null} URL tạm, hoặc null nếu mẩu không có ảnh.
+ */
+function urlCuaAnh(m) {
+  if (!m.anh) return null;
+  if (!urlAnh.has(m.id)) urlAnh.set(m.id, URL.createObjectURL(m.anh));
+  return urlAnh.get(m.id);
+}
+
+/* ============================================================
+   NGÀY THÁNG
+   ============================================================ */
+
+/** Đổi một mốc Date thành chuỗi yyyy-MM-dd theo giờ máy. */
+function maNgay(d) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+/** Đổi mốc Date thành chuỗi HH:mm 24 giờ. */
+function maGio(d) {
+  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+}
+/** Tách mã ngày thành các mảnh để hiển thị. */
+function doiNgay(ma) {
+  const [n, t, g] = ma.split("-").map(Number);
+  const d = new Date(n, t - 1, g);
+  return { thu: THU[d.getDay()], dai: `${g} ${THANG[t - 1].toLowerCase()}, ${n}`, ngay: g, thang: t, nam: n };
+}
+
+/** Nhóm các mẩu ghi theo ngày. @returns {Map<string, Array>} khóa là yyyy-MM-dd. */
+function nhomTheoNgay() {
+  const m = new Map();
+  for (const g of soGhi) {
+    if (!m.has(g.ngay)) m.set(g.ngay, []);
+    m.get(g.ngay).push(g);
+  }
+  return m;
+}
+
+/* ============================================================
+   THU LỜI NÓI
+
+   Ưu tiên bộ nhận giọng của trình duyệt: chạm một nút là nói được ngay.
+   Máy nào không có thì lùi về ô gõ — anh chạm vào ô rồi bấm nút micro
+   trên bàn phím iPhone, cũng ra chữ, mà lại chạy hẳn trong máy.
+   ============================================================ */
+
+const BoNghe = window.SpeechRecognition || window.webkitSpeechRecognition;
+let mayNghe = null, dangNghe = false;
+
+/** Ảnh vừa chụp, đang chờ ghi kèm lời. */
+let anhCho = null;
+
+/** Mẩu ghi đang sửa, null nếu đang soạn mẩu mới. */
+let dangSua = null;
+
+/** Mở khu soạn lời, tuỳ chọn bật luôn bộ nghe. */
+function moKhuSoan(batNghe) {
+  $("khu-soan").hidden = false;
+  if (batNghe && BoNghe) batDauNghe();
+  else setTimeout(() => $("o-loi").focus(), 80);
+}
+
+/** Đóng khu soạn, dọn sạch lời và ảnh đang chờ. */
+function dongKhuSoan() {
+  dungNghe();
+  $("khu-soan").hidden = true;
+  $("o-loi").value = "";
+  boAnhCho();
+  dangSua = null;
+  $("nut-luu").textContent = "Ghi vào nhật ký";
+  $("chu-nut-noi").textContent = "Chạm để nói";
+}
+
+/** Bật micro và đổ chữ thẳng vào ô soạn khi anh nói. */
+function batDauNghe() {
+  if (!BoNghe || dangNghe) return;
+  try {
+    mayNghe = new BoNghe();
+  } catch (e) { return; }
+
+  mayNghe.lang = "vi-VN";
+  mayNghe.continuous = true;
+  mayNghe.interimResults = true;
+
+  // Giữ lại phần đã gõ trước đó để lời nói nối vào chứ không đè lên.
+  const daCo = $("o-loi").value;
+  let chot = "";
+
+  mayNghe.onresult = (sk) => {
+    let tam = "";
+    for (let i = sk.resultIndex; i < sk.results.length; i++) {
+      const doan = sk.results[i][0].transcript;
+      if (sk.results[i].isFinal) chot += doan;
+      else tam += doan;
+    }
+    $("o-loi").value = (daCo ? daCo + " " : "") + chot + tam;
+  };
+
+  mayNghe.onerror = () => dungNghe();
+  mayNghe.onend = () => {
+    dangNghe = false;
+    $("nut-noi").classList.remove("dang-nghe");
+    $("chu-nut-noi").textContent = "Nói tiếp";
+  };
+
+  try {
+    mayNghe.start();
+    dangNghe = true;
+    $("nut-noi").classList.add("dang-nghe");
+    $("chu-nut-noi").textContent = "Đang nghe…";
+  } catch (e) {
+    dangNghe = false;
+  }
+}
+
+/** Tắt micro. */
+function dungNghe() {
+  if (mayNghe && dangNghe) { try { mayNghe.stop(); } catch (e) {} }
+  dangNghe = false;
+  $("nut-noi").classList.remove("dang-nghe");
+}
+
+/** Gỡ ảnh đang chờ khỏi khu soạn. */
+function boAnhCho() {
+  if (anhCho && anhCho.url) URL.revokeObjectURL(anhCho.url);
+  anhCho = null;
+  $("xem-anh").hidden = true;
+  $("anh-cho").removeAttribute("src");
+}
+
+/**
+ * Ghi mẩu đang soạn vào nhật ký.
+ * Không có chữ mà cũng không có ảnh thì bỏ qua, khỏi tạo mẩu rỗng.
+ */
+async function ghiVaoSo() {
+  const chu = $("o-loi").value.trim();
+  if (!chu && !anhCho) { dongKhuSoan(); return; }
+
+  dungNghe();
+
+  if (dangSua) {
+    // Sửa mẩu cũ: giữ nguyên mốc thời gian gốc, chỉ đổi nội dung.
+    dangSua.chu = chu;
+    if (anhCho) dangSua.anh = anhCho.blob;
+    await luuMau(dangSua);
+    const i = soGhi.findIndex((g) => g.id === dangSua.id);
+    if (i >= 0) soGhi[i] = dangSua;
+    if (urlAnh.has(dangSua.id)) { URL.revokeObjectURL(urlAnh.get(dangSua.id)); urlAnh.delete(dangSua.id); }
+  } else {
+    const luc = new Date();
+    const m = {
+      id: luc.getTime(),
+      ngay: maNgay(luc),
+      luc: luc.toISOString(),
+      chu,
+      anh: anhCho ? anhCho.blob : null
+    };
+    await luuMau(m);
+    soGhi.push(m);
+  }
+
+  soGhi.sort((a, b) => a.id - b.id);
+  dongKhuSoan();
+  veManGhi();
+}
+
+/* ============================================================
+   VẼ MÀN GHI
+   ============================================================ */
+
+/** Vẽ lại phần đầu ngày và danh sách mẩu ghi hôm nay. */
+function veManGhi() {
+  const nay = new Date();
+  const ma = maNgay(nay);
+  const t = doiNgay(ma);
+
+  $("thu-hom-nay").textContent = t.thu;
+  $("ngay-hom-nay").textContent = t.dai;
+
+  const cuaNay = soGhi.filter((g) => g.ngay === ma);
+  const soAnh = cuaNay.filter((g) => g.anh).length;
+  $("dem-hom-nay").textContent = cuaNay.length
+    ? `${cuaNay.length} mẩu ghi${soAnh ? ` · ${soAnh} ảnh` : ""}`
+    : "Chưa ghi gì hôm nay";
+
+  const o = $("ds-hom-nay");
+  if (!cuaNay.length) {
+    o.innerHTML = `<p class="trong">Chạm nút trên rồi nói một câu bất kỳ.<br>
+      Dù chỉ là “trời hôm nay đẹp”.</p>`;
+    return;
+  }
+
+  // Mới nhất lên trước, để anh thấy ngay cái vừa ghi.
+  o.innerHTML = [...cuaNay].reverse().map((g) => veMotMau(g)).join("");
+}
+
+/**
+ * Dựng HTML cho một mẩu ghi.
+ * @param {object} g Mẩu ghi.
+ * @param {boolean} choSua Có kèm nút sửa/xoá hay không.
+ * @returns {string} Chuỗi HTML.
+ */
+function veMotMau(g, choSua = true) {
+  const url = urlCuaAnh(g);
+  return `<section class="mau">
+    <div class="gio">${maGio(new Date(g.luc))}</div>
+    <div>
+      ${url ? `<img src="${url}" alt="Ảnh chụp lúc ${maGio(new Date(g.luc))}" loading="lazy">` : ""}
+      ${g.chu ? `<p class="loi">${thoat(g.chu)}</p>` : ""}
+      ${choSua ? `<span class="sua">
+        <button data-sua="${g.id}">Sửa</button>
+        <button data-xoa="${g.id}">Xoá</button>
+      </span>` : ""}
+    </div>
+  </section>`;
+}
+
+/* ============================================================
+   VẼ MÀN SỔ
+   ============================================================ */
+
+let tuKhoa = "", ngayDangXem = null;
+
+/** Vẽ mục lục các ngày, nhóm theo tháng, có lọc theo từ tìm kiếm. */
+function veMucLuc() {
+  ngayDangXem = null;
+  $("trang-ngay").hidden = true;
+  $("muc-luc").hidden = false;
+  $("nut-lui-so").hidden = true;
+  $("ten-so").textContent = "Sổ nhật ký";
+
+  const nhom = nhomTheoNgay();
+  let ngay = [...nhom.keys()].sort().reverse();
+
+  if (tuKhoa) {
+    ngay = ngay.filter((n) =>
+      nhom.get(n).some((g) => (g.chu || "").toLowerCase().includes(tuKhoa)));
+  }
+
+  if (!ngay.length) {
+    $("muc-luc").innerHTML = `<p class="trong">${tuKhoa
+      ? "Không tìm thấy ngày nào khớp."
+      : "Sổ còn trống. Sang thẻ Ghi để viết mẩu đầu tiên."}</p>`;
+    return;
+  }
+
+  let html = "", thangTruoc = "";
+  for (const n of ngay) {
+    const t = doiNgay(n);
+    const khoa = `${t.nam}-${t.thang}`;
+    if (khoa !== thangTruoc) {
+      if (thangTruoc) html += "</div>";
+      html += `<div class="nhom-thang"><p class="ten-thang">${THANG[t.thang - 1]} ${t.nam}</p>`;
+      thangTruoc = khoa;
+    }
+    const ds = nhom.get(n);
+    const dau = ds.find((g) => g.chu);
+    html += `<button class="the-ngay" data-ngay="${n}">
+      <span class="so">${String(t.ngay).padStart(2, "0")}</span>
+      <span class="tom">${thoat(dau ? dau.chu : "(chỉ có ảnh)")}</span>
+      <span class="dau">${ds.length}${ds.some((g) => g.anh) ? " ◗" : ""}</span>
+    </button>`;
+  }
+  html += "</div>";
+  $("muc-luc").innerHTML = html;
+}
+
+/**
+ * Vẽ trang đọc của một ngày, kèm bản tổng hợp ở cuối.
+ * @param {string} ma Mã ngày yyyy-MM-dd.
+ */
+function veTrangNgay(ma) {
+  ngayDangXem = ma;
+  $("muc-luc").hidden = true;
+  $("trang-ngay").hidden = false;
+  $("nut-lui-so").hidden = false;
+
+  const ds = soGhi.filter((g) => g.ngay === ma);
+  const t = doiNgay(ma);
+  $("ten-so").textContent = t.dai;
+
+  let html = `<header class="dau-trang">
+    <p class="ten-thang" style="margin:0">${t.thu}</p>
+    <h1>${t.dai}</h1>
+  </header>`;
+
+  html += ds.map((g) => veMotMau(g)).join("");
+
+  const bai = tongHopNgay(ds);
+  if (bai.length) {
+    html += `<section class="tong-hop"><h2>Ngày hôm ấy</h2>
+      ${bai.map((d) => `<p>${thoat(d)}</p>`).join("")}</section>`;
+  }
+
+  $("trang-ngay").innerHTML = html;
+  $("trang-ngay").scrollTop = 0;
+}
+
+/**
+ * Ghép các mẩu rời trong ngày thành đoạn văn liền mạch.
+ *
+ * Chạy hẳn trong máy, không cần mạng và không tốn tiền: chỉ xếp theo
+ * thời gian rồi thêm chữ dẫn theo buổi. Không bịa thêm chi tiết nào —
+ * mọi câu đều là lời anh đã nói, chỉ được nối lại cho liền.
+ *
+ * @param {Array} ds Các mẩu ghi trong một ngày, đã theo thứ tự thời gian.
+ * @returns {string[]} Các đoạn văn, rỗng nếu ngày đó chưa đủ chất liệu.
+ */
+function tongHopNgay(ds) {
+  const co = ds.filter((g) => g.chu && g.chu.trim());
+  if (co.length < 2) return [];
+
+  /** Tên buổi theo giờ, để câu dẫn nghe tự nhiên. */
+  const buoi = (h) => h < 5 ? "đêm" : h < 11 ? "sáng" : h < 14 ? "trưa"
+    : h < 18 ? "chiều" : h < 22 ? "tối" : "khuya";
+
+  const doan = [];
+  let buoiTruoc = "", cau = [];
+
+  for (const g of co) {
+    const d = new Date(g.luc);
+    const b = buoi(d.getHours());
+    let noi = g.chu.trim();
+    noi = noi.charAt(0).toLowerCase() + noi.slice(1);
+    if (!/[.!?…]$/.test(noi)) noi += ".";
+
+    if (b !== buoiTruoc) {
+      if (cau.length) { doan.push(cau.join(" ")); cau = []; }
+      const hoa = b.charAt(0).toUpperCase() + b.slice(1);
+      cau.push(`${hoa}, lúc ${maGio(d)}, ${noi}`);
+      buoiTruoc = b;
+    } else {
+      cau.push(`Đến ${maGio(d)}, ${noi}`);
+    }
+  }
+  if (cau.length) doan.push(cau.join(" "));
+
+  const soAnh = ds.filter((g) => g.anh).length;
+  if (soAnh) doan.push(`Ngày này còn giữ lại ${soAnh} tấm ảnh.`);
+
+  return doan;
+}
+
+/* ============================================================
+   BÌA VÀ DIỆN MẠO
+   ============================================================ */
+
+/** Tính tuổi từ năm sinh. @returns {number|null} */
+function tinhTuoi() {
+  const n = parseInt(ch.namSinh, 10);
+  if (!n || n < 1900 || n > 2100) return null;
+  return new Date().getFullYear() - n;
+}
+
+/** Áp chủ đề màu và bìa hiện tại lên toàn trang. */
+function apDienMao() {
+  document.documentElement.dataset.chuDe = ch.chuDe;
+  $("bia-chinh").dataset.bia = ch.bia;
+  $("bia-ten").textContent = ch.tenSach || "Nhật ký nhỏ";
+  const tuoi = tinhTuoi();
+  $("bia-nguoi").textContent = ch.nguoi
+    ? (tuoi !== null ? `${ch.nguoi} · ${tuoi} tuổi` : ch.nguoi) : "";
+  $("bia-cham").innerHTML = ch.chamNgon.trim()
+    ? `<hr class="bia-vach">${thoat(ch.chamNgon)}` : "";
+  const mau = CHU_DE.find((c) => c.ma === ch.chuDe);
+  if (mau) document.querySelector('meta[name="theme-color"]')?.setAttribute("content", mau.mau[0]);
+}
+
+/* ============================================================
+   CHUYỂN MÀN
+   ============================================================ */
+
+/** @param {"ghi"|"so"|"bia"} ten Màn cần hiện. */
+function diToi(ten) {
+  for (const m of ["ghi", "so", "bia"]) {
+    $("man-" + m).classList.toggle("hien", m === ten);
+  }
+  document.querySelectorAll(".chan button").forEach((b) => {
+    b.setAttribute("aria-current", String(b.dataset.di === ten));
+  });
+  if (ten === "ghi") veManGhi();
+  if (ten === "so" && !ngayDangXem) veMucLuc();
+}
+
+/* ============================================================
+   CÀI ĐẶT
+   ============================================================ */
+
+function moCai() {
+  $("nhap-ten").value = ch.tenSach;
+  $("nhap-nguoi").value = ch.nguoi;
+  $("nhap-nam").value = ch.namSinh;
+  $("nhap-cham").value = ch.chamNgon;
+  veLuoiBia(); veLuoiChuDe(); veKhuKhoa();
+  const soAnh = soGhi.filter((g) => g.anh).length;
+  $("mo-ta-kho").textContent = soGhi.length
+    ? `${soGhi.length} mẩu ghi, ${nhomTheoNgay().size} ngày, ${soAnh} ảnh.`
+    : "Chưa có mẩu ghi nào.";
+  $("bao-cai").textContent = "";
+  $("tam-che").hidden = false;
+  $("bang-cai").hidden = false;
+}
+function dongCai() { $("tam-che").hidden = true; $("bang-cai").hidden = true; }
+
+function veLuoiBia() {
+  $("luoi-bia").innerHTML = BIA.map((b) =>
+    `<button class="bia chon-bia" data-bia="${b.ma}" data-chon-bia="${b.ma}"
+      aria-pressed="${b.ma === ch.bia}" title="${b.ten}">
+      <span class="ten-bia">${b.ten}</span></button>`).join("");
+}
+function veLuoiChuDe() {
+  $("luoi-chu-de").innerHTML = CHU_DE.map((c) =>
+    `<button class="chon-chu-de" data-chu-de="${c.ma}" aria-pressed="${c.ma === ch.chuDe}">
+      <span class="dai-mau">${c.mau.map((m) => `<i style="background:${m}"></i>`).join("")}</span>
+      <span class="ten">${c.ten}</span></button>`).join("");
+}
+
+const KIEU_KHOA = [
+  { ma: "khong", ten: "Không khóa", mo: "Mở là đọc được ngay" },
+  { ma: "pin", ten: "Mã PIN", mo: "Bốn tới tám chữ số" },
+  { ma: "hinh-ve", ten: "Hình vẽ", mo: "Nối các điểm trên lưới" },
+  { ma: "mat-khau", ten: "Mật khẩu", mo: "Chuỗi chữ và số tự đặt" }
+];
+
+function veKhuKhoa() {
+  $("ds-khoa").innerHTML = KIEU_KHOA.map((k) =>
+    `<button class="hang-chon" data-kieu="${k.ma}" aria-pressed="${k.ma === ch.kieuKhoa}">
+      <span><strong>${k.ten}</strong><span class="phu">${k.mo}</span></span></button>`).join("");
+
+  const v = $("vung-dat-khoa"), g = $("ghi-chu-khoa");
+
+  if (ch.kieuKhoa === "khong") {
+    v.innerHTML = ""; g.textContent = "Nhật ký đang không khóa."; return;
+  }
+  if (ch.bamKhoa) {
+    v.innerHTML = `<button class="nut nho" id="nut-doi-ma">Đổi mã</button>`;
+    $("nut-doi-ma").onclick = () => { ch.bamKhoa = ""; luuCauHinh(); veKhuKhoa(); };
+    g.textContent = "Đã đặt mã. Lần sau mở app sẽ phải nhập.";
+    return;
+  }
+
+  if (ch.kieuKhoa === "pin") {
+    v.innerHTML = `<input class="o-nhap" id="dat-ma" inputmode="numeric" maxlength="8" placeholder="4 tới 8 số">
+      <button class="nut chinh" id="nut-luu-ma">Đặt mã này</button>`;
+    $("nut-luu-ma").onclick = () => {
+      const x = $("dat-ma").value.trim();
+      if (!/^\d{4,8}$/.test(x)) { g.textContent = "Mã PIN phải là 4 tới 8 chữ số."; return; }
+      datMa(x);
+    };
+  } else if (ch.kieuKhoa === "mat-khau") {
+    v.innerHTML = `<input class="o-nhap" id="dat-ma" type="password" placeholder="Ít nhất 4 ký tự" autocomplete="new-password">
+      <button class="nut chinh" id="nut-luu-ma">Đặt mật khẩu</button>`;
+    $("nut-luu-ma").onclick = () => {
+      const x = $("dat-ma").value;
+      if (x.length < 4) { g.textContent = "Mật khẩu cần ít nhất 4 ký tự."; return; }
+      datMa(x);
+    };
+  } else {
+    v.innerHTML = `<p class="ghi-chu" style="margin-top:0">Vẽ hình anh muốn dùng, nối ít nhất bốn điểm.</p>
+      <canvas id="luoi-dat" width="300" height="300"
+        style="width:min(14rem,100%);aspect-ratio:1;display:block;margin:.6rem auto;touch-action:none"></canvas>`;
+    ganLuoiVe($("luoi-dat"), (duong) => {
+      if (duong.length < 4) { g.textContent = "Hình vẽ cần nối ít nhất bốn điểm."; return; }
+      datMa(duong.join("-"));
+    });
+  }
+  g.textContent = "Chưa đặt mã — nhật ký vẫn đang mở tự do.";
+}
+
+function datMa(x) {
+  ch.bamKhoa = bam(x); luuCauHinh(); veKhuKhoa();
+  $("ghi-chu-khoa").textContent = "Đã đặt xong. Lần sau mở app sẽ phải nhập.";
+}
+
+/* ============================================================
+   LƯỚI HÌNH VẼ
+   ============================================================ */
+
+/**
+ * Gắn xử lý vẽ hình lên canvas lưới 3×3.
+ * @param {HTMLCanvasElement} canvas Canvas để vẽ.
+ * @param {(duong:number[])=>void} khiXong Nhận thứ tự các điểm 0..8 đã nối.
+ * @returns {{xoa:()=>void}} Điều khiển để xoá nét đã vẽ.
+ */
+function ganLuoiVe(canvas, khiXong) {
+  const ctx = canvas.getContext("2d");
+  const N = 300, le = 52, buoc = (N - le * 2) / 2, R = 11;
+  let duong = [], ve = false, chuot = null;
+  const diem = (i) => ({ x: le + (i % 3) * buoc, y: le + Math.floor(i / 3) * buoc });
+
+  function mau() {
+    const c = getComputedStyle(document.documentElement);
+    return { nhan: c.getPropertyValue("--nhan").trim() || "#0E7C7B",
+             vien: c.getPropertyValue("--vien").trim() || "#D5DCE1" };
+  }
+  function veLai() {
+    const m = mau();
+    ctx.clearRect(0, 0, N, N);
+    ctx.strokeStyle = m.nhan; ctx.lineWidth = 4; ctx.lineCap = "round"; ctx.lineJoin = "round";
+    if (duong.length) {
+      ctx.beginPath();
+      duong.forEach((i, k) => { const p = diem(i); k ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y); });
+      if (ve && chuot) ctx.lineTo(chuot.x, chuot.y);
+      ctx.stroke();
+    }
+    for (let i = 0; i < 9; i++) {
+      const p = diem(i), chon = duong.includes(i);
+      ctx.beginPath(); ctx.arc(p.x, p.y, chon ? R : R - 3, 0, Math.PI * 2);
+      ctx.fillStyle = chon ? m.nhan : "transparent";
+      ctx.strokeStyle = chon ? m.nhan : m.vien; ctx.lineWidth = 2;
+      ctx.fill(); ctx.stroke();
+    }
+  }
+  const toaDo = (e) => {
+    const r = canvas.getBoundingClientRect();
+    return { x: (e.clientX - r.left) * (N / r.width), y: (e.clientY - r.top) * (N / r.height) };
+  };
+  const bat = (p) => {
+    for (let i = 0; i < 9; i++) {
+      const d = diem(i);
+      if (Math.hypot(p.x - d.x, p.y - d.y) < R + 13 && !duong.includes(i)) { duong.push(i); return; }
+    }
+  };
+  canvas.addEventListener("pointerdown", (e) => {
+    e.preventDefault(); canvas.setPointerCapture(e.pointerId);
+    duong = []; ve = true; chuot = toaDo(e); bat(chuot); veLai();
+  });
+  canvas.addEventListener("pointermove", (e) => {
+    if (!ve) return; chuot = toaDo(e); bat(chuot); veLai();
+  });
+  const het = () => {
+    if (!ve) return;
+    ve = false; chuot = null; veLai();
+    if (duong.length) khiXong(duong.slice());
+  };
+  canvas.addEventListener("pointerup", het);
+  canvas.addEventListener("pointercancel", het);
+  veLai();
+  return { xoa: () => { duong = []; veLai(); } };
+}
+
+/* ============================================================
+   MÀN KHÓA
+   ============================================================ */
+
+let goPin = "", luoiKhoa = null;
+
+function hienManKhoa() {
+  $("man-khoa").classList.add("hien");
+  for (const m of ["ghi", "so", "bia"]) $("man-" + m).classList.remove("hien");
+  $("bao-loi-khoa").textContent = "";
+  $("vung-pin").hidden = ch.kieuKhoa !== "pin";
+  $("vung-hinh-ve").hidden = ch.kieuKhoa !== "hinh-ve";
+  $("vung-mat-khau").hidden = ch.kieuKhoa !== "mat-khau";
+  $("tieu-khoa").textContent = ch.tenSach || "Nhật ký nhỏ";
+  $("phu-khoa").textContent = { pin: "Nhập mã PIN để mở", "hinh-ve": "Vẽ hình để mở",
+    "mat-khau": "Nhập mật khẩu để mở" }[ch.kieuKhoa] || "";
+
+  if (ch.kieuKhoa === "pin") { goPin = ""; veBanPhim(); veChamPin(); }
+  else if (ch.kieuKhoa === "hinh-ve" && !luoiKhoa) {
+    luoiKhoa = ganLuoiVe($("luoi-hinh-ve"), (d) => thuMa(d.join("-")));
+  } else if (ch.kieuKhoa === "mat-khau") setTimeout(() => $("o-mat-khau").focus(), 60);
+}
+
+function veBanPhim() {
+  $("ban-phim").innerHTML = ["1","2","3","4","5","6","7","8","9","xoa","0","ok"].map((p) =>
+    p === "xoa" ? `<button class="chu" data-phim="xoa" aria-label="Xoá">⌫</button>`
+    : p === "ok" ? `<button class="chu" data-phim="ok">Mở</button>`
+    : `<button data-phim="${p}">${p}</button>`).join("");
+}
+function veChamPin() {
+  const n = Math.max(4, goPin.length);
+  $("day-cham").innerHTML = Array.from({ length: n },
+    (_, i) => `<span class="${i < goPin.length ? "day" : ""}"></span>`).join("");
+}
+
+/** Đối chiếu mã vừa nhập, đúng thì mở nhật ký. @param {string} x */
+function thuMa(x) {
+  if (bam(x) === ch.bamKhoa) {
+    $("man-khoa").classList.remove("hien");
+    diToi("ghi");
+  } else {
+    $("bao-loi-khoa").textContent = "Chưa đúng. Thử lại nhé.";
+    goPin = "";
+    if (ch.kieuKhoa === "pin") veChamPin();
+    if (ch.kieuKhoa === "mat-khau") $("o-mat-khau").value = "";
+    if (ch.kieuKhoa === "hinh-ve" && luoiKhoa) setTimeout(() => luoiKhoa.xoa(), 320);
+  }
+}
+
+/* ============================================================
+   XUẤT RA FILE .ZIP
+
+   Tự dựng gói zip thay vì gọi thư viện ngoài, để app vẫn sao lưu
+   được khi mất mạng. Xếp nguyên byte, không nén — ảnh JPEG vốn đã
+   nén rồi, nén thêm chẳng lợi bao nhiêu.
+   ============================================================ */
+
+const BANG_CRC = (() => {
+  const b = new Uint32Array(256);
+  for (let i = 0; i < 256; i++) {
+    let c = i;
+    for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    b[i] = c >>> 0;
+  }
+  return b;
+})();
+
+/** Tính CRC-32 của một khối byte. @param {Uint8Array} d @returns {number} */
+function crc32(d) {
+  let c = 0xFFFFFFFF;
+  for (let i = 0; i < d.length; i++) c = BANG_CRC[(c ^ d[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+
+/**
+ * Đóng nhiều file thành một gói zip.
+ * @param {Array<{ten:string, du:Uint8Array}>} muc File cần đóng gói.
+ * @returns {Blob} Gói zip.
+ */
+function dongGoiZip(muc) {
+  const bd = new TextEncoder();
+  const cuc = [], tt = [];
+  let vt = 0;
+  const gioDos = 0, ngayDos = ((2026 - 1980) << 9) | (1 << 5) | 1;
+
+  for (const m of muc) {
+    const ten = bd.encode(m.ten), c = crc32(m.du);
+    const dau = new Uint8Array(30 + ten.length);
+    const v = new DataView(dau.buffer);
+    v.setUint32(0, 0x04034B50, true); v.setUint16(4, 20, true); v.setUint16(6, 0x0800, true);
+    v.setUint16(8, 0, true); v.setUint16(10, gioDos, true); v.setUint16(12, ngayDos, true);
+    v.setUint32(14, c, true); v.setUint32(18, m.du.length, true); v.setUint32(22, m.du.length, true);
+    v.setUint16(26, ten.length, true); v.setUint16(28, 0, true);
+    dau.set(ten, 30);
+
+    const t = new Uint8Array(46 + ten.length);
+    const w = new DataView(t.buffer);
+    w.setUint32(0, 0x02014B50, true); w.setUint16(4, 20, true); w.setUint16(6, 20, true);
+    w.setUint16(8, 0x0800, true); w.setUint16(10, 0, true);
+    w.setUint16(12, gioDos, true); w.setUint16(14, ngayDos, true);
+    w.setUint32(16, c, true); w.setUint32(20, m.du.length, true); w.setUint32(24, m.du.length, true);
+    w.setUint16(28, ten.length, true); w.setUint32(42, vt, true);
+    t.set(ten, 46);
+
+    cuc.push(dau, m.du); tt.push(t);
+    vt += dau.length + m.du.length;
+  }
+
+  const coTT = tt.reduce((s, x) => s + x.length, 0);
+  const ket = new Uint8Array(22);
+  const k = new DataView(ket.buffer);
+  k.setUint32(0, 0x06054B50, true);
+  k.setUint16(8, muc.length, true); k.setUint16(10, muc.length, true);
+  k.setUint32(12, coTT, true); k.setUint32(16, vt, true);
+
+  return new Blob([...cuc, ...tt, ket], { type: "application/zip" });
+}
+
+/**
+ * Bung một gói zip ra thành danh sách file.
+ * Đọc theo bảng mục lục ở cuối gói vì đó là chỗ duy nhất chắc chắn
+ * có kích thước thật của từng file.
+ * @param {Blob} goi Gói zip.
+ * @returns {Promise<Array<{ten:string, blob:Blob}>>}
+ */
+async function bungZip(goi) {
+  const du = new Uint8Array(await goi.arrayBuffer());
+  const dv = new DataView(du.buffer);
+  const chu = new TextDecoder("utf-8");
+
+  let cuoi = -1;
+  for (let i = du.length - 22; i >= Math.max(0, du.length - 65557); i--) {
+    if (dv.getUint32(i, true) === 0x06054B50) { cuoi = i; break; }
+  }
+  if (cuoi < 0) throw new Error("Không phải file nén");
+
+  const so = dv.getUint16(cuoi + 10, true);
+  let vt = dv.getUint32(cuoi + 16, true);
+  const ket = [];
+
+  for (let i = 0; i < so; i++) {
+    if (dv.getUint32(vt, true) !== 0x02014B50) break;
+    const cach = dv.getUint16(vt + 10, true);
+    const coNen = dv.getUint32(vt + 20, true);
+    const dTen = dv.getUint16(vt + 28, true);
+    const dPhu = dv.getUint16(vt + 30, true);
+    const dChu = dv.getUint16(vt + 32, true);
+    const vtCuc = dv.getUint32(vt + 42, true);
+    const ten = chu.decode(du.subarray(vt + 46, vt + 46 + dTen));
+    vt += 46 + dTen + dPhu + dChu;
+    if (ten.endsWith("/")) continue;
+
+    const tCuc = dv.getUint16(vtCuc + 26, true);
+    const pCuc = dv.getUint16(vtCuc + 28, true);
+    const dau = vtCuc + 30 + tCuc + pCuc;
+    const tho = du.subarray(dau, dau + coNen);
+
+    let noi;
+    if (cach === 0) noi = new Blob([tho]);
+    else if (cach === 8) {
+      noi = await new Response(new Blob([tho]).stream()
+        .pipeThrough(new DecompressionStream("deflate-raw"))).blob();
+    } else continue;
+
+    ket.push({ ten, blob: noi });
+  }
+  return ket;
+}
+
+/** Gói toàn bộ nhật ký thành .zip rồi tải xuống. */
+async function xuatRaFile() {
+  if (!soGhi.length) { $("bao-cai").textContent = "Chưa có gì để xuất."; return; }
+
+  const nut = $("nut-xuat"), cu = nut.textContent;
+  nut.textContent = "Đang gói…"; nut.disabled = true;
+
+  try {
+    const bd = new TextEncoder();
+    const muc = [];
+    const nhom = nhomTheoNgay();
+
+    for (const [ngay, ds] of nhom) {
+      let chu = "";
+      for (const g of ds) {
+        chu += `\n## ${maGio(new Date(g.luc))}\n`;
+        if (g.anh) {
+          const ten = `${ngay}-${maGio(new Date(g.luc)).replace(":", "")}-${g.id % 1000}.jpg`;
+          muc.push({ ten: `anh/${ten}`, du: new Uint8Array(await g.anh.arrayBuffer()) });
+          chu += `![](anh/${ten})\n`;
+        }
+        if (g.chu) chu += `${g.chu}\n`;
+      }
+      muc.push({ ten: `${ngay}.md`, du: bd.encode(chu.trim() + "\n") });
+    }
+
+    // Kèm bản máy đọc, để nạp lại giữ nguyên từng mốc thời gian.
+    muc.push({
+      ten: "nhat-ky-nho.json",
+      du: bd.encode(JSON.stringify({
+        cauHinh: ch,
+        ghi: soGhi.map((g) => ({ id: g.id, ngay: g.ngay, luc: g.luc, chu: g.chu, coAnh: !!g.anh }))
+      }, null, 2))
+    });
+
+    const nay = maNgay(new Date());
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(dongGoiZip(muc));
+    a.download = `nhat-ky-nho-${nay}.zip`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    $("bao-cai").textContent = `Đã gói ${nhom.size} ngày.`;
+  } catch (e) {
+    $("bao-cai").textContent = "Gói không xong. Thử lại xem sao.";
+  } finally {
+    nut.textContent = cu; nut.disabled = false;
+  }
+}
+
+/**
+ * Nạp nhật ký từ file .zip hoặc .md.
+ * Dùng để chuyển máy, hoặc nhận lại nhật ký cũ ghi bằng Phím tắt.
+ * Mẩu nào đã có sẵn thì bỏ qua, nên nạp lại nhiều lần cũng không sinh bản trùng.
+ * @param {FileList|File[]} dsFile File người dùng chọn.
+ */
+async function napTuFile(dsFile) {
+  $("bao-cai").textContent = "Đang đọc…";
+  const tep = [];
+
+  for (const f of dsFile) {
+    if (/\.zip$/i.test(f.name)) {
+      try { tep.push(...await bungZip(f)); }
+      catch (e) { $("bao-cai").textContent = `Không mở được ${f.name}.`; return; }
+    } else {
+      tep.push({ ten: f.name, blob: f });
+    }
+  }
+
+  // Ảnh trước, để mẩu ghi tham chiếu tới là có sẵn.
+  const anh = new Map();
+  for (const t of tep) {
+    if (/\.(jpe?g|png|heic|webp|gif)$/i.test(t.ten)) anh.set(t.ten.split("/").pop(), t.blob);
+  }
+
+  const daCo = new Set(soGhi.map((g) => g.id));
+  let them = 0;
+
+  for (const t of tep) {
+    const ten = t.ten.split("/").pop();
+    if (!/^\d{4}-\d{2}-\d{2}\.md$/i.test(ten)) continue;
+
+    const ngay = ten.slice(0, 10);
+    const chu = await t.blob.text();
+    let gio = null, dong = [], anhCua = null;
+
+    /** Chốt mẩu đang gom lại thành một bản ghi. */
+    const chot = async () => {
+      if (!gio) return;
+      const [h, p] = gio.split(":").map(Number);
+      const [nn, tt, gg] = ngay.split("-").map(Number);
+      const luc = new Date(nn, tt - 1, gg, h || 0, p || 0);
+      const id = luc.getTime();
+      if (daCo.has(id)) { gio = null; dong = []; anhCua = null; return; }
+      const m = { id, ngay, luc: luc.toISOString(), chu: dong.join(" ").trim(),
+                  anh: anhCua ? anh.get(anhCua) || null : null };
+      await luuMau(m);
+      soGhi.push(m); daCo.add(id); them++;
+      gio = null; dong = []; anhCua = null;
+    };
+
+    for (const d of chu.split(/\r?\n/)) {
+      const td = d.match(/^##\s+(\d{1,2}:\d{2})\s*$/);
+      if (td) { await chot(); gio = td[1]; continue; }
+      if (/^\s*---\s*$/.test(d)) { await chot(); break; }
+      const ta = d.match(/!\[[^\]]*\]\(([^)]+)\)/);
+      if (ta) { anhCua = decodeURIComponent(ta[1].split("/").pop()); continue; }
+      const x = d.trim();
+      if (x && !/^#/.test(x)) dong.push(x);
+    }
+    await chot();
+  }
+
+  soGhi.sort((a, b) => a.id - b.id);
+  veManGhi();
+  $("bao-cai").textContent = them
+    ? `Đã nạp thêm ${them} mẩu ghi.`
+    : "Không có mẩu nào mới — có lẽ đã nạp rồi.";
+  const soAnh = soGhi.filter((g) => g.anh).length;
+  $("mo-ta-kho").textContent = `${soGhi.length} mẩu ghi, ${nhomTheoNgay().size} ngày, ${soAnh} ảnh.`;
+}
+
+/* ============================================================
+   IN THÀNH SÁCH
+   ============================================================ */
+
+/** Dựng bản in rồi gọi hộp thoại in của trình duyệt. */
+function inThanhSach() {
+  if (!soGhi.length) { $("bao-cai").textContent = "Chưa có gì để in."; return; }
+
+  const nhom = nhomTheoNgay();
+  const ngay = [...nhom.keys()].sort();
+  const dau = doiNgay(ngay[0]), cuoi = doiNgay(ngay[ngay.length - 1]);
+  const tuoi = tinhTuoi();
+
+  let html = `<section class="bia-in">
+    <h1>${thoat(ch.tenSach || "Nhật ký nhỏ")}</h1>
+    ${ch.chamNgon.trim() ? `<p class="cham">${thoat(ch.chamNgon)}</p>` : ""}
+    ${ch.nguoi ? `<p class="nguoi">${thoat(ch.nguoi)}${tuoi !== null ? ` · ${tuoi} tuổi` : ""}</p>` : ""}
+    <p class="khoang">${dau.dai} — ${cuoi.dai} · ${ngay.length} ngày</p>
+  </section>`;
+
+  for (const n of ngay) {
+    const t = doiNgay(n);
+    html += `<section class="ngay-in"><h2>${t.dai}</h2><p class="thu-in">${t.thu}</p>`;
+    for (const g of nhom.get(n)) {
+      const url = urlCuaAnh(g);
+      html += `<div class="mau-in"><div class="gio-in">${maGio(new Date(g.luc))}</div><div>
+        ${url ? `<img src="${url}" alt="">` : ""}
+        ${g.chu ? `<p>${thoat(g.chu)}</p>` : ""}</div></div>`;
+    }
+    html += `</section>`;
+  }
+
+  $("khu-in").innerHTML = html;
+  dongCai();
+  setTimeout(() => window.print(), 260);
+}
+
+/* ============================================================
+   GẮN SỰ KIỆN
+   ============================================================ */
+
+function ganSuKien() {
+  // Thanh dưới
+  document.querySelectorAll(".chan button").forEach((b) => {
+    b.addEventListener("click", () => {
+      if (b.dataset.di === "so") ngayDangXem = null;
+      diToi(b.dataset.di);
+    });
+  });
+
+  // Nút thu âm
+  $("nut-noi").addEventListener("click", () => {
+    if (dangNghe) { dungNghe(); return; }
+    if ($("khu-soan").hidden) moKhuSoan(true);
+    else if (BoNghe) batDauNghe();
+    else $("o-loi").focus();
+  });
+
+  $("nut-go").addEventListener("click", () => {
+    if ($("khu-soan").hidden) moKhuSoan(false);
+    else $("o-loi").focus();
+  });
+
+  $("nut-luu").addEventListener("click", ghiVaoSo);
+  $("nut-huy").addEventListener("click", dongKhuSoan);
+
+  // Chụp ảnh
+  $("nut-chup").addEventListener("click", () => $("o-chup").click());
+  $("o-chup").addEventListener("change", (e) => {
+    const f = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if (!f) return;
+    boAnhCho();
+    anhCho = { blob: f, url: URL.createObjectURL(f) };
+    $("anh-cho").src = anhCho.url;
+    $("xem-anh").hidden = false;
+    moKhuSoan(!!BoNghe);
+  });
+  $("nut-bo-anh").addEventListener("click", boAnhCho);
+
+  // Sửa, xoá mẩu ghi
+  const banMau = async (e) => {
+    const nSua = e.target.closest("[data-sua]");
+    const nXoa = e.target.closest("[data-xoa]");
+    if (nSua) {
+      const g = soGhi.find((x) => x.id === Number(nSua.dataset.sua));
+      if (!g) return;
+      diToi("ghi");
+      dangSua = g;
+      $("o-loi").value = g.chu || "";
+      $("nut-luu").textContent = "Lưu thay đổi";
+      $("khu-soan").hidden = false;
+      $("o-loi").focus();
+      return;
+    }
+    if (nXoa) {
+      const id = Number(nXoa.dataset.xoa);
+      if (!confirm("Xoá mẩu ghi này?")) return;
+      await xoaMau(id);
+      soGhi = soGhi.filter((x) => x.id !== id);
+      if (urlAnh.has(id)) { URL.revokeObjectURL(urlAnh.get(id)); urlAnh.delete(id); }
+      veManGhi();
+      if (ngayDangXem) veTrangNgay(ngayDangXem);
+    }
+  };
+  $("ds-hom-nay").addEventListener("click", banMau);
+  $("trang-ngay").addEventListener("click", banMau);
+
+  // Sổ
+  $("muc-luc").addEventListener("click", (e) => {
+    const n = e.target.closest("[data-ngay]");
+    if (n) veTrangNgay(n.dataset.ngay);
+  });
+  $("nut-lui-so").addEventListener("click", veMucLuc);
+  $("o-tim").addEventListener("input", (e) => {
+    tuKhoa = e.target.value.trim().toLowerCase();
+    veMucLuc();
+  });
+
+  // Cài đặt
+  $("nut-cai-so").addEventListener("click", moCai);
+  $("nut-cai-bia").addEventListener("click", moCai);
+  $("nut-dong-cai").addEventListener("click", dongCai);
+  $("tam-che").addEventListener("click", dongCai);
+
+  for (const [id, khoa] of [["nhap-ten","tenSach"], ["nhap-nguoi","nguoi"],
+                            ["nhap-nam","namSinh"], ["nhap-cham","chamNgon"]]) {
+    $(id).addEventListener("input", (e) => { ch[khoa] = e.target.value; luuCauHinh(); apDienMao(); });
+  }
+
+  $("luoi-bia").addEventListener("click", (e) => {
+    const n = e.target.closest("[data-chon-bia]");
+    if (!n) return;
+    ch.bia = n.dataset.chonBia; luuCauHinh(); veLuoiBia(); apDienMao();
+  });
+  $("luoi-chu-de").addEventListener("click", (e) => {
+    const n = e.target.closest("[data-chu-de]");
+    if (!n) return;
+    ch.chuDe = n.dataset.chuDe; luuCauHinh(); veLuoiChuDe(); apDienMao();
+  });
+  $("ds-khoa").addEventListener("click", (e) => {
+    const n = e.target.closest("[data-kieu]");
+    if (!n) return;
+    ch.kieuKhoa = n.dataset.kieu; ch.bamKhoa = ""; luuCauHinh(); veKhuKhoa();
+  });
+
+  $("nut-xuat").addEventListener("click", xuatRaFile);
+  $("nut-nhap").addEventListener("click", () => $("o-nhap-file").click());
+  $("o-nhap-file").addEventListener("change", (e) => {
+    const ds = [...(e.target.files || [])];
+    e.target.value = "";
+    if (ds.length) napTuFile(ds);
+  });
+  $("nut-in").addEventListener("click", inThanhSach);
+
+  $("nut-xoa-het").addEventListener("click", async () => {
+    if (!confirm("Xoá sạch toàn bộ nhật ký? Không lấy lại được.")) return;
+    await xoaKho();
+    for (const u of urlAnh.values()) URL.revokeObjectURL(u);
+    urlAnh.clear();
+    soGhi = [];
+    veManGhi(); veMucLuc();
+    $("mo-ta-kho").textContent = "Đã xoá sạch.";
+  });
+
+  // Màn khóa
+  $("ban-phim").addEventListener("click", (e) => {
+    const n = e.target.closest("[data-phim]");
+    if (!n) return;
+    const p = n.dataset.phim;
+    if (p === "xoa") goPin = goPin.slice(0, -1);
+    else if (p === "ok") { thuMa(goPin); return; }
+    else if (goPin.length < 8) goPin += p;
+    veChamPin();
+    if (goPin.length === 4) setTimeout(() => { if (goPin.length === 4) thuMa(goPin); }, 130);
+  });
+  $("nut-mo-mk").addEventListener("click", () => thuMa($("o-mat-khau").value));
+  $("o-mat-khau").addEventListener("keydown", (e) => { if (e.key === "Enter") thuMa($("o-mat-khau").value); });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !$("bang-cai").hidden) dongCai();
+  });
+
+  // Quay lại app sau một lúc: ngày có thể đã đổi, vẽ lại cho đúng.
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && $("man-ghi").classList.contains("hien")) veManGhi();
+  });
+}
+
+/* ============================================================
+   KHỞI ĐỘNG
+   ============================================================ */
+
+napCauHinh();
+apDienMao();
+ganSuKien();
+
+if (!BoNghe) {
+  // Không có bộ nhận giọng thì nút vẫn dùng được, chỉ đổi lời mời:
+  // chạm nút sẽ mở ô gõ, anh bấm micro trên bàn phím iPhone là xong.
+  $("chu-nut-noi").textContent = "Chạm để viết";
+}
+
+(async () => {
+  soGhi = await docHet();
+  if (ch.kieuKhoa !== "khong" && ch.bamKhoa) hienManKhoa();
+  else diToi("ghi");
+})();
+
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
