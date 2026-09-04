@@ -10,7 +10,7 @@
   IndexedDB chứ không đi qua đây.
 */
 
-const TEN_DEM = "nhat-ky-nho-v7";
+const TEN_DEM = "nhat-ky-nho-v8";
 
 /** Những thứ phải có sẵn ngay từ lúc cài, không chờ người dùng mở tới. */
 const CAN_TRUOC = [

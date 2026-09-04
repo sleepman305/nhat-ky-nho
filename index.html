@@ -382,6 +382,33 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
   to   { opacity: 1; transform: none; }
 }
 
+/* Thanh báo đang ghi bù cho một ngày đã qua */
+.bang-bu {
+  display: flex; align-items: center; gap: .8rem;
+  margin: 0 auto .2rem; padding: .55rem .7rem .55rem 1rem;
+  background: var(--nhan-nen);
+  border: 1px solid color-mix(in srgb, var(--nhan) 35%, transparent);
+  border-radius: 999px;
+  font-size: .85rem; color: var(--nhan); font-weight: 500;
+  animation: mauVao .34s var(--bat) both;
+}
+.bang-bu button {
+  color: var(--nhan); font-size: .8rem; font-weight: 600;
+  padding: .2rem .6rem; border-radius: 999px;
+  background: color-mix(in srgb, var(--nhan) 14%, transparent);
+}
+
+.hang-gio {
+  display: flex; align-items: center; gap: .7rem;
+  font-size: .86rem; color: var(--chu-mo);
+}
+.hang-gio input {
+  padding: .4rem .6rem; border-radius: 9px;
+  border: 1px solid var(--vien); background: var(--mat);
+  font-family: var(--may); font-size: .92rem;
+  color: var(--chu);
+}
+
 #o-loi {
   width: 100%; min-height: 5.5rem;
   padding: .85rem .95rem;
@@ -418,49 +445,6 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
 }
 .xem-anh button:active { transform: scale(.88); }
 
-/* Nút hút những câu đã nói bằng Phím tắt lúc máy khoá */
-.nut-hut {
-  display: flex; align-items: center; gap: .85rem;
-  width: 100%; max-width: 22rem; text-align: left;
-  margin-top: .3rem; padding: .85rem 1rem;
-  border: 1px dashed var(--vien); border-radius: 14px;
-  background: var(--mat);
-  transition: transform .2s var(--bat), border-color .2s, box-shadow .2s;
-}
-.nut-hut:hover { border-color: var(--nhan); border-style: solid; box-shadow: var(--bong-1); }
-.nut-hut:active { transform: scale(.98); }
-.nut-hut .hinh {
-  font-size: 1.2rem; line-height: 1;
-  width: 2.4rem; height: 2.4rem; flex: none;
-  display: grid; place-items: center;
-  background: var(--nhan-nen); border-radius: 10px;
-}
-.nut-hut strong { display: block; font-size: .89rem; font-weight: 600; }
-.nut-hut em {
-  display: block; font-style: normal;
-  font-size: .77rem; color: var(--chu-mo); margin-top: .08rem;
-}
-
-/* Lối dẫn sang sổ, chỉ hiện khi hôm nay đã có mẩu ghi */
-.dan-toi-so {
-  display: inline-flex; align-items: center; gap: .5rem;
-  margin-top: .6rem;
-  padding: .5rem 1rem;
-  border-radius: 999px;
-  border: 1px solid var(--vien-mo);
-  background: var(--mat);
-  color: var(--chu-nhat); font-size: .85rem; font-weight: 500;
-  box-shadow: var(--bong-1);
-  transition: transform .2s var(--bat), border-color .2s, box-shadow .2s;
-  animation: mauLan .4s var(--muot) .1s both;
-}
-.dan-toi-so:hover { border-color: var(--vien); box-shadow: var(--bong-2); }
-.dan-toi-so:active { transform: scale(.96); }
-.dan-toi-so .mui {
-  color: var(--nhan); font-size: .95rem;
-  transition: transform .25s var(--bat);
-}
-.dan-toi-so:hover .mui { transform: translateX(3px); }
 
 /* --- Danh sách mẩu ghi, giờ nằm trong sổ --- */
 
@@ -713,7 +697,7 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
 /* Thanh chuyển ngày dưới đáy trang ngày */
 .dieu-ngay {
   flex: none;
-  display: grid; grid-template-columns: 1fr 1fr; gap: .5rem;
+  display: grid; grid-template-columns: auto 1fr auto; gap: .5rem;
   padding: .7rem 1rem calc(.7rem + var(--duoi));
   background: var(--kinh);
   backdrop-filter: blur(20px) saturate(1.6);
@@ -776,14 +760,157 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
 }
 .tong-hop p + p { margin-top: .85rem; }
 
-/* ============ MÀN BÌA ============ */
+/* ============ MÀN NHẬT KÝ NHỎ ============ */
 
-#man-bia .than {
+.dinh.trong-suot { background: transparent; backdrop-filter: none; border-bottom: none; }
+
+.nut-banh-rang {
+  width: 2.3rem; height: 2.3rem; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--mat); border: 1px solid var(--vien-mo);
+  box-shadow: var(--bong-1);
+  transition: transform .4s var(--muot), background .2s;
+}
+.nut-banh-rang svg { width: 1.15rem; height: 1.15rem; fill: var(--chu-nhat); }
+.nut-banh-rang:hover { transform: rotate(45deg); }
+.nut-banh-rang:active { transform: rotate(45deg) scale(.9); }
+
+.khu-sach {
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  gap: 1.6rem; padding: 2rem 1.25rem;
-  perspective: 1400px;
+  gap: 1.2rem; padding: .5rem 1rem 1.5rem;
+  perspective: 1600px;
 }
+
+.ke-sach {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 1.1rem;
+}
+.loi-moi-mo { color: var(--chu-mo); font-size: .85rem; margin: 0; }
+
+#bia-chinh { cursor: pointer; }
+#bia-chinh:hover { transform: translateY(-6px) rotateY(-6deg); }
+#bia-chinh:active { transform: translateY(-2px) rotateY(-3deg) scale(.99); }
+
+/* ---- Quyển sổ đã mở ---- */
+
+.quyen {
+  display: flex; flex-direction: column; align-items: center; gap: .9rem;
+  width: 100%;
+  animation: moSo .55s var(--muot) both;
+}
+@keyframes moSo {
+  from { opacity: 0; transform: rotateY(-24deg) scale(.94); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Khối giấy: các trang xếp chồng, lật quanh mép trái */
+.giay {
+  position: relative;
+  width: min(22rem, 88vw);
+  aspect-ratio: 3 / 4.1;
+  transform-style: preserve-3d;
+}
+
+.to-giay {
+  position: absolute; inset: 0;
+  border-radius: 3px 12px 12px 3px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 1.62rem,
+      color-mix(in srgb, var(--nhan) 12%, transparent) 1.62rem 1.63rem),
+    linear-gradient(105deg,
+      color-mix(in srgb, var(--mat) 92%, var(--nhan)) 0%,
+      var(--mat) 8%, var(--mat) 100%);
+  border: 1px solid var(--vien-mo);
+  box-shadow: var(--bong-2);
+  padding: 1.6rem 1.4rem 1.3rem 1.7rem;
+  overflow: hidden;
+  transform-origin: left center;
+  backface-visibility: hidden;
+  display: flex; flex-direction: column;
+}
+
+/* Mép gáy sẫm hơn, cho ra cảm giác giấy dính vào gáy sổ */
+.to-giay::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 1.1rem;
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--chu) 16%, transparent), transparent);
+  pointer-events: none;
+}
+
+/* Trang đang lật: cong lên rồi đổ sang bên kia */
+.to-giay.lat-toi { animation: latToi .62s cubic-bezier(.45,.05,.35,1) forwards; }
+.to-giay.lat-lui { animation: latLui .62s cubic-bezier(.45,.05,.35,1) forwards; }
+
+@keyframes latToi {
+  0%   { transform: rotateY(0deg);   box-shadow: var(--bong-2); }
+  35%  { transform: rotateY(-42deg) translateZ(14px); }
+  100% { transform: rotateY(-172deg) translateZ(0);
+         box-shadow: 0 0 0 rgba(0,0,0,0); opacity: .1; }
+}
+@keyframes latLui {
+  0%   { transform: rotateY(-172deg); opacity: .1; }
+  65%  { transform: rotateY(-42deg) translateZ(14px); opacity: 1; }
+  100% { transform: rotateY(0deg); box-shadow: var(--bong-2); opacity: 1; }
+}
+
+/* Trang mới lộ ra bên dưới */
+.to-giay.duoi { z-index: 1; }
+.to-giay.tren { z-index: 3; }
+
+.trang-ngay-lon {
+  font-family: var(--may); font-size: .62rem; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--nhan);
+  margin: 0 0 .2rem;
+}
+.trang-tieu {
+  font-family: var(--de); font-weight: 700;
+  font-size: 1.28rem; letter-spacing: -.02em;
+  margin: 0 0 1rem; line-height: 1.2;
+  padding-bottom: .7rem;
+  border-bottom: 1px solid var(--vien-mo);
+}
+.trang-noi {
+  flex: 1; overflow-y: auto;
+  font-family: var(--de); font-size: .96rem; line-height: 1.62rem;
+}
+.trang-noi .doan-gio {
+  font-family: var(--may); font-size: .72rem; color: var(--nhan);
+  display: block; margin-top: .8rem;
+}
+.trang-noi .doan-gio:first-child { margin-top: 0; }
+.trang-noi p { margin: 0; text-wrap: pretty; }
+.trang-noi img {
+  display: block; width: 100%; max-width: 11rem;
+  border-radius: 6px; margin: .5rem 0;
+  border: 1px solid var(--vien-mo);
+}
+.trang-noi .trong-trang {
+  color: var(--chu-mo); font-style: italic; font-size: .9rem;
+}
+.trang-chan {
+  margin-top: .8rem; padding-top: .6rem;
+  border-top: 1px solid var(--vien-mo);
+  font-family: var(--may); font-size: .64rem;
+  color: var(--chu-mo); text-align: center;
+}
+
+.dieu-sach { display: flex; align-items: center; gap: 1.2rem; }
+.nut-lat {
+  width: 2.6rem; height: 2.6rem; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--mat); border: 1px solid var(--vien);
+  color: var(--chu-nhat); font-size: 1.2rem;
+  box-shadow: var(--bong-1);
+  transition: transform .18s var(--bat), background .15s;
+}
+.nut-lat:active { transform: scale(.88); background: var(--nhan-nen); }
+.nut-lat[disabled] { opacity: .32; cursor: default; }
+.so-trang {
+  font-family: var(--may); font-size: .78rem; color: var(--chu-mo);
+  font-variant-numeric: tabular-nums; min-width: 5rem; text-align: center;
+}
+.dong-so { color: var(--chu-mo); }
 
 .bia {
   width: min(19rem, 76vw);
@@ -1198,6 +1325,11 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
       <p class="dem" id="dem-hom-nay"></p>
     </header>
 
+    <div class="bang-bu" id="bang-bu" hidden>
+      <span id="chu-bu"></span>
+      <button id="thoi-bu">Thôi</button>
+    </div>
+
     <div class="san-ghi">
       <div class="o-nut">
         <canvas id="song-am" width="400" height="400" aria-hidden="true"></canvas>
@@ -1209,18 +1341,16 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
 
       <div class="hang-phu">
         <button class="nut" id="nut-chup">📷 Chụp ảnh</button>
+        <button class="nut" id="nut-anh">🖼 Thư viện</button>
         <button class="nut" id="nut-go">⌨ Gõ tay</button>
       </div>
 
-      <button class="nut-hut" id="nut-hut">
-        <span class="hinh" aria-hidden="true">📥</span>
-        <span>
-          <strong>Lấy câu đã nói bằng Phím tắt</strong>
-          <em>Những câu nói lúc máy khoá đang chờ ở đây</em>
-        </span>
-      </button>
 
       <div id="khu-soan" hidden>
+        <div class="hang-gio" id="hang-gio" hidden>
+          <label for="o-gio">Ghi vào lúc</label>
+          <input type="time" id="o-gio" step="60">
+        </div>
         <div class="xem-anh" id="xem-anh" hidden>
           <img id="anh-cho" alt="Ảnh sắp ghi vào nhật ký">
           <button id="nut-bo-anh" aria-label="Bỏ ảnh">✕</button>
@@ -1233,10 +1363,6 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
       </div>
     </div>
 
-    <button class="dan-toi-so" id="dan-toi-so" hidden>
-      <span id="chu-dan-so"></span>
-      <span class="mui" aria-hidden="true">→</span>
-    </button>
   </div>
 
   <nav class="chan" data-o="ghi"></nav>
@@ -1266,8 +1392,7 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
   </header>
   <div class="than">
     <section id="lich" aria-label="Lịch nhật ký"></section>
-    <div id="chuoi-ngay"></div>
-  </div>
+    </div>
   <nav class="chan" data-o="lich"></nav>
 </div>
 
@@ -1283,24 +1408,50 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
   </div>
   <div class="dieu-ngay">
     <button class="nut" id="ngay-lui">‹ Hôm trước</button>
+    <button class="nut chinh" id="ngay-them">Ghi vào ngày này</button>
     <button class="nut" id="ngay-toi">Hôm sau ›</button>
   </div>
 </div>
 
-<!-- ============ MÀN BÌA ============ -->
-<div class="man" id="man-bia">
-  <div class="than">
-    <div class="bia" id="bia-chinh" data-bia="vai-cham">
-      <div class="bia-trong">
-        <p class="bia-cua">Nhật ký</p>
-        <h1 class="bia-ten" id="bia-ten">Nhật ký nhỏ</h1>
-        <p class="bia-nguoi" id="bia-nguoi"></p>
+<!-- ============ MÀN NHẬT KÝ NHỎ — quyển sổ lật trang ============ -->
+<div class="man" id="man-sach">
+  <header class="dinh trong-suot">
+    <span class="ten" id="ten-sach">Nhật ký nhỏ</span>
+    <button class="nut-banh-rang" id="nut-cai-bia" aria-label="Cài đặt">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
+        <path d="M19.4 13a7.6 7.6 0 0 0 0-2l2-1.6-2-3.4-2.4 1a7.6 7.6 0 0 0-1.7-1L15 3.4h-4l-.3 2.6c-.6.3-1.2.6-1.7 1l-2.4-1-2 3.4L6.6 11a7.6 7.6 0 0 0 0 2l-2 1.6 2 3.4 2.4-1c.5.4 1.1.7 1.7 1l.3 2.6h4l.3-2.6c.6-.3 1.2-.6 1.7-1l2.4 1 2-3.4-2-1.6z"/>
+      </svg>
+    </button>
+  </header>
+
+  <div class="than khu-sach">
+    <!-- Bìa đóng: bấm để mở sổ -->
+    <div class="ke-sach" id="ke-sach">
+      <div class="bia" id="bia-chinh" data-bia="vai-cham" role="button" tabindex="0">
+        <div class="bia-trong">
+          <p class="bia-cua">Nhật ký</p>
+          <h1 class="bia-ten" id="bia-ten">Nhật ký nhỏ</h1>
+          <p class="bia-nguoi" id="bia-nguoi"></p>
+        </div>
+        <p class="bia-cham" id="bia-cham"></p>
       </div>
-      <p class="bia-cham" id="bia-cham"></p>
+      <p class="loi-moi-mo" id="loi-moi-mo">Chạm vào sổ để mở</p>
     </div>
-    <button class="nut" id="nut-cai-bia">Cài đặt</button>
+
+    <!-- Sổ đã mở: các trang lật -->
+    <div class="quyen" id="quyen" hidden>
+      <div class="giay" id="giay"></div>
+      <div class="dieu-sach">
+        <button class="nut-lat" id="lat-lui" aria-label="Trang trước">‹</button>
+        <span class="so-trang" id="so-trang"></span>
+        <button class="nut-lat" id="lat-toi" aria-label="Trang sau">›</button>
+      </div>
+      <button class="nut nho dong-so" id="dong-so">Gấp sổ lại</button>
+    </div>
   </div>
-  <nav class="chan" data-o="bia"></nav>
+
+  <nav class="chan" data-o="sach"></nav>
 </div>
 
 <!-- ============ CÀI ĐẶT ============ -->
@@ -1382,6 +1533,7 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
 </aside>
 
 <input type="file" id="o-chup" accept="image/*" capture="environment" hidden>
+<input type="file" id="o-anh" accept="image/*" hidden>
 <div id="khu-in" aria-hidden="true"></div>
 
 <script>
@@ -1589,7 +1741,11 @@ function maGio(d) {
 function doiNgay(ma) {
   const [n, t, g] = ma.split("-").map(Number);
   const d = new Date(n, t - 1, g);
-  return { thu: THU[d.getDay()], dai: `${g} ${THANG[t - 1].toLowerCase()}, ${n}`, ngay: g, thang: t, nam: n };
+  return {
+    thu: THU[d.getDay()],
+    dai: `Ngày ${String(g).padStart(2, "0")} tháng ${t} năm ${n}`,
+    ngay: g, thang: t, nam: n
+  };
 }
 
 /** Nhóm các mẩu ghi theo ngày. @returns {Map<string, Array>} khóa là yyyy-MM-dd. */
@@ -1730,6 +1886,13 @@ let dangSua = null;
 /** Id mẩu vừa ghi xong, để nó trôi vào khác với các mẩu cũ. */
 let vuaGhi = null;
 
+/**
+ * Ngày đang ghi bù (yyyy-MM-dd), null nghĩa là ghi cho hôm nay.
+ * Có giá trị thì màn ghi hiện thêm ô nhập giờ, vì máy không đoán
+ * hộ được lúc ấy là mấy giờ.
+ */
+let ngayGhiBu = null;
+
 /** Phiên này đã xuất file sao lưu chưa — dùng để cảnh báo trước khi xoá sạch. */
 let daXuatLan = false;
 
@@ -1754,6 +1917,11 @@ function dongKhuSoan() {
 /** Bật micro và đổ chữ thẳng vào ô soạn khi anh nói. */
 function batDauNghe() {
   if (!BoNghe || dangNghe) return;
+
+  // Dọn sạch bộ nghe của lần trước. Thiếu bước này thì lần thứ hai
+  // iOS từ chối cấp micro vì tưởng máy cũ còn đang giữ.
+  dungNghe();
+
   try {
     mayNghe = new BoNghe();
   } catch (e) { return; }
@@ -1795,9 +1963,22 @@ function batDauNghe() {
   }
 }
 
-/** Tắt micro. */
+/**
+ * Tắt micro và buông hẳn bộ nghe.
+ *
+ * Phải gỡ cả ba tay nghe sự kiện rồi mới abort: nếu để nguyên, sự kiện
+ * `onend` của máy cũ sẽ bắn muộn và tắt luôn lần ghi mới vừa bật.
+ */
 function dungNghe() {
-  if (mayNghe && dangNghe) { try { mayNghe.stop(); } catch (e) {} }
+  if (mayNghe) {
+    try {
+      mayNghe.onresult = null;
+      mayNghe.onerror = null;
+      mayNghe.onend = null;
+      mayNghe.abort();
+    } catch (e) { /* máy đã tự dừng thì thôi */ }
+    mayNghe = null;
+  }
   dangNghe = false;
   tatSongAm();
   $("nut-noi").classList.remove("dang-nghe");
@@ -1830,9 +2011,17 @@ async function ghiVaoSo() {
     if (i >= 0) soGhi[i] = dangSua;
     if (urlAnh.has(dangSua.id)) { URL.revokeObjectURL(urlAnh.get(dangSua.id)); urlAnh.delete(dangSua.id); }
   } else {
-    const luc = new Date();
+    let luc = new Date();
+    if (ngayGhiBu) {
+      // Ghi bù: lấy ngày anh chọn, giờ thì theo ô nhập (mặc định 12:00).
+      const [n, t, g] = ngayGhiBu.split("-").map(Number);
+      const gioNhap = ($("o-gio").value || "12:00").split(":").map(Number);
+      luc = new Date(n, t - 1, g, gioNhap[0] || 0, gioNhap[1] || 0);
+    }
+    let id = luc.getTime();
+    while (soGhi.some((x) => x.id === id)) id++;
     const m = {
-      id: luc.getTime(),
+      id,
       ngay: maNgay(luc),
       luc: luc.toISOString(),
       chu,
@@ -1855,7 +2044,16 @@ async function ghiVaoSo() {
   if (navigator.vibrate) { try { navigator.vibrate(12); } catch (e) {} }
 
   if (!laSua && $("man-ghi").classList.contains("hien")) {
-    baoNgan("Đã ghi vào nhật ký", "Xem sổ", () => { ngayDangXem = null; diToi("so"); });
+    if (ngayGhiBu) {
+      const t = doiNgay(ngayGhiBu);
+      const luu = ngayGhiBu;
+      baoNgan(`Đã ghi vào ${t.dai.toLowerCase()}`, "Xem ngày đó",
+              () => veTrangNgay(luu));
+      ngayGhiBu = null;
+      veManGhi();
+    } else {
+      baoNgan("Đã ghi vào nhật ký", "Xem sổ", () => { ngayDangXem = null; diToi("so"); });
+    }
   }
 }
 
@@ -1872,227 +2070,6 @@ async function ghiVaoSo() {
    tải lại không ghi trùng. Anh không phải chạm thêm nút nào.
    ============================================================ */
 
-/* ------------------------------------------------------------
-   CẦU NỐI GIỮA SAFARI VÀ APP TRÊN MÀN HÌNH CHÍNH
-
-   iOS cất IndexedDB của Safari và của app-trên-màn-hình-chính ở hai
-   kho riêng, không nhìn thấy nhau. Nhưng từ iOS 14 thì CacheStorage
-   lại DÙNG CHUNG. Ta mượn đúng chỗ đó làm hòm thư:
-
-     Phím tắt → Safari mở, bỏ câu vào hòm → báo "đã ghi" rồi thôi
-     Mở app  → app moi hòm ra, cất vào nhật ký thật, dọn hòm
-
-   Nhờ vậy anh vẫn giữ nút màn hình khoá, mà app chính thì chạy
-   toàn màn hình như một ứng dụng thật.
-   ------------------------------------------------------------ */
-
-const HOM_THU = "nhat-ky-nho-hom-thu";
-const DIA_CHI_THU = "/__hom-thu__";
-
-/** App đang chạy toàn màn hình (mở từ biểu tượng) hay trong Safari? */
-const chayToanManHinh =
-  window.navigator.standalone === true ||
-  (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
-
-/**
- * Bỏ một câu vào hòm thư chung để app moi ra sau.
- * @param {string} chu Câu vừa nói.
- * @returns {Promise<boolean>} false nếu trình duyệt không cho dùng hòm thư.
- */
-async function boVaoHom(chu) {
-  if (!window.caches) return false;
-  try {
-    const hom = await caches.open(HOM_THU);
-    const cu = await hom.match(DIA_CHI_THU);
-    const ds = cu ? await cu.json() : [];
-    ds.push({ luc: new Date().toISOString(), chu });
-    await hom.put(DIA_CHI_THU, new Response(JSON.stringify(ds),
-      { headers: { "Content-Type": "application/json" } }));
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-
-/**
- * Moi hết thư trong hòm ra, cất vào nhật ký rồi dọn sạch hòm.
- * Chạy mỗi lần mở app, nên câu nói lúc nào cũng về đúng chỗ.
- * @returns {Promise<number>} Số mẩu vừa nhận được.
- */
-async function moiHomThu() {
-  if (!window.caches) return 0;
-  try {
-    const hom = await caches.open(HOM_THU);
-    const cu = await hom.match(DIA_CHI_THU);
-    if (!cu) return 0;
-
-    const ds = await cu.json();
-    await hom.delete(DIA_CHI_THU);
-    if (!Array.isArray(ds) || !ds.length) return 0;
-
-    const daCo = new Set(soGhi.map((g) => g.id));
-    let them = 0;
-
-    for (const t of ds) {
-      const luc = new Date(t.luc);
-      let id = luc.getTime();
-      // Hai câu nói cùng một mili giây thì đẩy lệch đi, đừng đè lên nhau.
-      while (daCo.has(id)) id++;
-      const m = { id, ngay: maNgay(luc), luc: luc.toISOString(),
-                  chu: (t.chu || "").trim(), anh: null };
-      if (!m.chu) continue;
-      await luuMau(m);
-      soGhi.push(m);
-      daCo.add(id);
-      them++;
-    }
-    soGhi.sort((a, b) => a.id - b.id);
-    return them;
-  } catch (e) {
-    return 0;
-  }
-}
-
-/* ------------------------------------------------------------
-   HÚT CÂU TỪ BỘ NHỚ TẠM
-
-   Đây là đường duy nhất vừa ghi được lúc máy khoá, vừa không phải
-   mở trang web nào lên.
-
-   Phím tắt chỉ làm hai việc, cả hai đều chạy ngầm được: nghe anh nói,
-   rồi nối câu vào bộ nhớ tạm theo mẫu
-
-     NKN|2026-09-04 18:30:00|nội dung câu nói
-
-   Nói bao nhiêu câu cũng được, chúng xếp hàng ở đó. Lúc nào mở app,
-   chạm một nút là cả hàng về nhật ký.
-
-   Trình duyệt bắt buộc phải có cú chạm ấy mới cho đọc bộ nhớ tạm —
-   không lách được, nhưng đổi lại lúc ghi thì anh không phải làm gì.
-   ------------------------------------------------------------ */
-
-/** Nhận diện dòng do Phím tắt tạo ra. */
-const MAU_DONG = /^NKN\|(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\|([\s\S]*)$/;
-
-/**
- * Đọc bộ nhớ tạm, lọc lấy các câu do Phím tắt cất, ghi vào nhật ký.
- * Dòng nào không đúng mẫu thì bỏ qua, nên anh có lỡ chép thứ khác
- * vào bộ nhớ tạm cũng không sao.
- *
- * @returns {Promise<{them:number, loi:string}>} Số câu đã nhận và lời báo.
- */
-async function hutBoNhoTam() {
-  if (!navigator.clipboard || !navigator.clipboard.readText) {
-    return { them: 0, loi: "Máy này không cho app đọc bộ nhớ tạm." };
-  }
-
-  let tho = "";
-  try {
-    tho = await navigator.clipboard.readText();
-  } catch (e) {
-    return { them: 0, loi: "Chưa được phép đọc. Chạm lại rồi chọn Dán." };
-  }
-
-  if (!tho || !tho.includes("NKN|")) {
-    return { them: 0, loi: "Không có câu nào đang chờ." };
-  }
-
-  const daCo = new Set(soGhi.map((g) => g.id));
-  let them = 0;
-
-  for (const d of tho.split(/\r?\n/)) {
-    const kh = d.trim().match(MAU_DONG);
-    if (!kh) continue;
-
-    const chu = kh[2].trim();
-    if (!chu) continue;
-
-    // "2026-09-04 18:30:00" — dựng Date theo giờ máy, không lệch múi giờ.
-    const [ng, gi] = kh[1].split(" ");
-    const [nam, thg, ngy] = ng.split("-").map(Number);
-    const [h, p, s] = gi.split(":").map(Number);
-    const luc = new Date(nam, thg - 1, ngy, h, p, s);
-
-    let id = luc.getTime();
-    while (daCo.has(id)) id++;   // hai câu cùng giây thì đẩy lệch, đừng đè nhau
-
-    const m = { id, ngay: maNgay(luc), luc: luc.toISOString(), chu, anh: null };
-    await luuMau(m);
-    soGhi.push(m);
-    daCo.add(id);
-    them++;
-  }
-
-  if (!them) return { them: 0, loi: "Không có câu nào mới." };
-
-  soGhi.sort((a, b) => a.id - b.id);
-
-  // Dọn bộ nhớ tạm để lần sau khỏi nhận lại. Không dọn được cũng không sao,
-  // vì mỗi mẩu đã có mốc thời gian riêng nên không sinh bản trùng.
-  try { await navigator.clipboard.writeText(""); } catch (e) { /* bỏ qua */ }
-
-  return { them, loi: them === 1 ? "Đã nhận 1 câu" : `Đã nhận ${them} câu` };
-}
-
-/**
- * Đọc câu Phím tắt gửi tới qua đường dẫn rồi ghi thẳng vào nhật ký.
- * @returns {Promise<boolean>} true nếu vừa ghi được một mẩu từ Phím tắt.
- */
-async function nhanTuPhimTat() {
-  const bam = location.hash || "";
-  const khop = bam.match(/[#&]them=([^&]*)/);
-  if (!khop) return false;
-
-  let chu = "";
-  try { chu = decodeURIComponent(khop[1].replace(/\+/g, " ")).trim(); }
-  catch (e) { chu = khop[1].trim(); }
-
-  // Xoá đường dẫn ngay, trước cả khi ghi — để anh lỡ bấm tải lại
-  // thì cũng không ghi thêm bản thứ hai.
-  history.replaceState(null, "", location.pathname + location.search);
-
-  if (!chu) return false;
-
-  // Đang ở Safari thì chỉ bỏ vào hòm thư, đừng cất vào kho riêng của Safari —
-  // kho đó app trên màn hình chính không bao giờ đọc tới.
-  if (!chayToanManHinh) {
-    const duoc = await boVaoHom(chu);
-    if (duoc) {
-      if (navigator.vibrate) { try { navigator.vibrate(12); } catch (e) {} }
-      return true;
-    }
-    // Hòm thư hỏng thì thà cất vào kho Safari còn hơn để mất câu nói.
-  }
-
-  const luc = new Date();
-  const m = { id: luc.getTime(), ngay: maNgay(luc), luc: luc.toISOString(), chu, anh: null };
-  await luuMau(m);
-  soGhi.push(m);
-  soGhi.sort((a, b) => a.id - b.id);
-  vuaGhi = m.id;
-
-  if (navigator.vibrate) { try { navigator.vibrate(12); } catch (e) {} }
-  return true;
-}
-
-/**
- * Báo đã ghi xong, kiểu chớp nhoáng, rồi tự tan.
- * @param {string} chu Câu vừa được ghi vào nhật ký.
- */
-function baoDaGhi(chu) {
-  const o = document.createElement("div");
-  o.id = "bao-xong";
-  o.innerHTML = `<div class="dau-tich" aria-hidden="true">
-      <svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="23"/><path d="M15 27l8 8 15-16"/></svg>
-    </div>
-    <p class="loi-xong">Đã ghi vào nhật ký</p>
-    ${chu ? `<p class="cau-xong">${thoat(chu.length > 90 ? chu.slice(0, 90) + "…" : chu)}</p>` : ""}`;
-  document.body.appendChild(o);
-  setTimeout(() => {
-    o.classList.add("tan");
-    setTimeout(() => o.remove(), 420);
-  }, 1750);
-}
 
 /* ============================================================
    VẼ MÀN GHI
@@ -2106,9 +2083,12 @@ function baoDaGhi(chu) {
  * sang sổ — muốn đọc thì sang bên đó, nơi mọi thứ nằm chung một chỗ.
  */
 function veManGhi() {
-  const nay = new Date();
-  const ma = maNgay(nay);
+  const ma = ngayGhiBu || maNgay(new Date());
   const t = doiNgay(ma);
+
+  $("bang-bu").hidden = !ngayGhiBu;
+  $("hang-gio").hidden = !ngayGhiBu;
+  if (ngayGhiBu) $("chu-bu").textContent = "Đang ghi bù cho ngày đã qua";
 
   $("thu-hom-nay").textContent = t.thu;
   $("ngay-hom-nay").textContent = t.dai;
@@ -2117,16 +2097,9 @@ function veManGhi() {
   const soAnh = cuaNay.filter((g) => g.anh).length;
 
   $("dem-hom-nay").textContent = cuaNay.length
-    ? `${cuaNay.length} mẩu ghi${soAnh ? ` · ${soAnh} ảnh` : ""} hôm nay`
-    : "Chưa ghi gì hôm nay";
+    ? `${cuaNay.length} mẩu ghi${soAnh ? ` · ${soAnh} ảnh` : ""}`
+    : (ngayGhiBu ? "Ngày này chưa ghi gì" : "Chưa ghi gì hôm nay");
 
-  const dan = $("dan-toi-so");
-  if (cuaNay.length) {
-    $("chu-dan-so").textContent = "Đọc lại trong sổ";
-    dan.hidden = false;
-  } else {
-    dan.hidden = true;
-  }
 }
 
 /**
@@ -2273,40 +2246,8 @@ function veLich() {
     </div>
     <div class="lich-luoi">${o}</div>`;
 
-  const chuoi = demChuoiNgay();
-  $("chuoi-ngay").innerHTML = `<div class="lich-tom">
-      <div>
-        <div class="so-lon">${trongThang}</div>
-        <div class="chu-nho">ngày có ghi<br>trong tháng này</div>
-      </div>
-      <div class="vach"></div>
-      <div>
-        <div class="so-lon">${chuoi}</div>
-        <div class="chu-nho">${chuoi ? "ngày liền nhau<br>tính tới hôm nay" : "chưa ghi<br>hôm nay"}</div>
-      </div>
-      <div class="vach"></div>
-      <div>
-        <div class="so-lon">${nhom.size}</div>
-        <div class="chu-nho">ngày có ghi<br>từ trước tới nay</div>
-      </div>
-    </div>`;
 }
 
-/**
- * Đếm số ngày liền nhau có nhật ký, tính lùi từ hôm nay.
- * Hôm nay chưa ghi thì tính từ hôm qua, để chuỗi không bị đứt oan
- * chỉ vì trời còn sớm.
- * @returns {number}
- */
-function demChuoiNgay() {
-  const nhom = nhomTheoNgay();
-  if (!nhom.size) return 0;
-  const d = new Date();
-  if (!nhom.has(maNgay(d))) d.setDate(d.getDate() - 1);
-  let n = 0;
-  while (nhom.has(maNgay(d))) { n++; d.setDate(d.getDate() - 1); }
-  return n;
-}
 
 /** Vẽ mục lục các ngày, nhóm theo tháng, có lọc theo từ tìm kiếm. */
 function veMucLuc() {
@@ -2467,6 +2408,130 @@ function tongHopNgay(ds) {
 }
 
 /* ============================================================
+   QUYỂN SỔ LẬT TRANG
+
+   Mỗi ngày là một trang. Lật bằng nút hoặc vuốt ngang, tờ giấy
+   cong lên rồi đổ sang bên kia như sách thật.
+
+   Chỉ dựng đúng hai tờ trong khung hình — tờ đang đọc và tờ sắp
+   lộ ra. Dựng cả trăm tờ thì máy nào cũng ì.
+   ============================================================ */
+
+/** Các ngày có nhật ký, cũ trước mới sau — chính là thứ tự trang sách. */
+let cacTrang = [];
+
+/** Số thứ tự trang đang mở. */
+let trangDangMo = 0;
+
+/** Đang chạy hiệu ứng lật, khoá lại kẻo bấm dồn làm rối. */
+let dangLat = false;
+
+/** Dựng lại danh sách trang rồi hiện bìa sổ. */
+function veSach() {
+  cacTrang = [...nhomTheoNgay().keys()].sort();
+  const co = cacTrang.length > 0;
+
+  $("ke-sach").hidden = false;
+  $("quyen").hidden = true;
+  $("loi-moi-mo").textContent = co
+    ? `Chạm vào sổ để mở · ${cacTrang.length} trang`
+    : "Sổ còn trắng. Sang thẻ Viết nhật ký để bắt đầu.";
+  $("bia-chinh").style.pointerEvents = co ? "" : "none";
+}
+
+/** Mở sổ ra, nhảy tới trang mới nhất. */
+function moSo() {
+  if (!cacTrang.length) return;
+  trangDangMo = cacTrang.length - 1;
+  $("ke-sach").hidden = true;
+  $("quyen").hidden = false;
+  $("giay").innerHTML = dungToGiay(trangDangMo, "tren");
+  capNhatDieuSach();
+}
+
+/** Gấp sổ lại, quay về bìa. */
+function gapSo() {
+  $("quyen").hidden = true;
+  $("ke-sach").hidden = false;
+}
+
+/**
+ * Dựng HTML một tờ giấy.
+ * @param {number} i Số thứ tự trang.
+ * @param {string} lop Lớp thêm vào: "tren" hoặc "duoi".
+ * @returns {string}
+ */
+function dungToGiay(i, lop) {
+  const ma = cacTrang[i];
+  if (!ma) return "";
+  const t = doiNgay(ma);
+  const ds = soGhi.filter((g) => g.ngay === ma);
+
+  let noi = "";
+  for (const g of ds) {
+    noi += `<span class="doan-gio">${maGio(new Date(g.luc))}</span>`;
+    const url = urlCuaAnh(g);
+    if (url) noi += `<img src="${url}" alt="" loading="lazy">`;
+    if (g.chu) noi += `<p>${thoat(g.chu)}</p>`;
+  }
+  if (!noi) noi = `<p class="trong-trang">Ngày này chỉ có im lặng.</p>`;
+
+  return `<article class="to-giay ${lop}" data-trang="${i}">
+    <p class="trang-ngay-lon">${t.thu}</p>
+    <h2 class="trang-tieu">Ngày ${String(t.ngay).padStart(2, "0")} tháng ${t.thang} năm ${t.nam}</h2>
+    <div class="trang-noi">${noi}</div>
+    <p class="trang-chan">— ${i + 1} —</p>
+  </article>`;
+}
+
+/** Cập nhật nút lật và số trang. */
+function capNhatDieuSach() {
+  $("lat-lui").disabled = trangDangMo <= 0;
+  $("lat-toi").disabled = trangDangMo >= cacTrang.length - 1;
+  $("so-trang").textContent = `${trangDangMo + 1} / ${cacTrang.length}`;
+}
+
+/**
+ * Lật sang trang khác kèm hiệu ứng giấy cong.
+ * @param {number} buoc +1 sang trang sau, -1 về trang trước.
+ */
+function latTrang(buoc) {
+  if (dangLat) return;
+  const dich = trangDangMo + buoc;
+  if (dich < 0 || dich >= cacTrang.length) return;
+
+  dangLat = true;
+  const khung = $("giay");
+
+  if (buoc > 0) {
+    // Trang mới nằm sẵn bên dưới, trang cũ đổ sang trái để lộ nó ra.
+    khung.insertAdjacentHTML("afterbegin", dungToGiay(dich, "duoi"));
+    const cu = khung.querySelector(".to-giay.tren");
+    cu.classList.add("lat-toi");
+    setTimeout(() => {
+      cu.remove();
+      khung.querySelector(".to-giay").className = "to-giay tren";
+      xong();
+    }, 620);
+  } else {
+    // Lật ngược: trang cũ đang gập bên trái, mở trả về.
+    khung.insertAdjacentHTML("beforeend", dungToGiay(dich, "tren lat-lui"));
+    const moi = khung.querySelector(".to-giay.lat-lui");
+    setTimeout(() => {
+      khung.querySelectorAll(".to-giay").forEach((e) => { if (e !== moi) e.remove(); });
+      moi.className = "to-giay tren";
+      xong();
+    }, 620);
+  }
+
+  function xong() {
+    trangDangMo = dich;
+    dangLat = false;
+    capNhatDieuSach();
+  }
+}
+
+/* ============================================================
    BÌA VÀ DIỆN MẠO
    ============================================================ */
 
@@ -2514,10 +2579,10 @@ function apDienMao() {
 
 /** Bốn mục trên thanh dưới, theo thứ tự hiện ra. */
 const CAC_O = [
-  { ma: "ghi",  ten: "Hôm nay", hinh: "✎" },
-  { ma: "so",   ten: "Sổ",      hinh: "☰" },
-  { ma: "lich", ten: "Lịch",    hinh: "▦" },
-  { ma: "bia",  ten: "Bìa",     hinh: "❖" }
+  { ma: "ghi",   ten: "Viết nhật ký", hinh: "✎" },
+  { ma: "so",    ten: "Hôm nay",      hinh: "☰" },
+  { ma: "lich",  ten: "Lịch",         hinh: "▦" },
+  { ma: "sach",  ten: "Nhật ký nhỏ",  hinh: "❖" }
 ];
 
 /** Đổ nội dung cho cả bốn thanh dưới, đánh dấu mục đang mở. */
@@ -2531,7 +2596,7 @@ function veThanhDuoi(dang) {
 
 /** @param {"ghi"|"so"|"lich"|"ngay"|"bia"} ten Màn cần hiện. */
 function diToi(ten) {
-  for (const m of ["ghi", "so", "lich", "ngay", "bia"]) {
+  for (const m of ["ghi", "so", "lich", "ngay", "sach"]) {
     const o = $("man-" + m);
     const bat = m === ten;
     // Gỡ rồi gắn lại lớp hiệu ứng để nó chạy lại mỗi lần vào màn,
@@ -2547,9 +2612,11 @@ function diToi(ten) {
   // Trang một ngày không có mục riêng trên thanh dưới; nó thuộc về Sổ.
   veThanhDuoi(ten === "ngay" ? "so" : ten);
 
+  if (ten !== "ghi" && ngayGhiBu) ngayGhiBu = null;
   if (ten === "ghi") veManGhi();
   if (ten === "so") { ngayDangXem = null; veMucLuc(); }
   if (ten === "lich") veLich();
+  if (ten === "sach") veSach();
 }
 
 /* ============================================================
@@ -3080,7 +3147,46 @@ function ganSuKien() {
   };
   $("ngay-lui").addEventListener("click", () => doiNgayXem(-1));
   $("ngay-toi").addEventListener("click", () => doiNgayXem(1));
+
+  // Ghi bù cho một ngày đã qua: sang màn viết, mang theo ngày đó.
+  $("ngay-them").addEventListener("click", () => {
+    if (!ngayDangXem) return;
+    ngayGhiBu = ngayDangXem === maNgay(new Date()) ? null : ngayDangXem;
+    diToi("ghi");
+    if (ngayGhiBu) {
+      $("o-gio").value = "12:00";
+      moKhuSoan(false);
+    }
+  });
+
+  $("thoi-bu").addEventListener("click", () => {
+    ngayGhiBu = null;
+    dongKhuSoan();
+    veManGhi();
+  });
   $("nut-in-ngay").addEventListener("click", inThanhSach);
+
+  // --- Quyển sổ ---
+  $("bia-chinh").addEventListener("click", moSo);
+  $("bia-chinh").addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); moSo(); }
+  });
+  $("dong-so").addEventListener("click", gapSo);
+  $("lat-lui").addEventListener("click", () => latTrang(-1));
+  $("lat-toi").addEventListener("click", () => latTrang(1));
+
+  // Vuốt ngang trên tờ giấy để lật, như lật sách thật.
+  let batX = 0, batY = 0;
+  $("giay").addEventListener("touchstart", (e) => {
+    batX = e.touches[0].clientX; batY = e.touches[0].clientY;
+  }, { passive: true });
+  $("giay").addEventListener("touchend", (e) => {
+    const dx = e.changedTouches[0].clientX - batX;
+    const dy = e.changedTouches[0].clientY - batY;
+    // Chỉ tính là lật khi vuốt ngang dứt khoát, để không cướp thao tác cuộn dọc.
+    if (Math.abs(dx) < 55 || Math.abs(dx) < Math.abs(dy) * 1.6) return;
+    latTrang(dx < 0 ? 1 : -1);
+  }, { passive: true });
 
   $("nut-ve-thang-nay").addEventListener("click", () => {
     const n = new Date();
@@ -3104,9 +3210,8 @@ function ganSuKien() {
   $("nut-luu").addEventListener("click", ghiVaoSo);
   $("nut-huy").addEventListener("click", dongKhuSoan);
 
-  // Chụp ảnh
-  $("nut-chup").addEventListener("click", () => $("o-chup").click());
-  $("o-chup").addEventListener("change", (e) => {
+  // Chụp ảnh và chọn ảnh có sẵn — hai lối vào, cùng một chỗ đến
+  const nhanAnh = (e) => {
     const f = e.target.files && e.target.files[0];
     e.target.value = "";
     if (!f) return;
@@ -3115,7 +3220,11 @@ function ganSuKien() {
     $("anh-cho").src = anhCho.url;
     $("xem-anh").hidden = false;
     moKhuSoan(!!BoNghe);
-  });
+  };
+  $("nut-chup").addEventListener("click", () => $("o-chup").click());
+  $("nut-anh").addEventListener("click", () => $("o-anh").click());
+  $("o-chup").addEventListener("change", nhanAnh);
+  $("o-anh").addEventListener("change", nhanAnh);
   $("nut-bo-anh").addEventListener("click", boAnhCho);
 
   // Sửa, xoá mẩu ghi
@@ -3222,27 +3331,7 @@ function ganSuKien() {
     doi.addEventListener ? doi.addEventListener("change", nghe) : doi.addListener(nghe);
   }
 
-  $("dan-toi-so").addEventListener("click", () => { ngayDangXem = null; diToi("so"); });
 
-  $("nut-hut").addEventListener("click", async () => {
-    const nut = $("nut-hut");
-    const chuCu = nut.querySelector("strong").textContent;
-    nut.querySelector("strong").textContent = "Đang lấy…";
-
-    const kq = await hutBoNhoTam();
-
-    nut.querySelector("strong").textContent = chuCu;
-    if (kq.them) {
-      veManGhi();
-      if ($("man-ngay").classList.contains("hien") && ngayDangXem) veTrangNgay(ngayDangXem);
-      else if ($("man-so").classList.contains("hien")) veMucLuc();
-      else if ($("man-lich").classList.contains("hien")) veLich();
-      if (navigator.vibrate) { try { navigator.vibrate(12); } catch (e) {} }
-      baoNgan(kq.loi, "Xem sổ", () => { ngayDangXem = null; diToi("so"); });
-    } else {
-      baoNgan(kq.loi, "", null, 3200);
-    }
-  });
   $("ds-khoa").addEventListener("click", (e) => {
     const n = e.target.closest("[data-kieu]");
     if (!n) return;
@@ -3338,55 +3427,13 @@ if (!BoNghe) {
 
 (async () => {
   soGhi = await docHet();
-
-  // Moi hòm thư trước: những câu nói qua Phím tắt đang chờ ở đó.
-  const nhan = await moiHomThu();
-
-  const coKhoa = ch.kieuKhoa !== "khong" && ch.bamKhoa;
-  const cauMoi = (location.hash.match(/[#&]them=([^&]*)/) || [])[1];
-
-  if (await nhanTuPhimTat()) {
-    // Câu từ Phím tắt được cất ngay cả khi nhật ký đang khoá — ghi vào
-    // thì không lộ gì cả. Nhưng khi có khoá thì đừng in câu ra màn hình.
-    let hien = "";
-    if (!coKhoa && cauMoi) {
-      try { hien = decodeURIComponent(cauMoi.replace(/\+/g, " ")); } catch (e) { hien = ""; }
-    }
-    baoDaGhi(hien);
-  }
-
-  if (coKhoa) hienManKhoa();
+  if (ch.kieuKhoa !== "khong" && ch.bamKhoa) hienManKhoa();
   else diToi("ghi");
-
-  if (nhan) {
-    baoNgan(nhan === 1 ? "Nhận thêm 1 câu đã nói lúc trước"
-                       : `Nhận thêm ${nhan} câu đã nói lúc trước`,
-            "Xem sổ", () => { ngayDangXem = null; diToi("so"); }, 6000);
-  }
 })();
 
-// Quay lại app sau khi dùng Phím tắt: moi hòm thư lần nữa cho câu mới về kịp.
-document.addEventListener("visibilitychange", async () => {
-  if (document.hidden) return;
-  const n = await moiHomThu();
-  if (!n) return;
-  veManGhi();
-  if ($("man-so").classList.contains("hien")) {
-    ngayDangXem ? veTrangNgay(ngayDangXem) : veMucLuc();
-  }
-  baoNgan(n === 1 ? "Nhận thêm 1 câu vừa nói" : `Nhận thêm ${n} câu vừa nói`, "", null, 3500);
-});
-
-// Phím tắt mở lại app khi app đang chạy sẵn: chỉ đường dẫn đổi, trang không tải lại.
-window.addEventListener("hashchange", async () => {
-  const cau = (location.hash.match(/[#&]them=([^&]*)/) || [])[1];
-  if (!cau) return;
-  let hien = "";
-  try { hien = decodeURIComponent(cau.replace(/\+/g, " ")); } catch (e) { hien = ""; }
-  if (await nhanTuPhimTat()) {
-    baoDaGhi(ch.kieuKhoa !== "khong" && ch.bamKhoa ? "" : hien);
-    veManGhi();
-  }
+// Quay lại app sau một lúc: ngày có thể đã sang hôm khác, vẽ lại cho đúng.
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden && $("man-ghi").classList.contains("hien")) veManGhi();
 });
 
 if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
