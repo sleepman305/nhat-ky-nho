@@ -247,7 +247,7 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
   margin: 0 auto;
   margin-bottom: calc(.55rem + var(--duoi));
   width: calc(100% - 2rem); max-width: 22rem;
-  display: grid; grid-template-columns: repeat(3, 1fr);
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
   background: var(--kinh);
   backdrop-filter: blur(20px) saturate(1.6);
   -webkit-backdrop-filter: blur(20px) saturate(1.6);
@@ -257,16 +257,23 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
   overflow: hidden;
 }
 .chan button {
-  padding: .6rem .3rem .55rem;
-  font-size: .7rem; font-weight: 500;
+  padding: .6rem .15rem .55rem;
+  font-size: .62rem; font-weight: 500;
+  min-width: 0; text-align: center;
+  line-height: 1.25;
   color: var(--chu-mo);
   display: flex; flex-direction: column; align-items: center; gap: .15rem;
   position: relative;
   transition: color .2s var(--muot);
 }
 .chan button .hinh {
-  font-size: 1.1rem; line-height: 1;
+  display: grid; place-items: center;
   transition: transform .3s var(--bat);
+}
+.chan button .hinh svg {
+  width: 1.18rem; height: 1.18rem;
+  fill: none; stroke: currentColor;
+  stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round;
 }
 .chan button[aria-current="true"] { color: var(--nhan); }
 .chan button[aria-current="true"] .hinh { transform: translateY(-2px) scale(1.08); }
@@ -322,15 +329,6 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
   display: grid; place-items: center;
 }
 
-/* Canvas vẽ sóng âm thật, nằm dưới nút */
-#song-am {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity .35s var(--muot);
-}
-#song-am.chay { opacity: 1; }
 
 #nut-noi {
   position: relative; z-index: 2;
@@ -348,7 +346,15 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
   font-weight: 600; font-size: .86rem; letter-spacing: -.005em;
 }
 :root[data-tong="than-chi"] #nut-noi { color: var(--nen); }
-#nut-noi .bieu { font-size: 1.85rem; line-height: 1; transition: transform .25s var(--bat); }
+#nut-noi .bieu {
+  display: grid; place-items: center;
+  transition: transform .25s var(--bat);
+}
+#nut-noi .bieu svg {
+  width: 2rem; height: 2rem;
+  fill: none; stroke: currentColor;
+  stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+}
 #nut-noi:active { transform: scale(.93); }
 #nut-noi:active .bieu { transform: scale(1.12); }
 
@@ -361,14 +367,30 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
     0 8px 24px color-mix(in srgb, var(--nhan) 46%, transparent),
     0 18px 52px color-mix(in srgb, var(--nhan) 30%, transparent);
 }
-#nut-noi.dang-nghe.khong-song { animation: tho 1.8s ease-in-out infinite; }
+#nut-noi.dang-nghe { animation: tho 1.8s ease-in-out infinite; }
 @keyframes tho {
   0%, 100% { transform: scale(1.02); }
   50%      { transform: scale(1.07); }
 }
 
-.hang-phu { display: flex; gap: .7rem; }
-.hang-phu .nut { border-radius: 999px; padding: .5rem 1rem; }
+/* Ba nút phụ: chỉ còn biểu tượng, tròn đều nhau */
+.hang-phu { display: flex; gap: .85rem; }
+.nut-tron {
+  width: 3rem; height: 3rem; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--mat); border: 1px solid var(--vien);
+  box-shadow: var(--bong-1);
+  transition: transform .18s var(--bat), border-color .2s, box-shadow .2s;
+}
+.nut-tron svg {
+  width: 1.3rem; height: 1.3rem;
+  fill: none; stroke: var(--chu-nhat);
+  stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round;
+  transition: stroke .2s;
+}
+.nut-tron:hover { border-color: var(--nhan); box-shadow: var(--bong-2); }
+.nut-tron:hover svg { stroke: var(--nhan); }
+.nut-tron:active { transform: scale(.9); }
 
 /* --- Khu soạn lời --- */
 
@@ -1341,17 +1363,38 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
 
     <div class="san-ghi">
       <div class="o-nut">
-        <canvas id="song-am" width="400" height="400" aria-hidden="true"></canvas>
         <button id="nut-noi">
-          <span class="bieu" aria-hidden="true">🎙</span>
+          <span class="bieu" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <rect x="9" y="2.6" width="6" height="11.2" rx="3"/>
+              <path d="M5.5 11.2v1.1a6.5 6.5 0 0 0 13 0v-1.1"/>
+              <path d="M12 19.8v2.1"/>
+            </svg>
+          </span>
           <span id="chu-nut-noi">Chạm để nói</span>
         </button>
       </div>
 
       <div class="hang-phu">
-        <button class="nut" id="nut-chup">📷 Chụp ảnh</button>
-        <button class="nut" id="nut-anh">🖼 Thư viện</button>
-        <button class="nut" id="nut-go">⌨ Gõ tay</button>
+        <button class="nut-tron" id="nut-chup" aria-label="Chụp ảnh" title="Chụp ảnh">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 8.5A2.5 2.5 0 0 1 5.5 6h1.7a1 1 0 0 0 .83-.45l.94-1.4A1 1 0 0 1 9.8 3.7h4.4a1 1 0 0 1 .83.45l.94 1.4a1 1 0 0 0 .83.45h1.7A2.5 2.5 0 0 1 21 8.5v9a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5z"/>
+            <circle cx="12" cy="13" r="3.6"/>
+          </svg>
+        </button>
+        <button class="nut-tron" id="nut-anh" aria-label="Ảnh từ thư viện" title="Ảnh từ thư viện">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="4.5" width="18" height="15" rx="2.6"/>
+            <circle cx="8.6" cy="9.8" r="1.7"/>
+            <path d="M3.4 16.7l4.4-4.2a2 2 0 0 1 2.7-.05l3.4 3.05a2 2 0 0 0 2.6.03l1.9-1.6a2 2 0 0 1 2.6.02l1.6 1.4"/>
+          </svg>
+        </button>
+        <button class="nut-tron" id="nut-go" aria-label="Gõ tay" title="Gõ tay">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M16.4 3.9a2.1 2.1 0 0 1 3 3L8.6 17.7l-4 1 1-4z"/>
+            <path d="M14.6 5.7l3.7 3.7"/>
+          </svg>
+        </button>
       </div>
 
 
@@ -1779,112 +1822,15 @@ const BoNghe = window.SpeechRecognition || window.webkitSpeechRecognition;
 let mayNghe = null, dangNghe = false;
 
 /* ============================================================
-   SÓNG ÂM
+   NHỊP CỦA NÚT THU ÂM
 
-   Vẽ một vòng tròn biến dạng theo ÂM LƯỢNG THẬT lấy từ micro.
-   Không phải hoạt hình chạy sẵn: anh nói to thì sóng nở rộng,
-   im thì nó lặng xuống. Nhờ vậy nhìn là biết máy có nghe thấy
-   mình hay không, khỏi phải đoán.
+   Trước đây nút phập phồng theo âm lượng thật lấy từ micro. Nghe thì
+   hay, nhưng trên iPhone việc đó chiếm mất micro: lần ghi thứ hai
+   iOS từ chối cấp cho bộ nhận giọng, thành ra bấm mãi không ăn.
 
-   Lấy được sóng thì dùng sóng; máy nào không cho thì nút quay
-   về nhịp thở đều, vẫn báo được là đang bật.
+   Đổi sang nhịp thở đều — vẫn nói được là "đang nghe", mà không
+   tranh micro với ai.
    ============================================================ */
-
-let dongAm = null, boPhanTich = null, khungVe = 0, machAm = null;
-
-/**
- * Xin quyền micro rồi bắt đầu vẽ sóng.
- * Thất bại thì im lặng lùi về nhịp thở, không quấy rầy người dùng.
- */
-async function batSongAm() {
-  const canvas = $("song-am");
-  if (!canvas || !navigator.mediaDevices) { $("nut-noi").classList.add("khong-song"); return; }
-
-  try {
-    dongAm = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    machAm = ctx;
-    const nguon = ctx.createMediaStreamSource(dongAm);
-    boPhanTich = ctx.createAnalyser();
-    boPhanTich.fftSize = 128;
-    boPhanTich.smoothingTimeConstant = 0.75;
-    nguon.connect(boPhanTich);
-
-    $("nut-noi").classList.remove("khong-song");
-    canvas.classList.add("chay");
-    veSongAm();
-  } catch (e) {
-    // Không xin được micro cho việc vẽ (thường vì bộ nhận giọng đang giữ)
-    $("nut-noi").classList.add("khong-song");
-  }
-}
-
-/** Vẽ một khung sóng rồi tự hẹn khung kế tiếp. */
-function veSongAm() {
-  const canvas = $("song-am");
-  if (!canvas || !boPhanTich) return;
-  const ctx = canvas.getContext("2d");
-  const N = canvas.width, tam = N / 2;
-  const so = boPhanTich.frequencyBinCount;
-  const du = new Uint8Array(so);
-
-  const mau = getComputedStyle(document.documentElement).getPropertyValue("--nhan").trim() || "#0E7C7B";
-
-  const khung = () => {
-    if (!dangNghe || !boPhanTich) { ctx.clearRect(0, 0, N, N); return; }
-    boPhanTich.getByteFrequencyData(du);
-
-    // Trung bình dải thấp — giọng người nằm chủ yếu ở đây.
-    let tong = 0;
-    const lay = Math.min(so, 24);
-    for (let i = 0; i < lay; i++) tong += du[i];
-    const manh = Math.min(1, (tong / lay) / 130);
-
-    ctx.clearRect(0, 0, N, N);
-
-    // Ba vòng đồng tâm, vòng ngoài loãng hơn, cùng nở theo tiếng nói.
-    const banKinhGoc = N * 0.196;   // vừa khít mép nút
-    for (let v = 0; v < 3; v++) {
-      const day = 1 + v * 0.55;
-      const no = banKinhGoc + (N * 0.035) * (v + 1) * (0.25 + manh * 1.55);
-      ctx.beginPath();
-
-      // Méo nhẹ theo phổ tần, để vòng có nhịp riêng chứ không tròn cứng.
-      const buoc = Math.PI * 2 / 72;
-      for (let g = 0; g <= 72; g++) {
-        const goc = g * buoc;
-        const chiSo = Math.floor((g / 72) * lay);
-        const gon = (du[chiSo] / 255) * (N * 0.018) * (1 - v * 0.22);
-        const r = no + gon * Math.sin(goc * 3 + v);
-        const x = tam + Math.cos(goc) * r;
-        const y = tam + Math.sin(goc) * r;
-        g === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-      }
-      ctx.closePath();
-      ctx.strokeStyle = mau;
-      ctx.globalAlpha = (0.36 - v * 0.1) * (0.35 + manh * 0.65);
-      ctx.lineWidth = day;
-      ctx.stroke();
-    }
-    ctx.globalAlpha = 1;
-    khungVe = requestAnimationFrame(khung);
-  };
-  khungVe = requestAnimationFrame(khung);
-}
-
-/** Tắt micro dùng cho việc vẽ và dọn sạch canvas. */
-function tatSongAm() {
-  if (khungVe) cancelAnimationFrame(khungVe);
-  khungVe = 0;
-  const canvas = $("song-am");
-  if (canvas) {
-    canvas.classList.remove("chay");
-    canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
-  }
-  if (dongAm) { dongAm.getTracks().forEach((t) => t.stop()); dongAm = null; }
-  if (machAm) { try { machAm.close(); } catch (e) {} machAm = null; }
-  boPhanTich = null;
-}
 
 /** Ảnh vừa chụp, đang chờ ghi kèm lời. */
 let anhCho = null;
@@ -1956,7 +1902,6 @@ function batDauNghe() {
   mayNghe.onerror = () => dungNghe();
   mayNghe.onend = () => {
     dangNghe = false;
-    tatSongAm();
     $("nut-noi").classList.remove("dang-nghe");
     $("chu-nut-noi").textContent = "Nói tiếp";
   };
@@ -1966,7 +1911,6 @@ function batDauNghe() {
     dangNghe = true;
     $("nut-noi").classList.add("dang-nghe");
     $("chu-nut-noi").textContent = "Đang nghe…";
-    batSongAm();
   } catch (e) {
     dangNghe = false;
   }
@@ -1989,7 +1933,6 @@ function dungNghe() {
     mayNghe = null;
   }
   dangNghe = false;
-  tatSongAm();
   $("nut-noi").classList.remove("dang-nghe");
 }
 
@@ -2673,10 +2616,14 @@ function apDienMao() {
 
 /** Bốn mục trên thanh dưới, theo thứ tự hiện ra. */
 const CAC_O = [
-  { ma: "ghi",   ten: "Viết nhật ký", hinh: "✎" },
-  { ma: "so",    ten: "Hôm nay",      hinh: "☰" },
-  { ma: "lich",  ten: "Lịch",         hinh: "▦" },
-  { ma: "sach",  ten: "Nhật ký nhỏ",  hinh: "❖" }
+  { ma: "ghi",  ten: "Viết", hinh:
+    '<path d="M16.4 3.9a2.1 2.1 0 0 1 3 3L8.6 17.7l-4 1 1-4z"/><path d="M14.6 5.7l3.7 3.7"/>' },
+  { ma: "so",   ten: "Hôm nay", hinh:
+    '<path d="M4 6.5h16"/><path d="M4 12h16"/><path d="M4 17.5h10"/>' },
+  { ma: "lich", ten: "Lịch", hinh:
+    '<rect x="3.2" y="4.8" width="17.6" height="16" rx="2.4"/><path d="M3.2 9.6h17.6"/><path d="M8 3.2v3.2"/><path d="M16 3.2v3.2"/>' },
+  { ma: "sach", ten: "Sổ tay", hinh:
+    '<path d="M4.5 4.2h11.8a2.5 2.5 0 0 1 2.5 2.5v13.1H7a2.5 2.5 0 0 1-2.5-2.5z"/><path d="M8.2 4.2v15.6"/>' }
 ];
 
 /** Đổ nội dung cho cả bốn thanh dưới, đánh dấu mục đang mở. */
@@ -2684,7 +2631,9 @@ function veThanhDuoi(dang) {
   document.querySelectorAll(".chan").forEach((n) => {
     n.innerHTML = CAC_O.map((o) =>
       `<button data-di="${o.ma}" aria-current="${o.ma === dang}">
-        <span class="hinh" aria-hidden="true">${o.hinh}</span>${o.ten}</button>`).join("");
+        <span class="hinh" aria-hidden="true">
+          <svg viewBox="0 0 24 24">${o.hinh}</svg>
+        </span>${o.ten}</button>`).join("");
   });
 }
 
