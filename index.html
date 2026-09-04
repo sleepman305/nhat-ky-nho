@@ -28,68 +28,131 @@
    chỉ để cho vui mắt.
    ============================================================ */
 
+/* ------------------------------------------------------------
+   BẢNG MÀU
+
+   Tách làm hai trục cho khỏi rối:
+     data-tong    — sáu tông màu, chọn theo sở thích
+     data-che-do  — sáng hay tối
+
+   Mỗi tông có đủ cả hai bản. Chọn "theo máy" thì JavaScript đọc
+   cài đặt hệ thống rồi tự điền vào data-che-do, nên CSS ở đây
+   không cần biết tới chuyện đó.
+   ------------------------------------------------------------ */
+
+/* ===== MỰC — navy và xanh ngọc ===== */
 :root,
-:root[data-chu-de="muc-giay"] {
-  --nen: #EEF1F3; --nen-2: #F7F9FA; --mat: #FFFFFF; --mat-2: #E5EAED;
+:root[data-tong="muc"][data-che-do="sang"] {
+  --nen: #EEF1F3; --nen-2: #F8FAFB; --mat: #FFFFFF; --mat-2: #E4EAED;
   --chu: #16283D; --chu-nhat: #3B546F; --chu-mo: #6B7C8B;
-  --vien: #D5DCE1; --vien-mo: #E6EAED;
-  --nhan: #0E7C7B; --nhan-2: #14A09E; --nhan-nen: #E0EFEE; --do: #A8492C;
-  --kinh: rgba(255,255,255,.72);
-  --bong-1: 0 1px 2px rgba(22,40,61,.05);
-  --bong-2: 0 2px 6px rgba(22,40,61,.06), 0 12px 32px rgba(22,40,61,.08);
-  --bong-3: 0 4px 12px rgba(22,40,61,.08), 0 24px 56px rgba(22,40,61,.12);
+  --vien: #D3DBE0; --vien-mo: #E5EAED;
+  --nhan: #0E7C7B; --nhan-2: #14A09E; --nhan-nen: #DFEFEE; --do: #A8492C;
+  --kinh: rgba(255,255,255,.74);
 }
-:root[data-chu-de="dem-sau"] {
-  --nen: #0A1019; --nen-2: #111A24; --mat: #16202B; --mat-2: #1E2B39;
+:root[data-tong="muc"][data-che-do="toi"] {
+  --nen: #0A1019; --nen-2: #101923; --mat: #16202B; --mat-2: #202D3B;
   --chu: #DFE7EE; --chu-nhat: #A9BCCC; --chu-mo: #7A8C9C;
   --vien: #2A3B4C; --vien-mo: #1E2B38;
   --nhan: #4FBFB8; --nhan-2: #6FD8D1; --nhan-nen: #123634; --do: #E08267;
-  --kinh: rgba(22,32,43,.72);
-  --bong-1: 0 1px 2px rgba(0,0,0,.3);
-  --bong-2: 0 2px 6px rgba(0,0,0,.35), 0 12px 32px rgba(0,0,0,.3);
-  --bong-3: 0 4px 12px rgba(0,0,0,.4), 0 24px 56px rgba(0,0,0,.4);
-}
-:root[data-chu-de="co-ua"] {
-  --nen: #EBE2D0; --nen-2: #F5EFE3; --mat: #FAF5EC; --mat-2: #E5DAC5;
-  --chu: #3B2E1E; --chu-nhat: #5E4B33; --chu-mo: #8A7458;
-  --vien: #D5C7AC; --vien-mo: #E4DAC7;
-  --nhan: #96602A; --nhan-2: #B87A3C; --nhan-nen: #EDDFC8; --do: #9A3B23;
-  --kinh: rgba(250,245,236,.74);
-  --bong-1: 0 1px 2px rgba(59,46,30,.06);
-  --bong-2: 0 2px 6px rgba(59,46,30,.07), 0 12px 32px rgba(59,46,30,.1);
-  --bong-3: 0 4px 12px rgba(59,46,30,.1), 0 24px 56px rgba(59,46,30,.14);
-}
-:root[data-chu-de="hoa-dao"] {
-  --nen: #F4E6E8; --nen-2: #FCF3F4; --mat: #FFF9F9; --mat-2: #F0DEE0;
-  --chu: #40222A; --chu-nhat: #653A45; --chu-mo: #96707A;
-  --vien: #E4C9CD; --vien-mo: #EFDCDF;
-  --nhan: #B04766; --nhan-2: #C95F7E; --nhan-nen: #F5DDE3; --do: #A03A2E;
-  --kinh: rgba(255,249,249,.74);
-  --bong-1: 0 1px 2px rgba(64,34,42,.05);
-  --bong-2: 0 2px 6px rgba(64,34,42,.06), 0 12px 32px rgba(64,34,42,.09);
-  --bong-3: 0 4px 12px rgba(64,34,42,.09), 0 24px 56px rgba(64,34,42,.13);
-}
-:root[data-chu-de="reu-da"] {
-  --nen: #E1E6DC; --nen-2: #EFF3EA; --mat: #F4F7F0; --mat-2: #D8DFD1;
-  --chu: #232E23; --chu-nhat: #41513F; --chu-mo: #6E7C6A;
-  --vien: #C4CEBB; --vien-mo: #DBE2D4;
-  --nhan: #4A6B3E; --nhan-2: #628A52; --nhan-nen: #DDE6D5; --do: #94512A;
-  --kinh: rgba(244,247,240,.74);
-  --bong-1: 0 1px 2px rgba(35,46,35,.05);
-  --bong-2: 0 2px 6px rgba(35,46,35,.06), 0 12px 32px rgba(35,46,35,.09);
-  --bong-3: 0 4px 12px rgba(35,46,35,.09), 0 24px 56px rgba(35,46,35,.13);
-}
-:root[data-chu-de="than-chi"] {
-  --nen: #E9E9E8; --nen-2: #F5F5F4; --mat: #FBFBFA; --mat-2: #DEDEDC;
-  --chu: #1F1F1E; --chu-nhat: #454544; --chu-mo: #777776;
-  --vien: #CDCDCB; --vien-mo: #E2E2E0;
-  --nhan: #1F1F1E; --nhan-2: #454544; --nhan-nen: #DEDEDC; --do: #8A3A2A;
-  --kinh: rgba(251,251,250,.76);
-  --bong-1: 0 1px 2px rgba(0,0,0,.05);
-  --bong-2: 0 2px 6px rgba(0,0,0,.06), 0 12px 32px rgba(0,0,0,.08);
-  --bong-3: 0 4px 12px rgba(0,0,0,.08), 0 24px 56px rgba(0,0,0,.12);
+  --kinh: rgba(22,32,43,.74);
 }
 
+/* ===== HỔ PHÁCH — nâu vàng ấm ===== */
+:root[data-tong="ho-phach"][data-che-do="sang"] {
+  --nen: #F1EADD; --nen-2: #F9F4EA; --mat: #FDFAF4; --mat-2: #E7DBC6;
+  --chu: #3B2E1E; --chu-nhat: #5E4B33; --chu-mo: #8A7458;
+  --vien: #D8CAB0; --vien-mo: #E8DECB;
+  --nhan: #96602A; --nhan-2: #B87A3C; --nhan-nen: #EFE2CC; --do: #9A3B23;
+  --kinh: rgba(253,250,244,.76);
+}
+:root[data-tong="ho-phach"][data-che-do="toi"] {
+  --nen: #14100A; --nen-2: #1C1710; --mat: #221C13; --mat-2: #2E271B;
+  --chu: #EFE4D2; --chu-nhat: #C9B899; --chu-mo: #9A8A70;
+  --vien: #3B3222; --vien-mo: #2B2418;
+  --nhan: #D19A54; --nhan-2: #E6B472; --nhan-nen: #33270F; --do: #E08267;
+  --kinh: rgba(34,28,19,.76);
+}
+
+/* ===== HOA ĐÀO — hồng phấn ===== */
+:root[data-tong="hoa-dao"][data-che-do="sang"] {
+  --nen: #F5E9EB; --nen-2: #FDF4F5; --mat: #FFFAFA; --mat-2: #EFDCDF;
+  --chu: #40222A; --chu-nhat: #653A45; --chu-mo: #96707A;
+  --vien: #E3C7CB; --vien-mo: #EFDCDF;
+  --nhan: #B04766; --nhan-2: #C95F7E; --nhan-nen: #F5DDE3; --do: #A03A2E;
+  --kinh: rgba(255,250,250,.76);
+}
+:root[data-tong="hoa-dao"][data-che-do="toi"] {
+  --nen: #150E11; --nen-2: #1D1418; --mat: #231920; --mat-2: #30232B;
+  --chu: #F0DDE1; --chu-nhat: #CDAFB7; --chu-mo: #9C8189;
+  --vien: #3D2C34; --vien-mo: #2C2027;
+  --nhan: #E0788F; --nhan-2: #EE95A8; --nhan-nen: #35202A; --do: #E08267;
+  --kinh: rgba(35,25,32,.76);
+}
+
+/* ===== RÊU — xanh lá trầm ===== */
+:root[data-tong="reu"][data-che-do="sang"] {
+  --nen: #E5EADF; --nen-2: #F1F5EC; --mat: #F6F9F2; --mat-2: #D8E0D0;
+  --chu: #232E23; --chu-nhat: #41513F; --chu-mo: #6E7C6A;
+  --vien: #C2CDB9; --vien-mo: #DCE3D5;
+  --nhan: #4A6B3E; --nhan-2: #628A52; --nhan-nen: #DEE7D6; --do: #94512A;
+  --kinh: rgba(246,249,242,.76);
+}
+:root[data-tong="reu"][data-che-do="toi"] {
+  --nen: #0C110B; --nen-2: #131912; --mat: #182017; --mat-2: #212C1F;
+  --chu: #DEE7D6; --chu-nhat: #B2C0A8; --chu-mo: #82907A;
+  --vien: #2C3729; --vien-mo: #1F281D;
+  --nhan: #7FB268; --nhan-2: #99C982; --nhan-nen: #1E2C19; --do: #D18B5A;
+  --kinh: rgba(24,32,23,.76);
+}
+
+/* ===== TÍM TRẦM — oải hương ===== */
+:root[data-tong="tim"][data-che-do="sang"] {
+  --nen: #EEEAF3; --nen-2: #F7F4FA; --mat: #FCFAFE; --mat-2: #E2DAEC;
+  --chu: #2C2340; --chu-nhat: #4A3D66; --chu-mo: #786A93;
+  --vien: #D4CAE4; --vien-mo: #E5DEF0;
+  --nhan: #6B4E9E; --nhan-2: #8567BC; --nhan-nen: #E7DFF5; --do: #A03A4E;
+  --kinh: rgba(252,250,254,.76);
+}
+:root[data-tong="tim"][data-che-do="toi"] {
+  --nen: #100C18; --nen-2: #171122; --mat: #1D162A; --mat-2: #281E39;
+  --chu: #E4DCF0; --chu-nhat: #BCAFD6; --chu-mo: #8C7EA6;
+  --vien: #352A48; --vien-mo: #261D35;
+  --nhan: #A98BF0; --nhan-2: #BFA6F8; --nhan-nen: #2A1F42; --do: #E0788F;
+  --kinh: rgba(29,22,42,.76);
+}
+
+/* ===== THAN CHÌ — đơn sắc ===== */
+:root[data-tong="than-chi"][data-che-do="sang"] {
+  --nen: #ECECEB; --nen-2: #F6F6F5; --mat: #FCFCFB; --mat-2: #DEDEDC;
+  --chu: #1F1F1E; --chu-nhat: #454544; --chu-mo: #777776;
+  --vien: #CBCBC9; --vien-mo: #E1E1DF;
+  --nhan: #3D3D3B; --nhan-2: #5A5A57; --nhan-nen: #DFDFDD; --do: #8A3A2A;
+  --kinh: rgba(252,252,251,.78);
+}
+:root[data-tong="than-chi"][data-che-do="toi"] {
+  --nen: #111110; --nen-2: #191918; --mat: #1E1E1D; --mat-2: #2A2A28;
+  --chu: #E8E8E6; --chu-nhat: #B4B4B1; --chu-mo: #85857F;
+  --vien: #333331; --vien-mo: #252524;
+  --nhan: #B8B8B4; --nhan-2: #D2D2CE; --nhan-nen: #2C2C2A; --do: #D98A72;
+  --kinh: rgba(30,30,29,.78);
+}
+
+/* Bóng đổ dùng chung, đậm nhạt theo chế độ chứ không theo tông */
+:root[data-che-do="sang"] {
+  --bong-1: 0 1px 2px rgba(20,25,30,.05);
+  --bong-2: 0 2px 6px rgba(20,25,30,.06), 0 12px 32px rgba(20,25,30,.08);
+  --bong-3: 0 4px 12px rgba(20,25,30,.08), 0 24px 56px rgba(20,25,30,.12);
+}
+:root[data-che-do="toi"] {
+  --bong-1: 0 1px 2px rgba(0,0,0,.34);
+  --bong-2: 0 2px 6px rgba(0,0,0,.4), 0 12px 32px rgba(0,0,0,.34);
+  --bong-3: 0 4px 12px rgba(0,0,0,.46), 0 24px 56px rgba(0,0,0,.44);
+}
+:root {
+  --bong-1: 0 1px 2px rgba(20,25,30,.05);
+  --bong-2: 0 2px 6px rgba(20,25,30,.06), 0 12px 32px rgba(20,25,30,.08);
+  --bong-3: 0 4px 12px rgba(20,25,30,.08), 0 24px 56px rgba(20,25,30,.12);
+}
 :root {
   --de: "Literata", ui-serif, Georgia, serif;
   --than: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -140,7 +203,7 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
   border-color: transparent; color: #fff;
   box-shadow: var(--bong-2);
 }
-:root[data-chu-de="than-chi"] .nut.chinh { color: #FBFBFA; }
+:root[data-tong="than-chi"] .nut.chinh { color: var(--nen); }
 .nut.nho { padding: .38rem .75rem; font-size: .85rem; border-radius: 8px; }
 .nut[disabled] { opacity: .5; cursor: default; }
 
@@ -221,9 +284,15 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
 
 /* ============ MÀN GHI ============ */
 
-#man-ghi .than { display: flex; flex-direction: column; }
+/* Trang chủ chỉ có một việc: ghi. Mọi thứ dồn vào giữa màn hình,
+   không có nội dung nhật ký nào để mắt phải lướt qua. */
+#man-ghi .than {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: .5rem; padding: 1.5rem 1.25rem 2rem;
+}
 
-.dau-hom-nay { padding: 1.6rem 1.25rem .3rem; text-align: center; flex: none; }
+.dau-hom-nay { padding: 0 0 .3rem; text-align: center; flex: none; }
 .dau-hom-nay .thu {
   font-family: var(--may); font-size: .66rem; letter-spacing: .18em;
   text-transform: uppercase; color: var(--nhan); margin: 0 0 .3rem;
@@ -278,7 +347,7 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
   transition: transform .22s var(--bat), box-shadow .3s var(--muot);
   font-weight: 600; font-size: .86rem; letter-spacing: -.005em;
 }
-:root[data-chu-de="than-chi"] #nut-noi { color: #FBFBFA; }
+:root[data-tong="than-chi"] #nut-noi { color: var(--nen); }
 #nut-noi .bieu { font-size: 1.85rem; line-height: 1; transition: transform .25s var(--bat); }
 #nut-noi:active { transform: scale(.93); }
 #nut-noi:active .bieu { transform: scale(1.12); }
@@ -349,9 +418,30 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
 }
 .xem-anh button:active { transform: scale(.88); }
 
-/* --- Danh sách hôm nay --- */
+/* Lối dẫn sang sổ, chỉ hiện khi hôm nay đã có mẩu ghi */
+.dan-toi-so {
+  display: inline-flex; align-items: center; gap: .5rem;
+  margin-top: .6rem;
+  padding: .5rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--vien-mo);
+  background: var(--mat);
+  color: var(--chu-nhat); font-size: .85rem; font-weight: 500;
+  box-shadow: var(--bong-1);
+  transition: transform .2s var(--bat), border-color .2s, box-shadow .2s;
+  animation: mauLan .4s var(--muot) .1s both;
+}
+.dan-toi-so:hover { border-color: var(--vien); box-shadow: var(--bong-2); }
+.dan-toi-so:active { transform: scale(.96); }
+.dan-toi-so .mui {
+  color: var(--nhan); font-size: .95rem;
+  transition: transform .25s var(--bat);
+}
+.dan-toi-so:hover .mui { transform: translateX(3px); }
 
-.hom-nay { flex: 1; padding: .5rem 1.25rem 1.5rem; }
+/* --- Danh sách mẩu ghi, giờ nằm trong sổ --- */
+
+.hom-nay { padding: .5rem 1.25rem 0; }
 
 .nhan-muc {
   font-family: var(--may); font-size: .64rem; letter-spacing: .17em;
@@ -679,6 +769,23 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
   background: linear-gradient(transparent, rgba(0,0,0,.66)); color: #fff; font-weight: 500;
 }
 
+/* Ba nút sáng / tối / theo máy */
+.luoi-che-do { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; }
+.chon-che-do {
+  border: 1px solid var(--vien); border-radius: 12px;
+  background: var(--mat); padding: .75rem .4rem .65rem;
+  display: flex; flex-direction: column; align-items: center; gap: .3rem;
+  transition: transform .2s var(--bat), border-color .2s, background .2s, box-shadow .2s;
+}
+.chon-che-do .hinh { font-size: 1.25rem; line-height: 1; transition: transform .3s var(--bat); }
+.chon-che-do .ten { font-size: .76rem; font-weight: 500; }
+.chon-che-do:active { transform: scale(.96); }
+.chon-che-do[aria-pressed="true"] {
+  border-color: var(--nhan); background: var(--nhan-nen);
+  box-shadow: 0 0 0 1px var(--nhan);
+}
+.chon-che-do[aria-pressed="true"] .hinh { transform: scale(1.15); }
+
 .luoi-chu-de { display: grid; grid-template-columns: repeat(auto-fill, minmax(6.2rem, 1fr)); gap: .55rem; }
 .chon-chu-de {
   border: 1px solid var(--vien); border-radius: 11px; padding: .6rem;
@@ -950,10 +1057,10 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
       </div>
     </div>
 
-    <div class="hom-nay">
-      <p class="nhan-muc">Hôm nay</p>
-      <div id="ds-hom-nay"></div>
-    </div>
+    <button class="dan-toi-so" id="dan-toi-so" hidden>
+      <span id="chu-dan-so"></span>
+      <span class="mui" aria-hidden="true">→</span>
+    </button>
   </div>
 
   <nav class="chan">
@@ -974,6 +1081,7 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
     <input type="search" class="o-tim" id="o-tim" placeholder="Tìm trong nhật ký" aria-label="Tìm trong nhật ký">
   </div>
   <div class="than">
+    <div id="hom-nay-so" class="hom-nay"></div>
     <div id="muc-luc"></div>
     <article id="trang-ngay" hidden></article>
   </div>
@@ -1025,7 +1133,13 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
   </section>
 
   <section class="phan"><h3>Chọn bìa</h3><div class="luoi-bia" id="luoi-bia"></div></section>
-  <section class="phan"><h3>Chủ đề màu</h3><div class="luoi-chu-de" id="luoi-chu-de"></div></section>
+
+  <section class="phan">
+    <h3>Sáng hay tối</h3>
+    <div class="luoi-che-do" id="luoi-che-do"></div>
+  </section>
+
+  <section class="phan"><h3>Tông màu</h3><div class="luoi-chu-de" id="luoi-chu-de"></div></section>
 
   <section class="phan">
     <h3>Khóa nhật ký</h3>
@@ -1088,7 +1202,10 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
 
 const MAC_DINH = {
   tenSach: "Nhật ký nhỏ", nguoi: "", namSinh: "", chamNgon: "",
-  bia: "vai-cham", chuDe: "muc-giay", kieuKhoa: "khong", bamKhoa: ""
+  bia: "vai-cham",
+  tong: "muc",       // sáu tông màu
+  cheDo: "may",      // sang | toi | may (theo cài đặt hệ thống)
+  kieuKhoa: "khong", bamKhoa: ""
 };
 const KHOA_CH = "nhat-ky-nho:cau-hinh";
 let ch = { ...MAC_DINH };
@@ -1098,13 +1215,20 @@ const BIA = [
   { ma: "giay-tho", ten: "Giấy thô" }, { ma: "troi-dem", ten: "Trời đêm" },
   { ma: "son-mai", ten: "Sơn mài" }, { ma: "toi-gian", ten: "Tối giản" }
 ];
-const CHU_DE = [
-  { ma: "muc-giay", ten: "Mực giấy", mau: ["#F2F4F5", "#16283D", "#0E7C7B"] },
-  { ma: "dem-sau", ten: "Đêm sâu", mau: ["#0D141C", "#DFE7EE", "#4FBFB8"] },
-  { ma: "co-ua", ten: "Cỏ úa", mau: ["#EFE7D8", "#3B2E1E", "#96602A"] },
-  { ma: "hoa-dao", ten: "Hoa đào", mau: ["#F7EDEE", "#40222A", "#B04766"] },
-  { ma: "reu-da", ten: "Rêu đá", mau: ["#E6EAE2", "#232E23", "#4A6B3E"] },
-  { ma: "than-chi", ten: "Than chì", mau: ["#EDEDEC", "#1F1F1E", "#777776"] }
+/** Sáu tông màu, mỗi tông có sẵn cả bản sáng lẫn bản tối. */
+const TONG = [
+  { ma: "muc",      ten: "Mực",       sang: ["#EEF1F3", "#16283D", "#0E7C7B"], toi: ["#0A1019", "#DFE7EE", "#4FBFB8"] },
+  { ma: "ho-phach", ten: "Hổ phách",  sang: ["#F1EADD", "#3B2E1E", "#96602A"], toi: ["#14100A", "#EFE4D2", "#D19A54"] },
+  { ma: "hoa-dao",  ten: "Hoa đào",   sang: ["#F5E9EB", "#40222A", "#B04766"], toi: ["#150E11", "#F0DDE1", "#E0788F"] },
+  { ma: "reu",      ten: "Rêu",       sang: ["#E5EADF", "#232E23", "#4A6B3E"], toi: ["#0C110B", "#DEE7D6", "#7FB268"] },
+  { ma: "tim",      ten: "Tím trầm",  sang: ["#EEEAF3", "#2C2340", "#6B4E9E"], toi: ["#100C18", "#E4DCF0", "#A98BF0"] },
+  { ma: "than-chi", ten: "Than chì",  sang: ["#ECECEB", "#1F1F1E", "#3D3D3B"], toi: ["#111110", "#E8E8E6", "#B8B8B4"] }
+];
+
+const CHE_DO = [
+  { ma: "sang", ten: "Sáng",     hinh: "☀" },
+  { ma: "toi",  ten: "Tối",      hinh: "☾" },
+  { ma: "may",  ten: "Theo máy", hinh: "◐" }
 ];
 const THU = ["Chủ nhật", "Thứ hai", "Thứ ba", "Thứ tư", "Thứ năm", "Thứ sáu", "Thứ bảy"];
 const THANG = ["Tháng một", "Tháng hai", "Tháng ba", "Tháng tư", "Tháng năm", "Tháng sáu",
@@ -1120,6 +1244,16 @@ function napCauHinh() {
     const t = localStorage.getItem(KHOA_CH);
     if (t) ch = { ...MAC_DINH, ...JSON.parse(t) };
   } catch (e) { /* bỏ qua */ }
+
+  // Chuyển cấu hình bản cũ: hồi đó sáng tối trộn chung với tông màu.
+  if (ch.chuDe) {
+    const cu = { "muc-giay": ["muc", "sang"], "dem-sau": ["muc", "toi"],
+                 "co-ua": ["ho-phach", "sang"], "hoa-dao": ["hoa-dao", "sang"],
+                 "reu-da": ["reu", "sang"], "than-chi": ["than-chi", "sang"] }[ch.chuDe];
+    if (cu) { ch.tong = cu[0]; ch.cheDo = cu[1]; }
+    delete ch.chuDe;
+    luuCauHinh();
+  }
 }
 function luuCauHinh() {
   try { localStorage.setItem(KHOA_CH, JSON.stringify(ch)); } catch (e) { /* bỏ qua */ }
@@ -1519,11 +1653,17 @@ async function ghiVaoSo() {
   }
 
   soGhi.sort((a, b) => a.id - b.id);
+  const laSua = !!dangSua;
   dongKhuSoan();
   veManGhi();
+  if (ngayDangXem) veTrangNgay(ngayDangXem); else if ($("man-so").classList.contains("hien")) veMucLuc();
 
   // Một nhịp rung ngắn xác nhận đã ghi. Máy nào không có thì bỏ qua.
   if (navigator.vibrate) { try { navigator.vibrate(12); } catch (e) {} }
+
+  if (!laSua && $("man-ghi").classList.contains("hien")) {
+    baoNgan("Đã ghi vào nhật ký", "Xem sổ", () => { ngayDangXem = null; diToi("so"); });
+  }
 }
 
 /* ============================================================
@@ -1592,7 +1732,13 @@ function baoDaGhi(chu) {
    VẼ MÀN GHI
    ============================================================ */
 
-/** Vẽ lại phần đầu ngày và danh sách mẩu ghi hôm nay. */
+/**
+ * Vẽ lại trang chủ.
+ *
+ * Trang này cố tình không trưng nội dung nhật ký ra: nó chỉ có mỗi việc
+ * là ghi. Đã ghi được gì trong ngày thì chỉ hiện một dòng đếm và lối dẫn
+ * sang sổ — muốn đọc thì sang bên đó, nơi mọi thứ nằm chung một chỗ.
+ */
 function veManGhi() {
   const nay = new Date();
   const ma = maNgay(nay);
@@ -1603,28 +1749,18 @@ function veManGhi() {
 
   const cuaNay = soGhi.filter((g) => g.ngay === ma);
   const soAnh = cuaNay.filter((g) => g.anh).length;
+
   $("dem-hom-nay").textContent = cuaNay.length
-    ? `${cuaNay.length} mẩu ghi${soAnh ? ` · ${soAnh} ảnh` : ""}`
+    ? `${cuaNay.length} mẩu ghi${soAnh ? ` · ${soAnh} ảnh` : ""} hôm nay`
     : "Chưa ghi gì hôm nay";
 
-  const o = $("ds-hom-nay");
-  if (!cuaNay.length) {
-    o.innerHTML = `<p class="trong">Chạm nút trên rồi nói một câu bất kỳ.<br>
-      Dù chỉ là “trời hôm nay đẹp”.</p>`;
-    return;
+  const dan = $("dan-toi-so");
+  if (cuaNay.length) {
+    $("chu-dan-so").textContent = "Đọc lại trong sổ";
+    dan.hidden = false;
+  } else {
+    dan.hidden = true;
   }
-
-  // Mới nhất lên trước, để anh thấy ngay cái vừa ghi.
-  const nguoc = [...cuaNay].reverse();
-  o.innerHTML = nguoc.map((g, i) => veMotMau(g, true, i)).join("");
-
-  // Mẩu vừa ghi xong trôi lên từ chỗ ô soạn; những mẩu cũ hiện lần lượt.
-  const cac = o.querySelectorAll(".mau");
-  cac.forEach((e, i) => {
-    if (vuaGhi && Number(e.dataset.id) === vuaGhi) e.classList.add("moi");
-    else e.classList.add("lan");
-  });
-  vuaGhi = null;
 }
 
 /**
@@ -1655,35 +1791,58 @@ function veMotMau(g, choSua = true, thuTu = 0) {
 let gioHoanTac = null;
 
 /**
- * Hiện thanh cho phép lấy lại mẩu vừa xoá, sống trong tám giây.
- * Quá hạn mà không bấm thì mẩu đó mất hẳn.
- * @param {object} g Mẩu ghi vừa bị xoá, giữ nguyên cả ảnh.
+ * Thanh báo ngắn trôi lên từ đáy, kèm một nút bấm.
+ *
+ * Trang chủ cố ý không trưng nội dung nhật ký, nên ghi xong phải có
+ * cái gì đó nói "xong rồi" — nếu không anh sẽ ngờ máy có nhận không.
+ *
+ * @param {string} loi Câu báo.
+ * @param {string} tenNut Chữ trên nút, để rỗng thì không có nút.
+ * @param {Function} [khiBam] Việc làm khi bấm nút.
+ * @param {number} [song=5000] Sống bao lâu, tính bằng mili giây.
  */
-function hienHoanTac(g) {
+function baoNgan(loi, tenNut, khiBam, song = 5000) {
   const cu = $("thanh-hoan-tac");
   if (cu) cu.remove();
   if (gioHoanTac) clearTimeout(gioHoanTac);
 
   const o = document.createElement("div");
   o.id = "thanh-hoan-tac";
-  o.innerHTML = `<span>Đã xoá một mẩu ghi</span><button type="button">Lấy lại</button>`;
+  o.innerHTML = `<span>${thoat(loi)}</span>` +
+    (tenNut ? `<button type="button">${thoat(tenNut)}</button>` : "");
   document.body.appendChild(o);
 
-  o.querySelector("button").addEventListener("click", async () => {
+  const nut = o.querySelector("button");
+  if (nut) nut.addEventListener("click", () => {
+    o.remove();
+    if (gioHoanTac) clearTimeout(gioHoanTac);
+    if (khiBam) khiBam();
+  });
+
+  gioHoanTac = setTimeout(() => o.remove(), song);
+  return o;
+}
+
+/**
+ * Hiện thanh cho phép lấy lại mẩu vừa xoá, sống trong tám giây.
+ * Quá hạn mà không bấm thì mẩu đó mất hẳn.
+ * @param {object} g Mẩu ghi vừa bị xoá, giữ nguyên cả ảnh.
+ */
+function hienHoanTac(g) {
+  const o = baoNgan("Đã xoá một mẩu ghi", "Lấy lại", async () => {
     await luuMau(g);
     soGhi.push(g);
     soGhi.sort((a, b) => a.id - b.id);
     veManGhi();
-    if (ngayDangXem) veTrangNgay(ngayDangXem);
-    o.remove();
-    if (gioHoanTac) clearTimeout(gioHoanTac);
-  });
-
-  gioHoanTac = setTimeout(() => {
-    // Hết hạn: giờ mới thật sự buông tấm ảnh ra khỏi bộ nhớ.
-    if (urlAnh.has(g.id)) { URL.revokeObjectURL(urlAnh.get(g.id)); urlAnh.delete(g.id); }
-    o.remove();
+    if (ngayDangXem) veTrangNgay(ngayDangXem); else veMucLuc();
   }, 8000);
+
+  // Hết tám giây mà không ai bấm thì mới thật sự buông tấm ảnh khỏi bộ nhớ.
+  setTimeout(() => {
+    if (!document.body.contains(o) && urlAnh.has(g.id)) {
+      URL.revokeObjectURL(urlAnh.get(g.id)); urlAnh.delete(g.id);
+    }
+  }, 8200);
 }
 
 /* ============================================================
@@ -1697,10 +1856,12 @@ function veMucLuc() {
   ngayDangXem = null;
   $("trang-ngay").hidden = true;
   $("muc-luc").hidden = false;
+  $("hom-nay-so").hidden = false;
   $("nut-lui-so").hidden = true;
   $("ten-so").textContent = "Sổ nhật ký";
 
   const nhom = nhomTheoNgay();
+  const maNay = maNgay(new Date());
   let ngay = [...nhom.keys()].sort().reverse();
 
   if (tuKhoa) {
@@ -1708,10 +1869,29 @@ function veMucLuc() {
       nhom.get(n).some((g) => (g.chu || "").toLowerCase().includes(tuKhoa)));
   }
 
+  // Hôm nay hiện nguyên nội dung ngay đầu sổ, khỏi phải bấm vào mới đọc được.
+  const cuaNay = tuKhoa ? [] : (nhom.get(maNay) || []);
+  const o = $("hom-nay-so");
+  if (cuaNay.length) {
+    const nguoc = [...cuaNay].reverse();
+    o.innerHTML = `<p class="nhan-muc">Hôm nay</p>` +
+      nguoc.map((g, i) => veMotMau(g, true, i)).join("");
+    o.querySelectorAll(".mau").forEach((e) => {
+      if (vuaGhi && Number(e.dataset.id) === vuaGhi) e.classList.add("moi");
+      else e.classList.add("lan");
+    });
+    vuaGhi = null;
+  } else {
+    o.innerHTML = "";
+  }
+
+  // Các ngày trước đó xếp thành mục lục bên dưới.
+  ngay = ngay.filter((n) => tuKhoa || n !== maNay);
+
   if (!ngay.length) {
-    $("muc-luc").innerHTML = `<p class="trong">${tuKhoa
+    $("muc-luc").innerHTML = cuaNay.length ? "" : `<p class="trong">${tuKhoa
       ? "Không tìm thấy ngày nào khớp."
-      : "Sổ còn trống. Sang thẻ Ghi để viết mẩu đầu tiên."}</p>`;
+      : "Sổ còn trống. Sang thẻ Ghi để nói câu đầu tiên."}</p>`;
     return;
   }
 
@@ -1744,6 +1924,7 @@ function veMucLuc() {
 function veTrangNgay(ma) {
   ngayDangXem = ma;
   $("muc-luc").hidden = true;
+  $("hom-nay-so").hidden = true;
   $("trang-ngay").hidden = false;
   $("nut-lui-so").hidden = false;
 
@@ -1825,9 +2006,22 @@ function tinhTuoi() {
   return new Date().getFullYear() - n;
 }
 
-/** Áp chủ đề màu và bìa hiện tại lên toàn trang. */
+/**
+ * Quyết định cuối cùng là sáng hay tối.
+ * Chọn "theo máy" thì hỏi hệ điều hành; chọn cứng thì theo ý người dùng.
+ * @returns {"sang"|"toi"}
+ */
+function cheDoThuc() {
+  if (ch.cheDo === "sang" || ch.cheDo === "toi") return ch.cheDo;
+  return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "toi" : "sang";
+}
+
+/** Áp tông màu, chế độ sáng tối và bìa hiện tại lên toàn trang. */
 function apDienMao() {
-  document.documentElement.dataset.chuDe = ch.chuDe;
+  const g = document.documentElement;
+  g.dataset.tong = ch.tong;
+  g.dataset.cheDo = cheDoThuc();
   $("bia-chinh").dataset.bia = ch.bia;
   $("bia-ten").textContent = ch.tenSach || "Nhật ký nhỏ";
   const tuoi = tinhTuoi();
@@ -1835,8 +2029,12 @@ function apDienMao() {
     ? (tuoi !== null ? `${ch.nguoi} · ${tuoi} tuổi` : ch.nguoi) : "";
   $("bia-cham").innerHTML = ch.chamNgon.trim()
     ? `<hr class="bia-vach">${thoat(ch.chamNgon)}` : "";
-  const mau = CHU_DE.find((c) => c.ma === ch.chuDe);
-  if (mau) document.querySelector('meta[name="theme-color"]')?.setAttribute("content", mau.mau[0]);
+  // Đổi luôn màu thanh trạng thái iPhone cho khớp nền app.
+  const t = TONG.find((x) => x.ma === ch.tong);
+  if (t) {
+    const bo = cheDoThuc() === "toi" ? t.toi : t.sang;
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", bo[0]);
+  }
 }
 
 /* ============================================================
@@ -1873,7 +2071,7 @@ function moCai() {
   $("nhap-nguoi").value = ch.nguoi;
   $("nhap-nam").value = ch.namSinh;
   $("nhap-cham").value = ch.chamNgon;
-  veLuoiBia(); veLuoiChuDe(); veKhuKhoa();
+  veLuoiBia(); veCheDo(); veLuoiTong(); veKhuKhoa();
   const soAnh = soGhi.filter((g) => g.anh).length;
   $("mo-ta-kho").textContent = soGhi.length
     ? `${soGhi.length} mẩu ghi, ${nhomTheoNgay().size} ngày, ${soAnh} ảnh.`
@@ -1890,11 +2088,23 @@ function veLuoiBia() {
       aria-pressed="${b.ma === ch.bia}" title="${b.ten}">
       <span class="ten-bia">${b.ten}</span></button>`).join("");
 }
-function veLuoiChuDe() {
-  $("luoi-chu-de").innerHTML = CHU_DE.map((c) =>
-    `<button class="chon-chu-de" data-chu-de="${c.ma}" aria-pressed="${c.ma === ch.chuDe}">
-      <span class="dai-mau">${c.mau.map((m) => `<i style="background:${m}"></i>`).join("")}</span>
+/** Vẽ ba nút chọn sáng / tối / theo máy. */
+function veCheDo() {
+  $("luoi-che-do").innerHTML = CHE_DO.map((c) =>
+    `<button class="chon-che-do" data-che-do="${c.ma}" aria-pressed="${c.ma === ch.cheDo}">
+      <span class="hinh" aria-hidden="true">${c.hinh}</span>
       <span class="ten">${c.ten}</span></button>`).join("");
+}
+
+/** Vẽ lưới sáu tông màu, ô mẫu hiện đúng bản sáng hay tối đang dùng. */
+function veLuoiTong() {
+  const toi = cheDoThuc() === "toi";
+  $("luoi-chu-de").innerHTML = TONG.map((c) => {
+    const bo = toi ? c.toi : c.sang;
+    return `<button class="chon-chu-de" data-tong="${c.ma}" aria-pressed="${c.ma === ch.tong}">
+      <span class="dai-mau">${bo.map((m) => `<i style="background:${m}"></i>`).join("")}</span>
+      <span class="ten">${c.ten}</span></button>`;
+  }).join("");
 }
 
 const KIEU_KHOA = [
@@ -2426,7 +2636,7 @@ function ganSuKien() {
       hienHoanTac(g);
     }
   };
-  $("ds-hom-nay").addEventListener("click", banMau);
+  $("hom-nay-so").addEventListener("click", banMau);
   $("trang-ngay").addEventListener("click", banMau);
 
   // Sổ
@@ -2457,10 +2667,30 @@ function ganSuKien() {
     ch.bia = n.dataset.chonBia; luuCauHinh(); veLuoiBia(); apDienMao();
   });
   $("luoi-chu-de").addEventListener("click", (e) => {
-    const n = e.target.closest("[data-chu-de]");
+    const n = e.target.closest("[data-tong]");
     if (!n) return;
-    ch.chuDe = n.dataset.chuDe; luuCauHinh(); veLuoiChuDe(); apDienMao();
+    ch.tong = n.dataset.tong; luuCauHinh(); apDienMao(); veLuoiTong();
   });
+
+  $("luoi-che-do").addEventListener("click", (e) => {
+    const n = e.target.closest("[data-che-do]");
+    if (!n) return;
+    ch.cheDo = n.dataset.cheDo; luuCauHinh(); apDienMao();
+    veCheDo(); veLuoiTong();   // ô mẫu tông phải đổi theo sáng/tối vừa chọn
+  });
+
+  // Đang để "theo máy" mà hệ thống đổi sang chế độ khác thì app đổi theo ngay.
+  if (window.matchMedia) {
+    const doi = window.matchMedia("(prefers-color-scheme: dark)");
+    const nghe = () => {
+      if (ch.cheDo !== "may") return;
+      apDienMao();
+      if (!$("bang-cai").hidden) veLuoiTong();
+    };
+    doi.addEventListener ? doi.addEventListener("change", nghe) : doi.addListener(nghe);
+  }
+
+  $("dan-toi-so").addEventListener("click", () => { ngayDangXem = null; diToi("so"); });
   $("ds-khoa").addEventListener("click", (e) => {
     const n = e.target.closest("[data-kieu]");
     if (!n) return;
