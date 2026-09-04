@@ -559,89 +559,102 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
 }
 .o-tim:focus { border-color: var(--nhan); box-shadow: 0 0 0 3px var(--nhan-nen); outline: none; }
 
-/* ---- Lịch tháng ---- */
+/* ---- Lịch ----
+   Lưới bảy cột phải dùng minmax(0,1fr): với 1fr trơn, ô không co nhỏ hơn
+   nội dung nên trên máy hẹp cả lịch tràn ra ngoài khung. */
 
-#lich { padding: 1rem 1rem .4rem; }
-
-.lich-hop {
-  background: var(--mat);
-  border: 1px solid var(--vien-mo);
-  border-radius: 16px;
-  padding: .9rem .9rem 1rem;
-  box-shadow: var(--bong-1);
-}
+#lich { padding: 1.1rem 1rem .5rem; }
 
 .lich-dinh {
-  display: flex; align-items: center; gap: .5rem;
-  margin-bottom: .8rem;
+  display: flex; align-items: center; gap: .3rem;
+  margin-bottom: 1.1rem;
 }
 .lich-dinh .thang-nam {
-  font-family: var(--de); font-weight: 600; font-size: 1.02rem;
-  margin: 0 auto 0 .25rem; letter-spacing: -.01em;
+  font-family: var(--de); font-weight: 700;
+  font-size: 1.32rem; letter-spacing: -.02em;
+  margin: 0 auto 0 .1rem;
 }
 .lich-dinh button {
-  width: 2rem; height: 2rem; border-radius: 8px;
+  width: 2.2rem; height: 2.2rem; border-radius: 11px;
   display: grid; place-items: center;
-  color: var(--chu-nhat); font-size: 1rem;
-  transition: background .15s, transform .15s var(--bat);
+  color: var(--chu-nhat); font-size: 1.05rem;
+  background: var(--mat); border: 1px solid var(--vien-mo);
+  transition: background .15s, transform .16s var(--bat), opacity .2s;
 }
-.lich-dinh button:hover { background: var(--mat-2); }
 .lich-dinh button:active { transform: scale(.9); }
 .lich-dinh button[disabled] { opacity: .3; cursor: default; }
 
 .lich-tuan {
-  display: grid; grid-template-columns: repeat(7, 1fr);
-  gap: .1rem; margin-bottom: .3rem;
+  display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));
+  margin-bottom: .45rem;
 }
 .lich-tuan span {
   text-align: center;
-  font-family: var(--may); font-size: .6rem;
-  letter-spacing: .08em; text-transform: uppercase;
-  color: var(--chu-mo); padding: .2rem 0;
+  font-family: var(--may); font-size: .62rem;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--chu-mo);
 }
 
-.lich-luoi { display: grid; grid-template-columns: repeat(7, 1fr); gap: .12rem; }
+.lich-luoi {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: .25rem .1rem;
+}
 
 .lich-o {
   aspect-ratio: 1;
+  min-width: 0;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  gap: .12rem;
-  border-radius: 9px;
-  font-family: var(--may); font-size: .82rem;
+  gap: .18rem;
+  border-radius: 50%;
+  font-family: var(--than); font-size: .92rem; font-weight: 400;
   font-variant-numeric: tabular-nums;
   color: var(--chu-nhat);
   position: relative;
-  transition: background .15s, transform .18s var(--bat);
+  transition: background .18s, transform .2s var(--bat), color .18s;
 }
 .lich-o.trong { visibility: hidden; }
-.lich-o.ngoai { color: var(--chu-mo); opacity: .35; }
+.lich-o.ngoai { opacity: .28; }
 
-/* Chấm dưới số: ngày ấy có nhật ký */
+/* Chấm dưới số: ngày ấy có nhật ký. Nhiều mẩu thì chấm to hơn một chút. */
 .lich-o .cham {
-  width: .3rem; height: .3rem; border-radius: 50%;
+  width: .32rem; height: .32rem; border-radius: 50%;
   background: var(--do);
+  transition: transform .2s var(--bat);
 }
-.lich-o.co-ghi { color: var(--chu); font-weight: 500; }
+.lich-o .cham.day { width: .42rem; height: .42rem; }
+.lich-o .trong-cham { height: .32rem; }
+
+.lich-o.co-ghi { color: var(--chu); font-weight: 600; }
 .lich-o.co-ghi:hover { background: var(--mat-2); }
-.lich-o.co-ghi:active { transform: scale(.9); }
+.lich-o.co-ghi:active { transform: scale(.88); }
 
-/* Hôm nay: viền tròn quanh số */
-.lich-o.hom-nay-o { color: var(--nhan); font-weight: 600; }
-.lich-o.hom-nay-o::before {
-  content: ""; position: absolute;
-  width: 1.9rem; height: 1.9rem; border-radius: 50%;
-  border: 1.5px solid var(--nhan);
-  top: 50%; left: 50%; transform: translate(-50%, calc(-50% - .21rem));
+/* Hôm nay: nền đặc, chữ ngược màu — Day One cũng đánh dấu kiểu này */
+.lich-o.hom-nay-o {
+  background: var(--nhan); color: #fff; font-weight: 600;
 }
+:root[data-tong="than-chi"] .lich-o.hom-nay-o { color: var(--nen); }
+.lich-o.hom-nay-o .cham { background: rgba(255,255,255,.9); }
 
-.lich-chan {
-  margin-top: .75rem; padding-top: .7rem;
-  border-top: 1px solid var(--vien-mo);
-  display: flex; align-items: center; gap: .45rem;
-  font-size: .76rem; color: var(--chu-mo);
+.lich-tom {
+  margin: 1.2rem 1rem 0;
+  padding: .85rem 1rem;
+  background: var(--mat);
+  border: 1px solid var(--vien-mo);
+  border-radius: 14px;
+  display: flex; align-items: center; gap: .9rem;
+  box-shadow: var(--bong-1);
 }
-.lich-chan .cham { width: .3rem; height: .3rem; border-radius: 50%; background: var(--do); }
+.lich-tom .so-lon {
+  font-family: var(--de); font-size: 1.7rem; font-weight: 700;
+  color: var(--nhan); line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.lich-tom .chu-nho { font-size: .82rem; color: var(--chu-mo); line-height: 1.45; }
+
+/* Chuỗi ngày liên tiếp — thứ Day One gọi là streak */
+.lich-tom .vach { width: 1px; align-self: stretch; background: var(--vien-mo); }
 
 .nhom-thang { padding: 0 1rem; }
 .ten-thang {
@@ -681,13 +694,36 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
 
 /* --- Trang một ngày --- */
 
-#trang-ngay { padding: 1.3rem 1.3rem 2rem; max-width: 40rem; margin: 0 auto; }
-.dau-trang { margin-bottom: 1.4rem; }
+#trang-ngay { padding: 1.4rem 1.3rem 1.5rem; max-width: 40rem; margin: 0 auto; }
+.dau-trang { margin-bottom: 1.6rem; }
+.dau-trang .thu-lon {
+  font-family: var(--may); font-size: .66rem; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--nhan); margin: 0 0 .3rem;
+}
 .dau-trang h1 {
   font-family: var(--de); font-weight: 700;
-  font-size: clamp(1.5rem, 5.2vw, 2rem);
-  margin: .15rem 0 0; letter-spacing: -.025em;
+  font-size: clamp(1.55rem, 5.4vw, 2.05rem);
+  margin: 0; letter-spacing: -.028em; line-height: 1.14;
 }
+.dau-trang .dem-nho {
+  color: var(--chu-mo); font-size: .84rem; margin: .4rem 0 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Thanh chuyển ngày dưới đáy trang ngày */
+.dieu-ngay {
+  flex: none;
+  display: grid; grid-template-columns: 1fr 1fr; gap: .5rem;
+  padding: .7rem 1rem calc(.7rem + var(--duoi));
+  background: var(--kinh);
+  backdrop-filter: blur(20px) saturate(1.6);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  border-top: 1px solid var(--vien-mo);
+}
+.dieu-ngay .nut { justify-content: center; }
+.dieu-ngay .nut[disabled] { opacity: .35; }
+
+.hang-tim { padding: .7rem 1rem .3rem; flex: none; }
 
 /* Nút gọi bản tổng hợp — trước đây bài tự hiện nên chẳng ai để ý là có */
 .nut-tong-hop {
@@ -1203,34 +1239,52 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
     </button>
   </div>
 
-  <nav class="chan">
-    <button data-di="ghi" aria-current="true"><span class="hinh">✎</span>Ghi</button>
-    <button data-di="so"><span class="hinh">📖</span>Sổ</button>
-    <button data-di="bia"><span class="hinh">📔</span>Bìa</button>
-  </nav>
+  <nav class="chan" data-o="ghi"></nav>
 </div>
 
 <!-- ============ MÀN SỔ ============ -->
 <div class="man" id="man-so">
   <header class="dinh">
-    <button class="nut nho" id="nut-lui-so" hidden>‹ Lui</button>
-    <span class="ten" id="ten-so">Sổ nhật ký</span>
+    <span class="ten">Sổ nhật ký</span>
     <button class="nut nho" id="nut-cai-so">Cài đặt</button>
   </header>
-  <div style="padding:.7rem 1rem 0;flex:none">
+  <div class="hang-tim">
     <input type="search" class="o-tim" id="o-tim" placeholder="Tìm trong nhật ký" aria-label="Tìm trong nhật ký">
   </div>
   <div class="than">
-    <section id="lich" aria-label="Lịch nhật ký"></section>
     <div id="hom-nay-so" class="hom-nay"></div>
     <div id="muc-luc"></div>
-    <article id="trang-ngay" hidden></article>
   </div>
-  <nav class="chan">
-    <button data-di="ghi"><span class="hinh">✎</span>Ghi</button>
-    <button data-di="so" aria-current="true"><span class="hinh">📖</span>Sổ</button>
-    <button data-di="bia"><span class="hinh">📔</span>Bìa</button>
-  </nav>
+  <nav class="chan" data-o="so"></nav>
+</div>
+
+<!-- ============ MÀN LỊCH ============ -->
+<div class="man" id="man-lich">
+  <header class="dinh">
+    <span class="ten">Lịch</span>
+    <button class="nut nho" id="nut-ve-thang-nay">Hôm nay</button>
+  </header>
+  <div class="than">
+    <section id="lich" aria-label="Lịch nhật ký"></section>
+    <div id="chuoi-ngay"></div>
+  </div>
+  <nav class="chan" data-o="lich"></nav>
+</div>
+
+<!-- ============ MÀN MỘT NGÀY ============ -->
+<div class="man" id="man-ngay">
+  <header class="dinh">
+    <button class="nut nho" id="nut-thoat-ngay">‹</button>
+    <span class="ten" id="ten-ngay"></span>
+    <button class="nut nho" id="nut-in-ngay" title="In ngày này">⎙</button>
+  </header>
+  <div class="than">
+    <article id="trang-ngay"></article>
+  </div>
+  <div class="dieu-ngay">
+    <button class="nut" id="ngay-lui">‹ Hôm trước</button>
+    <button class="nut" id="ngay-toi">Hôm sau ›</button>
+  </div>
 </div>
 
 <!-- ============ MÀN BÌA ============ -->
@@ -1246,11 +1300,7 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
     </div>
     <button class="nut" id="nut-cai-bia">Cài đặt</button>
   </div>
-  <nav class="chan">
-    <button data-di="ghi"><span class="hinh">✎</span>Ghi</button>
-    <button data-di="so"><span class="hinh">📖</span>Sổ</button>
-    <button data-di="bia" aria-current="true"><span class="hinh">📔</span>Bìa</button>
-  </nav>
+  <nav class="chan" data-o="bia"></nav>
 </div>
 
 <!-- ============ CÀI ĐẶT ============ -->
@@ -1797,7 +1847,9 @@ async function ghiVaoSo() {
   const laSua = !!dangSua;
   dongKhuSoan();
   veManGhi();
-  if (ngayDangXem) veTrangNgay(ngayDangXem); else if ($("man-so").classList.contains("hien")) veMucLuc();
+  if ($("man-ngay").classList.contains("hien") && ngayDangXem) veTrangNgay(ngayDangXem);
+  else if ($("man-so").classList.contains("hien")) veMucLuc();
+  else if ($("man-lich").classList.contains("hien")) veLich();
 
   // Một nhịp rung ngắn xác nhận đã ghi. Máy nào không có thì bỏ qua.
   if (navigator.vibrate) { try { navigator.vibrate(12); } catch (e) {} }
@@ -2148,7 +2200,8 @@ function hienHoanTac(g) {
     soGhi.push(g);
     soGhi.sort((a, b) => a.id - b.id);
     veManGhi();
-    if (ngayDangXem) veTrangNgay(ngayDangXem); else veMucLuc();
+    if ($("man-ngay").classList.contains("hien") && ngayDangXem) veTrangNgay(ngayDangXem);
+    else veMucLuc();
   }, 8000);
 
   // Hết tám giây mà không ai bấm thì mới thật sự buông tấm ảnh khỏi bộ nhớ.
@@ -2180,11 +2233,10 @@ function veLich() {
   const maNay = maNgay(new Date());
 
   // getDay trả 0 cho chủ nhật; đổi để thứ hai thành cột đầu tiên.
-  const dauThang = new Date(nam, thang, 1);
-  const lech = (dauThang.getDay() + 6) % 7;
+  const lech = (new Date(nam, thang, 1).getDay() + 6) % 7;
   const soNgay = new Date(nam, thang + 1, 0).getDate();
 
-  // Không cho lật quá tháng hiện tại — tương lai thì chưa có gì để xem.
+  // Không cho lật quá tháng hiện tại — tương lai chưa có gì để xem.
   const nayThang = new Date().getFullYear() * 12 + new Date().getMonth();
   const dangThang = nam * 12 + thang;
 
@@ -2193,50 +2245,71 @@ function veLich() {
 
   for (let d = 1; d <= soNgay; d++) {
     const ma = `${nam}-${String(thang + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
-    const co = nhom.has(ma);
+    const ds = nhom.get(ma);
+    const co = !!ds;
     const nay = ma === maNay;
     const sau = dangThang === nayThang && d > new Date().getDate();
-    o += `<${co ? "button" : "div"} class="lich-o${co ? " co-ghi" : ""}${nay ? " hom-nay-o" : ""}${sau ? " ngoai" : ""}"
-      ${co ? `data-ngay="${ma}" title="${nhom.get(ma).length} mẩu ghi"` : ""}>
-      <span>${d}</span>${co ? '<span class="cham"></span>' : '<span style="height:.3rem"></span>'}
-      </${co ? "button" : "div"}>`;
+    const the = co ? "button" : "div";
+    o += `<${the} class="lich-o${co ? " co-ghi" : ""}${nay ? " hom-nay-o" : ""}${sau ? " ngoai" : ""}"`
+      + (co ? ` data-ngay="${ma}" aria-label="${d}, ${ds.length} mẩu ghi"` : "")
+      + `><span>${d}</span>`
+      + (co ? `<span class="cham${ds.length >= 3 ? " day" : ""}"></span>` : `<span class="trong-cham"></span>`)
+      + `</${the}>`;
   }
 
-  const soNgayCoGhi = [...nhom.keys()].filter((k) => {
+  const trongThang = [...nhom.keys()].filter((k) => {
     const [n, t] = k.split("-").map(Number);
     return n === nam && t === thang + 1;
   }).length;
 
-  $("lich").innerHTML = `<div class="lich-hop">
+  $("lich").innerHTML = `
     <div class="lich-dinh">
-      <button id="lich-lui" aria-label="Tháng trước">‹</button>
       <p class="thang-nam">${THANG[thang]} ${nam}</p>
+      <button id="lich-lui" aria-label="Tháng trước">‹</button>
       <button id="lich-toi" aria-label="Tháng sau" ${dangThang >= nayThang ? "disabled" : ""}>›</button>
     </div>
     <div class="lich-tuan">
       <span>H</span><span>B</span><span>T</span><span>N</span><span>S</span><span>B</span><span>CN</span>
     </div>
-    <div class="lich-luoi">${o}</div>
-    <div class="lich-chan">
-      <span class="cham"></span>
-      <span>${soNgayCoGhi ? `${soNgayCoGhi} ngày có nhật ký trong tháng này` : "Tháng này chưa ghi ngày nào"}</span>
-    </div>
-  </div>`;
+    <div class="lich-luoi">${o}</div>`;
+
+  const chuoi = demChuoiNgay();
+  $("chuoi-ngay").innerHTML = `<div class="lich-tom">
+      <div>
+        <div class="so-lon">${trongThang}</div>
+        <div class="chu-nho">ngày có ghi<br>trong tháng này</div>
+      </div>
+      <div class="vach"></div>
+      <div>
+        <div class="so-lon">${chuoi}</div>
+        <div class="chu-nho">${chuoi ? "ngày liền nhau<br>tính tới hôm nay" : "chưa ghi<br>hôm nay"}</div>
+      </div>
+      <div class="vach"></div>
+      <div>
+        <div class="so-lon">${nhom.size}</div>
+        <div class="chu-nho">ngày có ghi<br>từ trước tới nay</div>
+      </div>
+    </div>`;
+}
+
+/**
+ * Đếm số ngày liền nhau có nhật ký, tính lùi từ hôm nay.
+ * Hôm nay chưa ghi thì tính từ hôm qua, để chuỗi không bị đứt oan
+ * chỉ vì trời còn sớm.
+ * @returns {number}
+ */
+function demChuoiNgay() {
+  const nhom = nhomTheoNgay();
+  if (!nhom.size) return 0;
+  const d = new Date();
+  if (!nhom.has(maNgay(d))) d.setDate(d.getDate() - 1);
+  let n = 0;
+  while (nhom.has(maNgay(d))) { n++; d.setDate(d.getDate() - 1); }
+  return n;
 }
 
 /** Vẽ mục lục các ngày, nhóm theo tháng, có lọc theo từ tìm kiếm. */
 function veMucLuc() {
-  ngayDangXem = null;
-  $("trang-ngay").hidden = true;
-  $("muc-luc").hidden = false;
-  $("hom-nay-so").hidden = false;
-  $("nut-lui-so").hidden = true;
-  $("ten-so").textContent = "Sổ nhật ký";
-
-  // Đang tìm kiếm thì giấu lịch đi, để kết quả không bị đẩy xuống dưới.
-  $("lich").hidden = !!tuKhoa;
-  if (!tuKhoa) veLich();
-
   const nhom = nhomTheoNgay();
   const maNay = maNgay(new Date());
   let ngay = [...nhom.keys()].sort().reverse();
@@ -2245,6 +2318,8 @@ function veMucLuc() {
     ngay = ngay.filter((n) =>
       nhom.get(n).some((g) => (g.chu || "").toLowerCase().includes(tuKhoa)));
   }
+
+  $("hom-nay-so").hidden = false;
 
   // Hôm nay hiện nguyên nội dung ngay đầu sổ, khỏi phải bấm vào mới đọc được.
   const cuaNay = tuKhoa ? [] : (nhom.get(maNay) || []);
@@ -2300,20 +2375,26 @@ function veMucLuc() {
  */
 function veTrangNgay(ma) {
   ngayDangXem = ma;
-  $("muc-luc").hidden = true;
-  $("hom-nay-so").hidden = true;
-  $("lich").hidden = true;
-  $("trang-ngay").hidden = false;
-  $("nut-lui-so").hidden = false;
+  diToi("ngay");
 
   const ds = soGhi.filter((g) => g.ngay === ma);
   const t = doiNgay(ma);
-  $("ten-so").textContent = t.dai;
+  const soAnh = ds.filter((g) => g.anh).length;
+  $("ten-ngay").textContent = `${t.ngay}/${t.thang}`;
+
+  // Không cho tiến quá hôm nay.
+  const nayMa = maNgay(new Date());
+  $("ngay-toi").disabled = ma >= nayMa;
 
   let html = `<header class="dau-trang">
-    <p class="ten-thang" style="margin:0">${t.thu}</p>
+    <p class="thu-lon">${t.thu}</p>
     <h1>${t.dai}</h1>
+    <p class="dem-nho">${ds.length} mẩu ghi${soAnh ? ` · ${soAnh} ảnh` : ""}</p>
   </header>`;
+
+  if (!ds.length) {
+    html += `<p class="trong">Ngày này chưa ghi gì.</p>`;
+  }
 
   html += ds.map((g, i) => veMotMau(g, true, i)).join("");
 
@@ -2431,9 +2512,26 @@ function apDienMao() {
    CHUYỂN MÀN
    ============================================================ */
 
-/** @param {"ghi"|"so"|"bia"} ten Màn cần hiện. */
+/** Bốn mục trên thanh dưới, theo thứ tự hiện ra. */
+const CAC_O = [
+  { ma: "ghi",  ten: "Hôm nay", hinh: "✎" },
+  { ma: "so",   ten: "Sổ",      hinh: "☰" },
+  { ma: "lich", ten: "Lịch",    hinh: "▦" },
+  { ma: "bia",  ten: "Bìa",     hinh: "❖" }
+];
+
+/** Đổ nội dung cho cả bốn thanh dưới, đánh dấu mục đang mở. */
+function veThanhDuoi(dang) {
+  document.querySelectorAll(".chan").forEach((n) => {
+    n.innerHTML = CAC_O.map((o) =>
+      `<button data-di="${o.ma}" aria-current="${o.ma === dang}">
+        <span class="hinh" aria-hidden="true">${o.hinh}</span>${o.ten}</button>`).join("");
+  });
+}
+
+/** @param {"ghi"|"so"|"lich"|"ngay"|"bia"} ten Màn cần hiện. */
 function diToi(ten) {
-  for (const m of ["ghi", "so", "bia"]) {
+  for (const m of ["ghi", "so", "lich", "ngay", "bia"]) {
     const o = $("man-" + m);
     const bat = m === ten;
     // Gỡ rồi gắn lại lớp hiệu ứng để nó chạy lại mỗi lần vào màn,
@@ -2445,11 +2543,13 @@ function diToi(ten) {
     }
     o.classList.toggle("hien", bat);
   }
-  document.querySelectorAll(".chan button").forEach((b) => {
-    b.setAttribute("aria-current", String(b.dataset.di === ten));
-  });
+
+  // Trang một ngày không có mục riêng trên thanh dưới; nó thuộc về Sổ.
+  veThanhDuoi(ten === "ngay" ? "so" : ten);
+
   if (ten === "ghi") veManGhi();
-  if (ten === "so" && !ngayDangXem) veMucLuc();
+  if (ten === "so") { ngayDangXem = null; veMucLuc(); }
+  if (ten === "lich") veLich();
 }
 
 /* ============================================================
@@ -2959,12 +3059,33 @@ function inThanhSach() {
    ============================================================ */
 
 function ganSuKien() {
-  // Thanh dưới
-  document.querySelectorAll(".chan button").forEach((b) => {
-    b.addEventListener("click", () => {
-      if (b.dataset.di === "so") ngayDangXem = null;
-      diToi(b.dataset.di);
+  // Thanh dưới — uỷ quyền, vì nội dung được vẽ lại mỗi lần chuyển màn.
+  document.querySelectorAll(".chan").forEach((n) => {
+    n.addEventListener("click", (e) => {
+      const b = e.target.closest("[data-di]");
+      if (b) diToi(b.dataset.di);
     });
+  });
+
+  // Trang một ngày: thoát, lùi, tiến, in
+  $("nut-thoat-ngay").addEventListener("click", () => diToi("so"));
+
+  /** Nhảy sang ngày liền trước hoặc liền sau ngày đang xem. */
+  const doiNgayXem = (buoc) => {
+    if (!ngayDangXem) return;
+    const [n, t, g] = ngayDangXem.split("-").map(Number);
+    const d = new Date(n, t - 1, g + buoc);
+    if (maNgay(d) > maNgay(new Date())) return;
+    veTrangNgay(maNgay(d));
+  };
+  $("ngay-lui").addEventListener("click", () => doiNgayXem(-1));
+  $("ngay-toi").addEventListener("click", () => doiNgayXem(1));
+  $("nut-in-ngay").addEventListener("click", inThanhSach);
+
+  $("nut-ve-thang-nay").addEventListener("click", () => {
+    const n = new Date();
+    thangLich = new Date(n.getFullYear(), n.getMonth(), 1);
+    veLich();
   });
 
   // Nút thu âm
@@ -3056,7 +3177,6 @@ function ganSuKien() {
     const o = e.target.closest("[data-ngay]");
     if (o) veTrangNgay(o.dataset.ngay);
   });
-  $("nut-lui-so").addEventListener("click", veMucLuc);
   $("o-tim").addEventListener("input", (e) => {
     tuKhoa = e.target.value.trim().toLowerCase();
     veMucLuc();
@@ -3114,9 +3234,9 @@ function ganSuKien() {
     nut.querySelector("strong").textContent = chuCu;
     if (kq.them) {
       veManGhi();
-      if ($("man-so").classList.contains("hien")) {
-        ngayDangXem ? veTrangNgay(ngayDangXem) : veMucLuc();
-      }
+      if ($("man-ngay").classList.contains("hien") && ngayDangXem) veTrangNgay(ngayDangXem);
+      else if ($("man-so").classList.contains("hien")) veMucLuc();
+      else if ($("man-lich").classList.contains("hien")) veLich();
       if (navigator.vibrate) { try { navigator.vibrate(12); } catch (e) {} }
       baoNgan(kq.loi, "Xem sổ", () => { ngayDangXem = null; diToi("so"); });
     } else {
@@ -3171,7 +3291,7 @@ function ganSuKien() {
     for (const u of urlAnh.values()) URL.revokeObjectURL(u);
     urlAnh.clear();
     soGhi = [];
-    veManGhi(); veMucLuc();
+    veManGhi(); veMucLuc(); veLich();
     $("khu-xoa").hidden = true;
     $("nut-xoa-het").hidden = false;
     $("mo-ta-kho").textContent = "Đã xoá sạch.";
@@ -3207,6 +3327,7 @@ function ganSuKien() {
 
 napCauHinh();
 apDienMao();
+veThanhDuoi("ghi");
 ganSuKien();
 
 if (!BoNghe) {
