@@ -13,7 +13,7 @@
 <meta name="theme-color" content="#16283D">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;0,7..72,700;1,7..72,400&family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Cormorant+Garamond:ital,wght@1,300;1,400;1,500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;0,7..72,700;1,7..72,400&family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Dancing+Script:wght@500;600;700&family=Playfair+Display:ital,wght@1,500;1,600;1,700&display=swap">
 
 <style>
 /* ============================================================
@@ -2737,7 +2737,9 @@ function veCauTrich() {
   cauVua = i;
 
   o.innerHTML = `<blockquote>“${thoat(CAU_TRICH[i])}”</blockquote>
-    <span class="hoa-thi" aria-hidden="true">✧</span>`;
+    <div class="hoa-van" aria-hidden="true">
+      <i></i><span>❦</span><i></i>
+    </div>`;
   o.classList.remove("hien-len");
   void o.offsetWidth;
   o.classList.add("hien-len");
