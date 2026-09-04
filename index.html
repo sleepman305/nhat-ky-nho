@@ -237,6 +237,8 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
   font-family: var(--de); font-weight: 600; font-size: 1.04rem;
   margin-right: auto; letter-spacing: -.01em;
 }
+/* Màn Sổ không còn nút phải, để tên chạy hết chiều ngang */
+#man-so .dinh .ten { margin-right: 0; }
 
 .than { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 
@@ -391,6 +393,8 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
 .nut-tron:hover { border-color: var(--nhan); box-shadow: var(--bong-2); }
 .nut-tron:hover svg { stroke: var(--nhan); }
 .nut-tron:active { transform: scale(.9); }
+.nut-tron.nho-hon { width: 2.2rem; height: 2.2rem; }
+.nut-tron.nho-hon svg { width: 1.05rem; height: 1.05rem; }
 
 /* --- Khu soạn lời --- */
 
@@ -744,10 +748,14 @@ button.lich-o:active { transform: scale(.88); }
 .nut-tong-hop:hover { border-color: var(--nhan); box-shadow: var(--bong-2); }
 .nut-tong-hop:active { transform: scale(.985); }
 .nut-tong-hop .hinh {
-  font-size: 1.3rem; line-height: 1;
   width: 2.6rem; height: 2.6rem; flex: none;
   display: grid; place-items: center;
   background: var(--nhan-nen); border-radius: 10px;
+}
+.nut-tong-hop .hinh svg {
+  width: 1.25rem; height: 1.25rem;
+  fill: none; stroke: var(--nhan);
+  stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round;
 }
 .nut-tong-hop strong { display: block; font-size: .95rem; font-weight: 600; }
 .nut-tong-hop em {
@@ -786,16 +794,6 @@ button.lich-o:active { transform: scale(.88); }
 
 .dinh.trong-suot { background: transparent; backdrop-filter: none; border-bottom: none; }
 
-.nut-banh-rang {
-  width: 2.3rem; height: 2.3rem; border-radius: 50%;
-  display: grid; place-items: center;
-  background: var(--mat); border: 1px solid var(--vien-mo);
-  box-shadow: var(--bong-1);
-  transition: transform .4s var(--muot), background .2s;
-}
-.nut-banh-rang svg { width: 1.15rem; height: 1.15rem; fill: var(--chu-nhat); }
-.nut-banh-rang:hover { transform: rotate(45deg); }
-.nut-banh-rang:active { transform: rotate(45deg) scale(.9); }
 
 .khu-sach {
   display: flex; flex-direction: column;
@@ -982,10 +980,6 @@ button.lich-o:active { transform: scale(.88); }
 #bia-chinh:hover::after { opacity: 1; }
 
 .bia-trong { position: relative; z-index: 2; transform: translateZ(18px); }
-.bia-cua {
-  font-family: var(--may); font-size: .62rem; letter-spacing: .24em;
-  text-transform: uppercase; opacity: .6; margin: 0 0 .85rem;
-}
 .bia-ten {
   font-family: var(--de); font-weight: 700;
   font-size: clamp(1.6rem, 6vw, 2.05rem);
@@ -1432,7 +1426,6 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
 <div class="man" id="man-so">
   <header class="dinh">
     <span class="ten">Sổ nhật ký</span>
-    <button class="nut nho" id="nut-cai-so">Cài đặt</button>
   </header>
   <div class="hang-tim">
     <input type="search" class="o-tim" id="o-tim" placeholder="Tìm trong nhật ký" aria-label="Tìm trong nhật ký">
@@ -1461,7 +1454,13 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
   <header class="dinh">
     <button class="nut nho" id="nut-thoat-ngay">‹</button>
     <span class="ten" id="ten-ngay"></span>
-    <button class="nut nho" id="nut-in-ngay" title="In ngày này">⎙</button>
+    <button class="nut-tron nho-hon" id="nut-in-ngay" aria-label="In ngày này" title="In ngày này">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7 8.6V3.6h10v5"/>
+        <path d="M7 17.4H5.4A2.4 2.4 0 0 1 3 15V11a2.4 2.4 0 0 1 2.4-2.4h13.2A2.4 2.4 0 0 1 21 11v4a2.4 2.4 0 0 1-2.4 2.4H17"/>
+        <rect x="7" y="14.4" width="10" height="6"/>
+      </svg>
+    </button>
   </header>
   <div class="than">
     <article id="trang-ngay"></article>
@@ -1517,8 +1516,6 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
     <input class="o-nhap" id="nhap-ten" placeholder="Nhật ký nhỏ">
     <label class="nhan-nho" for="nhap-nguoi">Tên của anh</label>
     <input class="o-nhap" id="nhap-nguoi" placeholder="SirV">
-    <label class="nhan-nho" for="nhap-nam">Năm sinh</label>
-    <input class="o-nhap" id="nhap-nam" type="number" inputmode="numeric" placeholder="1990">
     <label class="nhan-nho" for="nhap-cham">Châm ngôn</label>
     <textarea class="o-nhap" id="nhap-cham" placeholder="Câu anh muốn thấy mỗi lần mở nhật ký"></textarea>
   </section>
@@ -2321,7 +2318,14 @@ function veTrangNgay(ma) {
   const bai = tongHopNgay(ds);
   if (bai.length) {
     html += `<button class="nut-tong-hop" id="nut-tong-hop" data-ngay="${ma}">
-        <span class="hinh" aria-hidden="true">✍</span>
+        <span class="hinh" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M4 19.5V6.2A2.2 2.2 0 0 1 6.2 4H14"/>
+            <path d="M4 19.5A2.2 2.2 0 0 1 6.2 17.3H20"/>
+            <path d="M20 17.3V9.4"/>
+            <path d="M17.3 4.6a1.9 1.9 0 0 1 2.7 2.7l-5.2 5.2-3.6.9.9-3.6z"/>
+          </svg>
+        </span>
         <span>
           <strong>Viết thành bài nhật ký</strong>
           <em>Nối ${ds.filter((g) => g.chu).length} mẩu rời thành một trang liền mạch</em>
@@ -2670,13 +2674,6 @@ function latTrang(buoc) {
    BÌA VÀ DIỆN MẠO
    ============================================================ */
 
-/** Tính tuổi từ năm sinh. @returns {number|null} */
-function tinhTuoi() {
-  const n = parseInt(ch.namSinh, 10);
-  if (!n || n < 1900 || n > 2100) return null;
-  return new Date().getFullYear() - n;
-}
-
 /**
  * Quyết định cuối cùng là sáng hay tối.
  * Chọn "theo máy" thì hỏi hệ điều hành; chọn cứng thì theo ý người dùng.
@@ -2712,7 +2709,7 @@ function apDienMao() {
 
 /** Bốn mục trên thanh dưới, theo thứ tự hiện ra. */
 const CAC_O = [
-  { ma: "ghi",  ten: "Viết", hinh:
+  { ma: "ghi",  ten: "Viết nhật ký", hinh:
     '<path d="M16.4 3.9a2.1 2.1 0 0 1 3 3L8.6 17.7l-4 1 1-4z"/><path d="M14.6 5.7l3.7 3.7"/>' },
   { ma: "so",   ten: "Hôm nay", hinh:
     '<path d="M4 6.5h16"/><path d="M4 12h16"/><path d="M4 17.5h10"/>' },
@@ -2765,7 +2762,6 @@ function diToi(ten) {
 function moCai() {
   $("nhap-ten").value = ch.tenSach;
   $("nhap-nguoi").value = ch.nguoi;
-  $("nhap-nam").value = ch.namSinh;
   $("nhap-cham").value = ch.chamNgon;
   veLuoiBia(); veCheDo(); veLuoiTong(); veKhuKhoa();
   const soAnh = soGhi.filter((g) => g.anh).length;
@@ -3247,12 +3243,11 @@ function inThanhSach() {
   const nhom = nhomTheoNgay();
   const ngay = [...nhom.keys()].sort();
   const dau = doiNgay(ngay[0]), cuoi = doiNgay(ngay[ngay.length - 1]);
-  const tuoi = tinhTuoi();
 
   let html = `<section class="bia-in">
     <h1>${thoat(ch.tenSach || "Nhật ký nhỏ")}</h1>
     ${ch.chamNgon.trim() ? `<p class="cham">${thoat(ch.chamNgon)}</p>` : ""}
-    ${ch.nguoi ? `<p class="nguoi">${thoat(ch.nguoi)}${tuoi !== null ? ` · ${tuoi} tuổi` : ""}</p>` : ""}
+    ${ch.nguoi ? `<p class="nguoi">${thoat(ch.nguoi)}</p>` : ""}
     <p class="khoang">${dau.dai} — ${cuoi.dai} · ${ngay.length} ngày</p>
   </section>`;
 
@@ -3443,13 +3438,12 @@ function ganSuKien() {
   });
 
   // Cài đặt
-  $("nut-cai-so").addEventListener("click", moCai);
   $("nut-cai-ghi").addEventListener("click", moCai);
   $("nut-dong-cai").addEventListener("click", dongCai);
   $("tam-che").addEventListener("click", dongCai);
 
   for (const [id, khoa] of [["nhap-ten","tenSach"], ["nhap-nguoi","nguoi"],
-                            ["nhap-nam","namSinh"], ["nhap-cham","chamNgon"]]) {
+                            ["nhap-cham","chamNgon"]]) {
     $(id).addEventListener("input", (e) => { ch[khoa] = e.target.value; luuCauHinh(); apDienMao(); });
   }
 
