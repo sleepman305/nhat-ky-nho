@@ -2890,7 +2890,13 @@ let goPin = "", luoiKhoa = null;
 
 function hienManKhoa() {
   $("man-khoa").classList.add("hien");
-  for (const m of ["ghi", "so", "bia"]) $("man-" + m).classList.remove("hien");
+  // Giấu mọi màn khác. Danh sách này phải khớp với các màn thật đang có —
+  // gọi tới một màn không tồn tại là cả hàm chết giữa chừng, và người dùng
+  // bị nhốt ngoài màn khoá với một ô trống không nhập được gì.
+  for (const m of ["ghi", "so", "lich", "ngay", "sach"]) {
+    const o = $("man-" + m);
+    if (o) o.classList.remove("hien");
+  }
   $("bao-loi-khoa").textContent = "";
   $("vung-pin").hidden = ch.kieuKhoa !== "pin";
   $("vung-hinh-ve").hidden = ch.kieuKhoa !== "hinh-ve";
@@ -2899,10 +2905,17 @@ function hienManKhoa() {
   $("phu-khoa").textContent = { pin: "Nhập mã PIN để mở", "hinh-ve": "Vẽ hình để mở",
     "mat-khau": "Nhập mật khẩu để mở" }[ch.kieuKhoa] || "";
 
-  if (ch.kieuKhoa === "pin") { goPin = ""; veBanPhim(); veChamPin(); }
-  else if (ch.kieuKhoa === "hinh-ve" && !luoiKhoa) {
-    luoiKhoa = ganLuoiVe($("luoi-hinh-ve"), (d) => thuMa(d.join("-")));
-  } else if (ch.kieuKhoa === "mat-khau") setTimeout(() => $("o-mat-khau").focus(), 60);
+  if (ch.kieuKhoa === "pin") {
+    goPin = ""; veBanPhim(); veChamPin();
+  } else if (ch.kieuKhoa === "hinh-ve") {
+    // Dựng lại lưới mỗi lần mở màn khoá: canvas chỉ đo được kích thước thật
+    // sau khi khung chứa nó thôi bị ẩn.
+    requestAnimationFrame(() => {
+      luoiKhoa = ganLuoiVe($("luoi-hinh-ve"), (d) => thuMa(d.join("-")));
+    });
+  } else if (ch.kieuKhoa === "mat-khau") {
+    setTimeout(() => $("o-mat-khau").focus(), 60);
+  }
 }
 
 function veBanPhim() {
