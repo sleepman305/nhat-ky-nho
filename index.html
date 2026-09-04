@@ -159,7 +159,7 @@
   --may: "IBM Plex Mono", ui-monospace, Consolas, monospace;
   /* Chữ cho câu trích: nét viết tay bay bổng. Lùi về serif nghiêng nếu
      máy chưa tải kịp — cả hai đều có đủ dấu tiếng Việt. */
-  --tho: "Dancing Script", "Playfair Display", "Literata", Georgia, cursive;
+  --tho: 'Dancing Script', 'Playfair Display', 'Literata', Georgia, cursive;
   --tren: env(safe-area-inset-top, 0px);
   --duoi: env(safe-area-inset-bottom, 0px);
 
@@ -1403,6 +1403,131 @@ button.lich-o:active { transform: scale(.88); }
   box-shadow: 0 1px 3px rgba(0,0,0,.1), 0 10px 24px rgba(0,0,0,.1), 0 24px 50px rgba(0,0,0,.12); }
 .bia[data-bia="toi-gian"]::before { background: linear-gradient(90deg, rgba(0,0,0,.12), transparent 70%); }
 
+
+/* ---- Mười mẫu bìa thêm ---- */
+
+.bia[data-bia="nhung-do"] { --bia-chu: #F8E7D8;
+  background:
+    radial-gradient(ellipse at 35% 25%, rgba(255,220,200,.16), transparent 58%),
+    repeating-linear-gradient(90deg, rgba(0,0,0,.06) 0 1px, transparent 1px 3px),
+    linear-gradient(155deg, #8E1F2E, #4A0C16 78%); }
+
+.bia[data-bia="dai-duong"] { --bia-chu: #E4F1F6;
+  background:
+    radial-gradient(ellipse at 50% 110%, rgba(120,200,220,.3), transparent 60%),
+    repeating-linear-gradient(170deg, rgba(255,255,255,.04) 0 2px, transparent 2px 7px),
+    linear-gradient(168deg, #0B3B52, #06202E 72%); }
+
+.bia[data-bia="hoang-hon"] { --bia-chu: #FFF3E6;
+  background:
+    radial-gradient(circle at 50% 88%, rgba(255,196,120,.55), transparent 52%),
+    linear-gradient(180deg, #2B2350 0%, #6B3A5C 42%, #C4653F 76%, #E8944B 100%); }
+
+.bia[data-bia="rung-gia"] { --bia-chu: #E8F0E2;
+  background:
+    radial-gradient(ellipse at 28% 18%, rgba(190,220,170,.14), transparent 56%),
+    repeating-linear-gradient(75deg, rgba(0,0,0,.05) 0 2px, transparent 2px 8px),
+    linear-gradient(158deg, #23402A, #0F1E14 76%); }
+
+.bia[data-bia="cam-thach"] { --bia-chu: #3A3A3C;
+  background:
+    repeating-linear-gradient(112deg, rgba(140,140,150,.12) 0 1px, transparent 1px 22px),
+    repeating-linear-gradient(58deg, rgba(120,120,135,.09) 0 1px, transparent 1px 31px),
+    radial-gradient(ellipse at 70% 30%, rgba(255,255,255,.9), transparent 55%),
+    linear-gradient(160deg, #EFEFF1, #D8D8DE 82%);
+  box-shadow: 0 2px 4px rgba(0,0,0,.1), 0 12px 30px rgba(0,0,0,.14); }
+
+.bia[data-bia="vang-dong"] { --bia-chu: #3B2E12;
+  background:
+    repeating-linear-gradient(122deg, rgba(255,255,255,.16) 0 2px, transparent 2px 9px),
+    radial-gradient(ellipse at 30% 22%, rgba(255,246,200,.5), transparent 58%),
+    linear-gradient(155deg, #E0B652, #A87A2C 78%);
+  box-shadow: 0 2px 4px rgba(0,0,0,.14), 0 14px 34px rgba(120,90,20,.26); }
+
+.bia[data-bia="ke-soc"] { --bia-chu: #F2EFE8;
+  background:
+    repeating-linear-gradient(90deg,
+      rgba(255,255,255,.08) 0 6px, transparent 6px 26px),
+    linear-gradient(160deg, #2C3E4F, #1A2733 76%); }
+
+.bia[data-bia="cham-bi"] { --bia-chu: #F5EEE4;
+  background:
+    radial-gradient(2.2px 2.2px at 12px 14px, rgba(255,255,255,.28), transparent),
+    radial-gradient(2.2px 2.2px at 34px 40px, rgba(255,255,255,.22), transparent),
+    linear-gradient(150deg, #4A3B52, #26192E 78%);
+  background-size: 46px 54px, 46px 54px, 100% 100%; }
+
+.bia[data-bia="sen-hong"] { --bia-chu: #4A2434;
+  background:
+    radial-gradient(ellipse at 70% 24%, rgba(255,255,255,.62), transparent 54%),
+    repeating-linear-gradient(38deg, rgba(190,110,140,.07) 0 1px, transparent 1px 6px),
+    linear-gradient(162deg, #F6D9E2, #E0A9BE 80%);
+  box-shadow: 0 2px 4px rgba(90,40,60,.1), 0 12px 30px rgba(90,40,60,.16); }
+
+.bia[data-bia="tho-cam"] { --bia-chu: #FBF0DE;
+  background:
+    repeating-linear-gradient(45deg, rgba(240,190,110,.16) 0 3px, transparent 3px 12px),
+    repeating-linear-gradient(-45deg, rgba(210,90,80,.14) 0 3px, transparent 3px 12px),
+    repeating-linear-gradient(0deg, rgba(0,0,0,.07) 0 2px, transparent 2px 10px),
+    linear-gradient(150deg, #7A3B2E, #46201C 78%); }
+
+/* Bìa dùng ảnh riêng: ảnh do người dùng chọn, đặt vào biến CSS */
+.bia[data-bia="anh-rieng"] { --bia-chu: #FFFFFF;
+  background-color: #2A2A2E;
+  background-image: var(--anh-bia, none);
+  background-size: cover;
+  background-position: center; }
+.bia[data-bia="anh-rieng"] .bia-trong,
+.bia[data-bia="anh-rieng"] .bia-cham {
+  text-shadow: 0 1px 12px rgba(0,0,0,.75), 0 1px 3px rgba(0,0,0,.6); }
+/* Lớp tối nhẹ để chữ nổi trên mọi tấm ảnh */
+.bia[data-bia="anh-rieng"]::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,.38), rgba(0,0,0,.12) 45%, rgba(0,0,0,.5));
+  opacity: 1;
+}
+
+
+/* ---- Màn chỉnh ảnh làm bìa ---- */
+
+.khu-cat {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 1.1rem; padding: 1rem;
+}
+.khung-cat {
+  position: relative;
+  width: min(20rem, 82vw);
+  aspect-ratio: 3 / 4.35;
+  border-radius: 4px 10px 10px 4px;
+  overflow: hidden;
+  background: var(--mat-2);
+  box-shadow: var(--bong-3);
+  touch-action: none;
+  cursor: grab;
+}
+.khung-cat:active { cursor: grabbing; }
+.khung-cat canvas { display: block; width: 100%; height: 100%; }
+
+/* Vạch chia ba, giúp căn bố cục như khung ngắm máy ảnh */
+.vien-bia {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    linear-gradient(90deg, transparent 33.2%, rgba(255,255,255,.28) 33.2% 33.5%,
+      transparent 33.5% 66.4%, rgba(255,255,255,.28) 66.4% 66.7%, transparent 66.7%),
+    linear-gradient(0deg, transparent 33.2%, rgba(255,255,255,.28) 33.2% 33.5%,
+      transparent 33.5% 66.4%, rgba(255,255,255,.28) 66.4% 66.7%, transparent 66.7%);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.35);
+  border-radius: inherit;
+}
+
+.dieu-cat { width: min(20rem, 82vw); }
+.nut.nho.chinh {
+  background: linear-gradient(165deg, var(--nhan-2), var(--nhan));
+  border-color: transparent; color: #fff;
+}
+:root[data-tong="than-chi"] .nut.nho.chinh { color: var(--nen); }
+
 /* ============ BẢNG CÀI ĐẶT ============ */
 
 #tam-che {
@@ -2007,6 +2132,42 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
 
 <input type="file" id="o-chup" accept="image/*" capture="environment" hidden>
 <input type="file" id="o-anh" accept="image/*" hidden>
+<input type="file" id="o-anh-bia" accept="image/*" hidden>
+
+<!-- ============ CHỈNH ẢNH LÀM BÌA ============ -->
+<div class="man" id="man-cat-anh">
+  <header class="dinh">
+    <button class="nut nho" id="cat-huy">Huỷ</button>
+    <span class="ten">Chỉnh ảnh bìa</span>
+    <button class="nut nho chinh" id="cat-xong">Dùng ảnh này</button>
+  </header>
+
+  <div class="than khu-cat">
+    <div class="khung-cat" id="khung-cat">
+      <canvas id="vai-cat"></canvas>
+      <div class="vien-bia" aria-hidden="true"></div>
+    </div>
+
+    <div class="dieu-cat">
+      <label class="nhan-nho" for="cat-phong">
+        Phóng to <span class="so-hien" id="so-phong"></span>
+      </label>
+      <input type="range" class="thanh-truot" id="cat-phong" min="100" max="320" step="2">
+
+      <label class="nhan-nho" for="cat-xoay" style="margin-top:.5rem">
+        Xoay nghiêng <span class="so-hien" id="so-xoay"></span>
+      </label>
+      <input type="range" class="thanh-truot" id="cat-xoay" min="-180" max="180" step="1">
+
+      <div class="hang-nut" style="margin-top:.7rem">
+        <button class="nut nho" id="cat-quay">Xoay 90°</button>
+        <button class="nut nho" id="cat-lat">Lật ngang</button>
+        <button class="nut nho" id="cat-dat-lai">Đặt lại</button>
+      </div>
+      <p class="ghi-chu">Kéo ảnh để chọn phần muốn giữ.</p>
+    </div>
+  </div>
+</div>
 <div id="khu-in" aria-hidden="true"></div>
 
 <script>
@@ -2042,12 +2203,12 @@ const MAC_DINH = {
 
 /** Năm phông chữ cho phép chọn, tất cả đều có đủ dấu tiếng Việt. */
 const PHONG = [
-  { ma: "viet-tay",  ten: "Viết tay",   css: '"Dancing Script", cursive',        canh: 1.32, dam: 400 },
-  { ma: "co-dien",   ten: "Cổ điển",    css: '"Playfair Display", Georgia, serif', canh: 1,  dam: 400, nghieng: 1 },
-  { ma: "sach-vo",   ten: "Sách vở",    css: '"Literata", Georgia, serif',       canh: .97, dam: 400 },
-  { ma: "mem-mai",   ten: "Mềm mại",    css: '"Lora", Georgia, serif',           canh: .99, dam: 400, nghieng: 1 },
-  { ma: "tron-tria", ten: "Tròn trịa",  css: '"Quicksand", system-ui, sans-serif', canh: .98, dam: 500 },
-  { ma: "chac-chan", ten: "Chắc chắn",  css: '"Bitter", Georgia, serif',         canh: .95, dam: 400 }
+  { ma: "viet-tay",  ten: "Viết tay",   css: "'Dancing Script', cursive",          canh: 1.32, dam: 500 },
+  { ma: "co-dien",   ten: "Cổ điển",    css: "'Playfair Display', Georgia, serif", canh: 1,    dam: 400, nghieng: 1 },
+  { ma: "sach-vo",   ten: "Sách vở",    css: "'Literata', Georgia, serif",         canh: .97,  dam: 400 },
+  { ma: "mem-mai",   ten: "Mềm mại",    css: "'Lora', Georgia, serif",             canh: .99,  dam: 400, nghieng: 1 },
+  { ma: "tron-tria", ten: "Tròn trịa",  css: "'Quicksand', system-ui, sans-serif", canh: .98,  dam: 500 },
+  { ma: "chac-chan", ten: "Chắc chắn",  css: "'Bitter', Georgia, serif",           canh: .95,  dam: 400 }
 ];
 
 /** Mười mẫu gạch chân dưới câu trích, cộng một ô tự gõ. */
@@ -2094,9 +2255,15 @@ const KHOA_CH = "nhat-ky-nho:cau-hinh";
 let ch = { ...MAC_DINH };
 
 const BIA = [
-  { ma: "vai-cham", ten: "Vải gân" }, { ma: "da-nau", ten: "Da nâu" },
-  { ma: "giay-tho", ten: "Giấy thô" }, { ma: "troi-dem", ten: "Trời đêm" },
-  { ma: "son-mai", ten: "Sơn mài" }, { ma: "toi-gian", ten: "Tối giản" }
+  { ma: "vai-cham",  ten: "Vải gân" },   { ma: "da-nau",    ten: "Da nâu" },
+  { ma: "giay-tho",  ten: "Giấy thô" },  { ma: "troi-dem",  ten: "Trời đêm" },
+  { ma: "son-mai",   ten: "Sơn mài" },   { ma: "toi-gian",  ten: "Tối giản" },
+  { ma: "nhung-do",  ten: "Nhung đỏ" },  { ma: "dai-duong", ten: "Đại dương" },
+  { ma: "hoang-hon", ten: "Hoàng hôn" }, { ma: "rung-gia",  ten: "Rừng già" },
+  { ma: "cam-thach", ten: "Cẩm thạch" }, { ma: "vang-dong", ten: "Vàng đồng" },
+  { ma: "ke-soc",    ten: "Kẻ sọc" },    { ma: "cham-bi",   ten: "Chấm bi" },
+  { ma: "sen-hong",  ten: "Sen hồng" },  { ma: "tho-cam",   ten: "Thổ cẩm" },
+  { ma: "anh-rieng", ten: "Ảnh của anh" }
 ];
 /** Sáu tông màu, mỗi tông có sẵn cả bản sáng lẫn bản tối. */
 const TONG = [
@@ -2231,7 +2398,8 @@ async function docHet() {
       yc.onsuccess = () => xong(yc.result || []);
       yc.onerror = () => xong([]);
     });
-    return ds.sort((a, b) => a.id - b.id);
+    // Bỏ bản ghi id -1: đó là tấm bìa, không phải mẩu nhật ký.
+    return ds.filter((g) => g.id !== -1).sort((a, b) => a.id - b.id);
   } finally { db.close(); }
 }
 
@@ -3988,6 +4156,140 @@ function latTrang(buoc) {
   }
 }
 
+
+/* ------------------------------------------------------------
+   CHỈNH ẢNH LÀM BÌA SỔ
+
+   Khung có tỷ lệ đúng bằng bìa sổ. Anh kéo để chọn phần muốn giữ,
+   trượt để phóng to và xoay nghiêng. Lúc bấm xong, phần nằm trong
+   khung được vẽ lại thành một tấm ảnh mới rồi cất vào máy — nên
+   ảnh gốc nặng bao nhiêu cũng không làm app ì.
+   ------------------------------------------------------------ */
+
+/** Ảnh gốc đang chỉnh. */
+let anhGoc = null;
+
+/** Trạng thái chỉnh: dịch, phóng, xoay, lật. */
+let catX = 0, catY = 0, catPhong = 1, catXoay = 0, catLat = 1;
+
+/** Kích thước tấm bìa lưu ra, đủ nét cho màn hình Retina. */
+const BIA_RONG = 900, BIA_CAO = Math.round(900 * 4.35 / 3);
+
+/**
+ * Mở màn chỉnh ảnh với tấm ảnh vừa chọn.
+ * @param {File} tep Ảnh người dùng chọn.
+ */
+function moCatAnh(tep) {
+  const img = new Image();
+  img.onload = () => {
+    anhGoc = img;
+    datLaiCat();
+    diToi("cat-anh");
+    // Chờ khung hiện ra rồi mới đo, nếu không canvas ra kích thước 0.
+    requestAnimationFrame(() => { chuanBiVai(); veVaiCat(); });
+  };
+  img.onerror = () => baoNgan("Không mở được ảnh này", "", null, 3000);
+  img.src = URL.createObjectURL(tep);
+}
+
+/** Đưa mọi thông số về mặc định: ảnh vừa khít khung, không xoay. */
+function datLaiCat() {
+  catX = 0; catY = 0; catXoay = 0; catLat = 1;
+  catPhong = 1;
+  $("cat-phong").value = 100;
+  $("cat-xoay").value = 0;
+  $("so-phong").textContent = "100%";
+  $("so-xoay").textContent = "0°";
+}
+
+/** Đặt kích thước thật cho canvas theo mật độ điểm ảnh của máy. */
+function chuanBiVai() {
+  const v = $("vai-cat");
+  const k = $("khung-cat");
+  const ty = Math.min(window.devicePixelRatio || 1, 3);
+  v.width = Math.round(k.clientWidth * ty);
+  v.height = Math.round(k.clientHeight * ty);
+}
+
+/**
+ * Vẽ ảnh vào khung theo các thông số hiện tại.
+ * @param {CanvasRenderingContext2D} [ctxNgoai] Vẽ ra nơi khác, dùng khi xuất ảnh.
+ * @param {number} [rong] @param {number} [cao]
+ */
+function veVaiCat(ctxNgoai, rong, cao) {
+  const v = $("vai-cat");
+  const ctx = ctxNgoai || v.getContext("2d");
+  const W = rong || v.width, H = cao || v.height;
+  if (!anhGoc || !W || !H) return;
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Cỡ nền: ảnh phủ kín khung dù tỷ lệ hai bên khác nhau.
+  const phuKin = Math.max(W / anhGoc.width, H / anhGoc.height);
+  const ty = phuKin * catPhong;
+  const rongVe = anhGoc.width * ty;
+  const caoVe = anhGoc.height * ty;
+
+  ctx.save();
+  ctx.translate(W / 2 + catX * (W / 100), H / 2 + catY * (H / 100));
+  ctx.rotate(catXoay * Math.PI / 180);
+  ctx.scale(catLat, 1);
+  ctx.drawImage(anhGoc, -rongVe / 2, -caoVe / 2, rongVe, caoVe);
+  ctx.restore();
+}
+
+/** Cất phần ảnh trong khung thành bìa sổ. */
+async function luuAnhBia() {
+  const v = document.createElement("canvas");
+  v.width = BIA_RONG; v.height = BIA_CAO;
+  veVaiCat(v.getContext("2d"), BIA_RONG, BIA_CAO);
+
+  const khoi = await new Promise((xong) =>
+    v.toBlob(xong, "image/jpeg", 0.88));
+  if (!khoi) { baoNgan("Không lưu được ảnh", "", null, 3000); return; }
+
+  await luuAnhBiaVaoKho(khoi);
+  ch.bia = "anh-rieng";
+  luuCauHinh();
+  await napAnhBia();
+  apDienMao();
+  veLuoiBia();
+  diToi("sach");
+  baoNgan("Đã đổi bìa sổ", "", null, 2500);
+}
+
+/** Cất tấm bìa vào kho, dùng chung ngăn với nhật ký cho gọn. */
+async function luuAnhBiaVaoKho(khoi) {
+  const db = await moKho();
+  if (!db) return;
+  try {
+    await new Promise((xong, hong) => {
+      const gd = db.transaction(NGAN, "readwrite");
+      gd.objectStore(NGAN).put({ id: -1, ngay: "bia", luc: "", chu: "", anh: khoi });
+      gd.oncomplete = xong; gd.onerror = hong;
+    });
+  } finally { db.close(); }
+}
+
+/** Đọc tấm bìa đã lưu rồi đặt vào biến CSS. */
+async function napAnhBia() {
+  const db = await moKho();
+  if (!db) return;
+  try {
+    const m = await new Promise((xong) => {
+      const yc = db.transaction(NGAN, "readonly").objectStore(NGAN).get(-1);
+      yc.onsuccess = () => xong(yc.result);
+      yc.onerror = () => xong(null);
+    });
+    if (m && m.anh) {
+      if (urlAnh.has(-1)) URL.revokeObjectURL(urlAnh.get(-1));
+      const u = URL.createObjectURL(m.anh);
+      urlAnh.set(-1, u);
+      document.documentElement.style.setProperty("--anh-bia", `url("${u}")`);
+    }
+  } finally { db.close(); }
+}
+
 /* ============================================================
    BÌA VÀ DIỆN MẠO
    ============================================================ */
@@ -4077,7 +4379,7 @@ function veThanhDuoi(dang) {
 
 /** @param {"ghi"|"so"|"lich"|"ngay"|"bia"} ten Màn cần hiện. */
 function diToi(ten) {
-  for (const m of ["ghi", "so", "lich", "ngay", "sach"]) {
+  for (const m of ["ghi", "so", "lich", "ngay", "sach", "cat-anh"]) {
     const o = $("man-" + m);
     const bat = m === ten;
     // Gỡ rồi gắn lại lớp hiệu ứng để nó chạy lại mỗi lần vào màn,
@@ -4091,7 +4393,7 @@ function diToi(ten) {
   }
 
   // Trang một ngày không có mục riêng trên thanh dưới; nó thuộc về Sổ.
-  veThanhDuoi(ten === "ngay" ? "so" : ten);
+  veThanhDuoi(ten === "ngay" ? "so" : (ten === "cat-anh" ? "sach" : ten));
 
   if (ten !== "ghi" && ngayGhiBu) ngayGhiBu = null;
   if (ten !== "ghi" && gioDoiCau) { clearTimeout(gioDoiCau); gioDoiCau = null; }
@@ -4353,7 +4655,7 @@ function hienManKhoa() {
   // Giấu mọi màn khác. Danh sách này phải khớp với các màn thật đang có —
   // gọi tới một màn không tồn tại là cả hàm chết giữa chừng, và người dùng
   // bị nhốt ngoài màn khoá với một ô trống không nhập được gì.
-  for (const m of ["ghi", "so", "lich", "ngay", "sach"]) {
+  for (const m of ["ghi", "so", "lich", "ngay", "sach", "cat-anh"]) {
     const o = $("man-" + m);
     if (o) o.classList.remove("hien");
   }
@@ -5003,6 +5305,62 @@ function ganSuKien() {
     henDoiCau();
   });
 
+
+  /* --- Chỉnh ảnh làm bìa --- */
+
+  $("o-anh-bia").addEventListener("change", (e) => {
+    const f = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if (f) moCatAnh(f);
+  });
+
+  $("cat-huy").addEventListener("click", () => diToi("sach"));
+  $("cat-xong").addEventListener("click", luuAnhBia);
+
+  $("cat-phong").addEventListener("input", (e) => {
+    catPhong = Number(e.target.value) / 100;
+    $("so-phong").textContent = e.target.value + "%";
+    veVaiCat();
+  });
+
+  $("cat-xoay").addEventListener("input", (e) => {
+    catXoay = Number(e.target.value);
+    $("so-xoay").textContent = catXoay + "°";
+    veVaiCat();
+  });
+
+  $("cat-quay").addEventListener("click", () => {
+    catXoay = ((catXoay + 90 + 180) % 360) - 180;
+    $("cat-xoay").value = catXoay;
+    $("so-xoay").textContent = catXoay + "°";
+    veVaiCat();
+  });
+
+  $("cat-lat").addEventListener("click", () => { catLat *= -1; veVaiCat(); });
+
+  $("cat-dat-lai").addEventListener("click", () => { datLaiCat(); veVaiCat(); });
+
+  // Kéo ảnh trong khung. Tính theo phần trăm bề ngang khung nên
+  // kéo trên máy tính hay điện thoại đều nhạy như nhau.
+  let keo = false, keoX = 0, keoY = 0, batX0 = 0, batY0 = 0;
+  const khung = $("khung-cat");
+
+  khung.addEventListener("pointerdown", (e) => {
+    keo = true;
+    khung.setPointerCapture(e.pointerId);
+    batX0 = e.clientX; batY0 = e.clientY;
+    keoX = catX; keoY = catY;
+  });
+  khung.addEventListener("pointermove", (e) => {
+    if (!keo) return;
+    catX = keoX + (e.clientX - batX0) / khung.clientWidth * 100;
+    catY = keoY + (e.clientY - batY0) / khung.clientHeight * 100;
+    veVaiCat();
+  });
+  const thoiKeo = () => { keo = false; };
+  khung.addEventListener("pointerup", thoiKeo);
+  khung.addEventListener("pointercancel", thoiKeo);
+
   $("nut-xuat").addEventListener("click", xuatRaFile);
   $("nut-nhap").addEventListener("click", () => $("o-nhap-file").click());
   $("o-nhap-file").addEventListener("change", (e) => {
@@ -5087,6 +5445,7 @@ ganSuKien();
 
 (async () => {
   soGhi = await docHet();
+  await napAnhBia();
   if (ch.kieuKhoa !== "khong" && ch.bamKhoa) hienManKhoa();
   else diToi("ghi");
 })();
