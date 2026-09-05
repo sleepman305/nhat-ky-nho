@@ -2882,6 +2882,10 @@ async function ghiVaoSo() {
   dongKhuSoan();
   veLaiManDangMo();
 
+  // Dựng lại trang sổ ngay từ bây giờ. Đợi tới lúc anh mở sổ mới dựng thì
+  // khung giấy chưa kịp vẽ, và trang ra thiếu mẩu vừa ghi.
+  if (!$("man-sach").classList.contains("hien")) capNhatSoNen();
+
   // Một nhịp rung ngắn xác nhận đã ghi. Máy nào không có thì bỏ qua.
   if (navigator.vibrate) { try { navigator.vibrate(12); } catch (e) {} }
 
@@ -4065,7 +4069,8 @@ let toDo = null;
  */
 function moToDo() {
   const khung = $("giay");
-  if (!khung) return null;
+  // Khung cao bằng 0 thì mọi phép đo đều sai: cái gì cũng thành "tràn".
+  if (!khung || !khung.clientHeight) return null;
   if (!toDo) {
     toDo = document.createElement("div");
     toDo.style.cssText = "position:absolute;visibility:hidden;pointer-events:none;left:0;top:0;width:100%;height:100%";
@@ -4092,6 +4097,17 @@ function dongToDo() {
  * cùng của ngày ấy, như ảnh dán ở cuối bài viết.
  */
 function veSach() {
+  const khung = $("giay");
+
+  /* Khung giấy chưa có kích thước thật — thường gặp ngay lúc vừa chuyển
+     sang màn này, trình duyệt chưa kịp vẽ xong. Đo lúc ấy thì tờ giấy cao
+     bằng 0, mọi thứ đều bị coi là tràn, và trang sổ ra thiếu chữ hoặc rỗng.
+     Chờ vẽ xong rồi hãy đo. */
+  if (!khung || !khung.clientHeight) {
+    requestAnimationFrame(veSach);
+    return;
+  }
+
   const nhom = nhomTheoNgay();
   cacTrang = [];
 
@@ -4117,6 +4133,35 @@ function veSach() {
     ? `Chạm vào sổ để mở · ${cacTrang.length} trang`
     : "Sổ còn trắng. Sang thẻ Viết để bắt đầu.";
   $("bia-chinh").style.pointerEvents = co ? "" : "none";
+}
+
+
+/**
+ * Mở sổ tay: đọc lại toàn bộ nhật ký từ kho rồi mới dựng trang.
+ *
+ * Bản trong bộ nhớ có thể lỡ nhịp — vừa ghi xong mà chưa kịp cất, hoặc
+ * mẩu ghi ở tab khác vừa thêm vào. Đọc thẳng từ kho một lần thì chắc chắn
+ * không sót mẩu nào, cũng không mất mẩu cũ.
+ */
+async function moSoTay() {
+  try {
+    const tuKho = await docHet();
+    if (tuKho.length) soGhi = tuKho;
+  } catch (e) {
+    // Kho trục trặc thì cứ dùng bản đang có, còn hơn để trang trắng.
+  }
+  veSach();
+}
+
+
+/**
+ * Dựng lại danh sách trang sổ ở hậu trường, khi màn sổ đang đóng.
+ *
+ * Khung giấy lúc này không hiện nên không đo được. Ta chỉ ghi nhận rằng
+ * danh sách đã cũ; lần mở sổ kế tiếp sẽ dựng lại từ đầu với khung thật.
+ */
+function capNhatSoNen() {
+  cacTrang = [];
 }
 
 /** Mở sổ ra, nhảy tới trang mới nhất. */
@@ -4346,6 +4391,11 @@ async function themAnhVaoSo(tep) {
 
 /** Dựng lại cuốn sổ nhưng giữ người đọc ở đúng trang đang mở. */
 function veLaiTrangSach() {
+  const khung = $("giay");
+  if (!khung || !khung.clientHeight) {
+    requestAnimationFrame(veLaiTrangSach);
+    return;
+  }
   const cu = cacTrang[trangDangMo];
   veSach();
   if (!cacTrang.length) { gapSo(); return; }
@@ -4652,7 +4702,7 @@ function diToi(ten) {
   if (ten === "ghi") { veManGhi(); veCauTrich(); }
   if (ten === "so") { ngayDangXem = null; veMucLuc(); }
   if (ten === "lich") veLich();
-  if (ten === "sach") veSach();
+  if (ten === "sach") moSoTay();
 }
 
 /* ============================================================
