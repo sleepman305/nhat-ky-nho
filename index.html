@@ -1423,7 +1423,7 @@ button.lich-o:active { transform: scale(.88); }
 
 /* Nút sửa nép ở góc tờ giấy, mờ đi cho khỏi chiếm mắt lúc đang đọc */
 .nut-sua-trang {
-  position: absolute; top: .7rem; right: .7rem;
+  position: absolute; top: .7rem; left: .7rem;
   width: 1.9rem; height: 1.9rem; border-radius: 50%;
   display: grid; place-items: center;
   background: var(--mat-2);
@@ -1435,6 +1435,7 @@ button.lich-o:active { transform: scale(.88); }
   fill: none; stroke: var(--chu-nhat);
   stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
 }
+.nut-sua-trang.nut-sua-chu { left: auto; right: .7rem; }
 .nut-sua-trang:hover { opacity: 1; background: var(--nhan-nen); }
 .nut-sua-trang:active { transform: scale(.88); }
 
@@ -2286,6 +2287,7 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
 <input type="file" id="o-chup" accept="image/*" capture="environment" hidden>
 <input type="file" id="o-anh" accept="image/*" hidden>
 <input type="file" id="o-anh-bia" accept="image/*" hidden>
+<input type="file" id="o-anh-so" accept="image/*" hidden>
 
 <!-- ============ CHỈNH ẢNH LÀM BÌA ============ -->
 <div class="man" id="man-cat-anh">
@@ -4152,7 +4154,7 @@ function dungToGiay(i, lop) {
 
   if (tr.anh.length) {
     noi += `<div class="anh-dan">` + tr.anh.map((g) =>
-      `<img src="${urlCuaAnh(g)}" alt="" loading="lazy">`).join("") + `</div>`;
+      `<img src="${urlCuaAnh(g)}" data-anh="${g.id}" alt="" loading="lazy">`).join("") + `</div>`;
   }
   if (!noi) noi = `<p class="trong-trang">Ngày này chỉ có im lặng.</p>`;
 
@@ -4164,7 +4166,14 @@ function dungToGiay(i, lop) {
          <h2 class="trang-tieu mo">Ngày ${String(t.ngay).padStart(2, "0")} tháng ${t.thang}</h2>`}
     <div class="trang-noi">${noi}</div>
     <p class="trang-chan">${tr.tong > 1 ? `${tr.phan}/${tr.tong} · ` : ""}— ${i + 1} —</p>
-    ${tr.doan.length ? `<button class="nut-sua-trang" data-sua-trang aria-label="Sửa chữ trên trang này" title="Sửa chữ">
+    <button class="nut-sua-trang" data-them-anh aria-label="Thêm ảnh vào trang này" title="Thêm ảnh">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="3" y="4.5" width="18" height="15" rx="2.6"/>
+        <circle cx="8.6" cy="9.8" r="1.7"/>
+        <path d="M3.4 16.7l4.4-4.2a2 2 0 0 1 2.7-.05l3.4 3.05a2 2 0 0 0 2.6.03l1.9-1.6a2 2 0 0 1 2.6.02l1.6 1.4"/>
+      </svg>
+    </button>
+    ${tr.doan.length ? `<button class="nut-sua-trang nut-sua-chu" data-sua-trang aria-label="Sửa chữ trên trang này" title="Sửa chữ">
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M16.4 3.9a2.1 2.1 0 0 1 3 3L8.6 17.7l-4 1 1-4z"/>
         <path d="M14.6 5.7l3.7 3.7"/>
@@ -4237,25 +4246,102 @@ async function dongSuaTrang(luu) {
     moi.set(id, moi.has(id) ? (moi.get(id) + " " + chu).trim() : chu);
   });
 
+  // Ảnh nào còn trên giấy sau khi anh sửa. Ảnh vắng mặt nghĩa là anh
+  // đã xoá nó đi — trước đây em không ngó tới đây nên vẽ lại từ dữ liệu
+  // gốc, thành ra ảnh sống lại ngay sau khi bấm Xong.
+  const anhConLai = new Set();
+  o.querySelectorAll("img[data-anh]").forEach((e) => anhConLai.add(Number(e.dataset.anh)));
+
+  // Ảnh của trang này, theo dữ liệu trước khi sửa.
+  const anhCuaTrang = new Set((tr ? tr.anh : []).map((g) => g.id));
+
   let doi = 0;
   for (const id of cuaTrang) {
     const g = soGhi.find((x) => x.id === id);
     if (!g) continue;
-    const chuMoi = (moi.get(id) || "").trim();
 
-    if (!chuMoi && !g.anh) {
+    const chuMoi = (moi.get(id) || "").trim();
+    const boAnh = g.anh && anhCuaTrang.has(id) && !anhConLai.has(id);
+    const conAnh = g.anh && !boAnh;
+
+    if (!chuMoi && !conAnh) {
+      // Không còn chữ, cũng không còn ảnh: mẩu này coi như anh bỏ hẳn.
       await xoaMau(id);
       soGhi = soGhi.filter((x) => x.id !== id);
+      if (urlAnh.has(id)) { URL.revokeObjectURL(urlAnh.get(id)); urlAnh.delete(id); }
       doi++;
-    } else if (chuMoi !== (g.chu || "").trim()) {
-      g.chu = chuMoi;
-      await luuMau(g);
-      doi++;
+      continue;
     }
+
+    let sua = false;
+    if (chuMoi !== (g.chu || "").trim()) { g.chu = chuMoi; sua = true; }
+    if (boAnh) {
+      g.anh = null;
+      if (urlAnh.has(id)) { URL.revokeObjectURL(urlAnh.get(id)); urlAnh.delete(id); }
+      sua = true;
+    }
+    if (sua) { await luuMau(g); doi++; }
+  }
+
+  // Mẩu chỉ có ảnh nhưng ảnh bị xoá, mà mẩu ấy không mang chữ nào trên trang.
+  for (const id of anhCuaTrang) {
+    if (cuaTrang.has(id) || anhConLai.has(id)) continue;
+    const g = soGhi.find((x) => x.id === id);
+    if (!g) continue;
+    if ((g.chu || "").trim()) {
+      g.anh = null;
+      await luuMau(g);
+    } else {
+      await xoaMau(id);
+      soGhi = soGhi.filter((x) => x.id !== id);
+    }
+    if (urlAnh.has(id)) { URL.revokeObjectURL(urlAnh.get(id)); urlAnh.delete(id); }
+    doi++;
   }
 
   veLaiTrangSach();
   if (doi) baoNgan(doi === 1 ? "Đã sửa 1 mẩu ghi" : `Đã sửa ${doi} mẩu ghi`, "", null, 2600);
+}
+
+
+/**
+ * Đưa một tấm ảnh vào ngày đang mở trong sổ.
+ *
+ * Ảnh thành một mẩu ghi riêng, đặt mốc giờ ngay sau mẩu cuối cùng của
+ * ngày ấy — để nó nằm đúng cuối trang chứ không chen vào giữa bài.
+ *
+ * @param {File} tep Ảnh anh vừa chọn.
+ */
+async function themAnhVaoSo(tep) {
+  const tr = cacTrang[trangDangMo];
+  if (!tr || !tep) return;
+
+  const ds = soGhi.filter((g) => g.ngay === tr.ma);
+  let luc;
+  if (ds.length) {
+    // Ngay sau mẩu cuối, cách một phút cho khỏi trùng mốc.
+    luc = new Date(new Date(ds[ds.length - 1].luc).getTime() + 60000);
+    // Sang ngày khác thì kéo về cuối ngày cũ.
+    if (maNgay(luc) !== tr.ma) {
+      const [n, t, g] = tr.ma.split("-").map(Number);
+      luc = new Date(n, t - 1, g, 23, 59);
+    }
+  } else {
+    const [n, t, g] = tr.ma.split("-").map(Number);
+    luc = new Date(n, t - 1, g, 12, 0);
+  }
+
+  let id = luc.getTime();
+  while (soGhi.some((x) => x.id === id)) id++;
+
+  const m = { id, ngay: tr.ma, luc: luc.toISOString(), chu: "", anh: tep };
+  await luuMau(m);
+  soGhi.push(m);
+  soGhi.sort((a, b) => a.id - b.id);
+
+  veLaiTrangSach();
+  if (navigator.vibrate) { try { navigator.vibrate(12); } catch (e) {} }
+  baoNgan("Đã dán ảnh vào trang này", "", null, 2500);
 }
 
 /** Dựng lại cuốn sổ nhưng giữ người đọc ở đúng trang đang mở. */
@@ -5211,7 +5297,18 @@ function ganSuKien() {
   $("giay").addEventListener("click", (e) => {
     if (e.target.closest("[data-sua-trang]")) {
       dangSuaTrang ? dongSuaTrang(true) : moSuaTrang();
+      return;
     }
+    if (e.target.closest("[data-them-anh]")) {
+      if (dangSuaTrang) dongSuaTrang(true);
+      $("o-anh-so").click();
+    }
+  });
+
+  $("o-anh-so").addEventListener("change", (e) => {
+    const f = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if (f) themAnhVaoSo(f);
   });
   $("lat-lui").addEventListener("click", () => latTrang(-1));
   $("lat-toi").addEventListener("click", () => latTrang(1));
