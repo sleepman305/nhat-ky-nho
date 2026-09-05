@@ -1393,17 +1393,24 @@ button.lich-o:active { transform: scale(.88); }
 
 .trang-noi .anh-dan {
   display: flex; flex-wrap: wrap; gap: .5rem;
-  margin: 1.2rem 0 0;
+  margin: 1.1rem 0 .2rem;
+  flex: none;
 }
 .trang-noi .anh-dan img {
   display: block; width: calc(50% - .25rem);
+  /* Chặn chiều cao: ảnh dọc mà để tự do thì cao gấp mấy lần bề ngang,
+     tràn khỏi tờ giấy và bị mép trang xén ngang. Cắt gọn theo khung
+     rồi lấy phần giữa — chỗ đáng nhìn nhất của một tấm ảnh. */
+  max-height: 8.5rem;
+  object-fit: cover;
+  object-position: center;
   border-radius: 3px;
   border: 4px solid var(--mat);
   box-shadow: 0 1px 3px rgba(0,0,0,.22);
   transform: rotate(-1.2deg);
 }
 .trang-noi .anh-dan img:nth-child(even) { transform: rotate(1.4deg); }
-.trang-noi .anh-dan img:only-child { width: 72%; }
+.trang-noi .anh-dan img:only-child { width: 68%; max-height: 11rem; }
 .trang-noi .trong-trang {
   color: var(--chu-mo); font-style: italic; font-size: .9rem;
 }
@@ -4097,17 +4104,27 @@ function dongToDo() {
  * cùng của ngày ấy, như ảnh dán ở cuối bài viết.
  */
 function veSach() {
-  const khung = $("giay");
+  // Chỉ lo phần bìa. Việc cắt trang để dành tới lúc mở sổ, vì lúc này
+  // khung giấy còn nằm trong phần đang ẩn nên đo gì cũng ra số không.
+  cacTrang = [];
+  const soNgay = nhomTheoNgay().size;
 
-  /* Khung giấy chưa có kích thước thật — thường gặp ngay lúc vừa chuyển
-     sang màn này, trình duyệt chưa kịp vẽ xong. Đo lúc ấy thì tờ giấy cao
-     bằng 0, mọi thứ đều bị coi là tràn, và trang sổ ra thiếu chữ hoặc rỗng.
-     Chờ vẽ xong rồi hãy đo. */
-  if (!khung || !khung.clientHeight) {
-    requestAnimationFrame(veSach);
-    return;
-  }
+  $("ke-sach").hidden = false;
+  $("quyen").hidden = true;
+  $("loi-moi-mo").textContent = soNgay
+    ? `Chạm vào sổ để mở · ${soNgay} ngày`
+    : "Sổ còn trắng. Sang thẻ Viết để bắt đầu.";
+  $("bia-chinh").style.pointerEvents = soNgay ? "" : "none";
+}
 
+/**
+ * Dựng danh sách trang cho cả cuốn sổ.
+ *
+ * Gọi khi khung giấy đã hiện và đo được thật. Một ngày có thể chiếm
+ * nhiều trang; ảnh của ngày dồn xuống trang cuối của ngày ấy, và nếu
+ * trang cuối không còn chỗ thì ảnh được cho hẳn một trang riêng.
+ */
+function dungCacTrang() {
   const nhom = nhomTheoNgay();
   cacTrang = [];
 
@@ -4117,61 +4134,73 @@ function veSach() {
     const anh = ds.filter((g) => urlCuaAnh(g));
 
     cac.forEach((doan, i) => {
-      cacTrang.push({
-        ma, doan,
-        phan: i + 1,
-        tong: cac.length,
-        anh: i === cac.length - 1 ? anh : []   // ảnh dán ở trang cuối của ngày
-      });
+      cacTrang.push({ ma, doan, phan: i + 1, tong: cac.length, anh: [] });
     });
+
+    if (anh.length) {
+      // Thử dán ảnh vào trang cuối của ngày. Không vừa thì cho ảnh
+      // một trang riêng — thà thêm trang còn hơn cắt cụt tấm ảnh.
+      const cuoi = cacTrang[cacTrang.length - 1];
+      if (cuoi && cuoi.ma === ma && vuaTrang(cuoi.doan, anh)) {
+        cuoi.anh = anh;
+      } else {
+        cacTrang.push({ ma, doan: [], phan: cac.length + 1, tong: cac.length + 1, anh });
+      }
+    }
+
+    // Đánh lại tổng số trang của ngày cho đúng.
+    const cuaNgay = cacTrang.filter((t) => t.ma === ma);
+    cuaNgay.forEach((t, i) => { t.phan = i + 1; t.tong = cuaNgay.length; });
   }
-
-  const co = cacTrang.length > 0;
-  $("ke-sach").hidden = false;
-  $("quyen").hidden = true;
-  $("loi-moi-mo").textContent = co
-    ? `Chạm vào sổ để mở · ${cacTrang.length} trang`
-    : "Sổ còn trắng. Sang thẻ Viết để bắt đầu.";
-  $("bia-chinh").style.pointerEvents = co ? "" : "none";
 }
-
 
 /**
- * Mở sổ tay: đọc lại toàn bộ nhật ký từ kho rồi mới dựng trang.
- *
- * Bản trong bộ nhớ có thể lỡ nhịp — vừa ghi xong mà chưa kịp cất, hoặc
- * mẩu ghi ở tab khác vừa thêm vào. Đọc thẳng từ kho một lần thì chắc chắn
- * không sót mẩu nào, cũng không mất mẩu cũ.
+ * Thử xem chữ và ảnh có cùng lọt một trang không.
+ * @param {Array} doan Các đoạn chữ.
+ * @param {Array} anh Các mẩu có ảnh.
+ * @returns {boolean}
  */
-async function moSoTay() {
-  try {
-    const tuKho = await docHet();
-    if (tuKho.length) soGhi = tuKho;
-  } catch (e) {
-    // Kho trục trặc thì cứ dùng bản đang có, còn hơn để trang trắng.
-  }
-  veSach();
+function vuaTrang(doan, anh) {
+  const o = moToDo();
+  if (!o) return false;
+  o.innerHTML = veCacDoan(doan) + veKhoiAnh(anh);
+  const tran = o.scrollHeight > o.clientHeight + 1;
+  dongToDo();
+  return !tran;
 }
-
 
 /**
- * Dựng lại danh sách trang sổ ở hậu trường, khi màn sổ đang đóng.
- *
- * Khung giấy lúc này không hiện nên không đo được. Ta chỉ ghi nhận rằng
- * danh sách đã cũ; lần mở sổ kế tiếp sẽ dựng lại từ đầu với khung thật.
+ * Dựng khối ảnh dán ở cuối trang.
+ * @param {Array} anh Các mẩu ghi có ảnh.
+ * @returns {string}
  */
-function capNhatSoNen() {
-  cacTrang = [];
+function veKhoiAnh(anh) {
+  if (!anh.length) return "";
+  return `<div class="anh-dan">` + anh.map((g) =>
+    `<img src="${urlCuaAnh(g)}" data-anh="${g.id}" alt="" loading="lazy">`
+  ).join("") + `</div>`;
 }
 
-/** Mở sổ ra, nhảy tới trang mới nhất. */
+/**
+ * Mở sổ ra, nhảy tới trang mới nhất.
+ *
+ * Hiện khung giấy TRƯỚC, chờ trình duyệt vẽ xong rồi mới cắt trang —
+ * đo lúc khung còn ẩn thì mọi thứ đều thành "tràn".
+ */
 function moSo() {
-  if (!cacTrang.length) return;
-  trangDangMo = cacTrang.length - 1;
+  if (!nhomTheoNgay().size) return;
+
   $("ke-sach").hidden = true;
   $("quyen").hidden = false;
-  $("giay").innerHTML = dungToGiay(trangDangMo, "tren");
-  capNhatDieuSach();
+  $("giay").innerHTML = "";
+
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    dungCacTrang();
+    if (!cacTrang.length) { gapSo(); return; }
+    trangDangMo = cacTrang.length - 1;
+    $("giay").innerHTML = dungToGiay(trangDangMo, "tren");
+    capNhatDieuSach();
+  }));
 }
 
 /** Gấp sổ lại, quay về bìa. */
@@ -4197,10 +4226,7 @@ function dungToGiay(i, lop) {
 
   let noi = tr.doan.length ? veCacDoan(tr.doan) : "";
 
-  if (tr.anh.length) {
-    noi += `<div class="anh-dan">` + tr.anh.map((g) =>
-      `<img src="${urlCuaAnh(g)}" data-anh="${g.id}" alt="" loading="lazy">`).join("") + `</div>`;
-  }
+  noi += veKhoiAnh(tr.anh);
   if (!noi) noi = `<p class="trong-trang">Ngày này chỉ có im lặng.</p>`;
 
   return `<article class="to-giay ${lop}" data-trang="${i}">
@@ -4391,20 +4417,24 @@ async function themAnhVaoSo(tep) {
 
 /** Dựng lại cuốn sổ nhưng giữ người đọc ở đúng trang đang mở. */
 function veLaiTrangSach() {
+  if ($("quyen").hidden) { veSach(); return; }
+
   const khung = $("giay");
   if (!khung || !khung.clientHeight) {
     requestAnimationFrame(veLaiTrangSach);
     return;
   }
+
   const cu = cacTrang[trangDangMo];
-  veSach();
+  dungCacTrang();
   if (!cacTrang.length) { gapSo(); return; }
+
+  // Giữ người đọc ở đúng ngày cũ, dù số trang có xê dịch sau khi sửa.
   const i = cu ? cacTrang.findIndex((t) => t.ma === cu.ma && t.phan === cu.phan) : -1;
   const j = i >= 0 ? i : (cu ? cacTrang.findIndex((t) => t.ma === cu.ma) : -1);
   trangDangMo = Math.max(0, Math.min(j >= 0 ? j : trangDangMo, cacTrang.length - 1));
-  $("ke-sach").hidden = true;
-  $("quyen").hidden = false;
-  $("giay").innerHTML = dungToGiay(trangDangMo, "tren");
+
+  khung.innerHTML = dungToGiay(trangDangMo, "tren");
   capNhatDieuSach();
 }
 
