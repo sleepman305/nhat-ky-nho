@@ -1393,9 +1393,13 @@ button.lich-o:active { transform: scale(.88); }
   text-align: justify; hyphens: auto;
 }
 .trang-noi p {
-  /* Cách nhau đúng nửa dòng kẻ. Trước để hở nguyên một dòng nên trang
-     nhìn rời rạc, mà chỗ anh tự xuống dòng lại càng hở toang. */
-  margin: 0 0 .5rem;
+  /* KHÔNG hở giữa các dòng ghi. Giấy có dòng kẻ cách nhau 1.62rem, hở
+     thêm nửa dòng là chữ trôi lệch khỏi kẻ ngay từ đoạn thứ hai — mà nay
+     mỗi sự kiện một dòng riêng nên sai lệch tích lại rất nhanh. Giờ mở
+     đầu mỗi dòng đã đủ tách các sự kiện ra rồi.
+
+     Chỉ chỗ ngày chuyển khúc mới hở, và hở đúng MỘT dòng kẻ. */
+  margin: 0;
   text-wrap: pretty;
   /* Giữ chỗ xuống dòng anh tự gõ. Thiếu dòng này thì HTML gộp hết
      lại thành một dòng liền, và chỗ ngắt anh vừa đặt biến mất. */
@@ -1408,7 +1412,29 @@ button.lich-o:active { transform: scale(.88); }
   text-indent: 1.4em;
 }
 .trang-noi p:last-of-type { margin-bottom: 0; }
+/* Ngày sang khúc khác (hai mẩu cách nhau quá hai tiếng): hở đúng một
+   dòng kẻ. Đầu trang thì thôi, hở ở đó chỉ phí chỗ. */
+.trang-noi .dau-cum:not(:first-child) { margin-top: 1.62rem; }
 .trang-noi .trong-trang { text-indent: 0; }
+
+/* Giờ mở đầu mỗi dòng: "08h00: Minh béo đi học về."
+
+   Vẽ bằng `::before` chứ không phải một thẻ chữ. Cả vùng này là ô sửa
+   chữ, mà lượt gom chữ lúc lưu nhặt mọi chữ nó thấy trong đó; chữ do CSS
+   sinh ra không nằm trong cây tài liệu nên không đời nào lọt vào nội
+   dung, cũng không xoá nhầm được. Vẫn chiếm chỗ thật nên phép đo cắt
+   trang không sai một ly.
+
+   Dùng `tabular-nums` cho các con số thẳng cột nhau. */
+.trang-noi .dong-ghi[data-gio]::before {
+  content: attr(data-gio) ": ";
+  font-family: var(--may);
+  font-size: .82em;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .01em;
+  color: var(--nhan);
+  white-space: nowrap;
+}
 /* ẢNH TRONG BÀI
 
    Hai bài học đã trả giá ở đây.
@@ -1437,7 +1463,8 @@ button.lich-o:active { transform: scale(.88); }
   --ngang: 1.33;
   --phong: .78;
   --cao-nen: 13rem;
-  margin: .9rem 0;
+  /* Trên dưới cộng lại đúng một dòng kẻ, giữ chữ bám lưới. */
+  margin: .81rem 0;
   display: flex; justify-content: center;
   position: relative;
   text-indent: 0;
@@ -2735,6 +2762,10 @@ function maNgay(d) {
 /** Đổi mốc Date thành chuỗi HH:mm 24 giờ. */
 function maGio(d) {
   return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+/** Đổi mốc Date thành chuỗi giờ ngắn kiểu 08h00, để ghi đầu mỗi dòng sổ. */
+function gioNgan(d) {
+  return `${String(d.getHours()).padStart(2, "0")}h${String(d.getMinutes()).padStart(2, "0")}`;
+}
 }
 /** Tách mã ngày thành các mảnh để hiển thị. */
 function doiNgay(ma) {
@@ -4084,7 +4115,9 @@ function dungKhoi(ds) {
     if (chu) {
       let x = chu;
       if (!/[.!?…]$/.test(x)) x += ".";
-      cum.push({ id: g.id, chu: x });
+      // Giờ đi kèm ngay đây, nhưng CHỈ để vẽ ra — nó không bao giờ nhập
+      // vào `chu`, nếu không lần sửa sau sẽ lưu luôn cả giờ vào nội dung.
+      cum.push({ id: g.id, chu: x, gio: gioNgan(d) });
     }
 
     // Ảnh đứng riêng một khối, ngay sau lời kể về nó.
@@ -4171,9 +4204,21 @@ function veCacKhoi(khoi) {
         <img src="${urlCuaAnh(g)}" data-anh="${g.id}" alt="">
       </div>`;
     }
-    return `<p>` + k.mau.map((m) =>
-      `<span class="mau-chu" data-id="${m.id}">${thoat(m.chu)}</span>`
-    ).join(" ") + `</p>`;
+    /* Mỗi mẩu ghi một dòng riêng, mở đầu bằng giờ: "08h00: ...".
+
+       Giờ nằm ở THUỘC TÍNH `data-gio` rồi để CSS vẽ ra bằng `::before`,
+       chứ không phải một thẻ chữ. Lý do: cả vùng này là ô sửa chữ, mà
+       lượt gom chữ lúc lưu nhặt mọi chữ nó thấy trong đó — có lần nhãn
+       một cái nút đã chui vào giữa bài văn vì thế. Chữ do CSS sinh ra thì
+       không có trong cây tài liệu, nên không đời nào lọt vào nội dung,
+       cũng không xoá nhầm được. Mà nó vẫn chiếm chỗ thật nên phép đo cắt
+       trang vẫn đúng.
+
+       Mẩu dài bị xẻ ra nhiều trang thì chỉ khúc đầu mang giờ. */
+    return k.mau.map((m, i) =>
+      `<p class="dong-ghi${i ? "" : " dau-cum"}"${m.gio && !m.truoc ? ` data-gio="${m.gio}"` : ""}>` +
+      `<span class="mau-chu" data-id="${m.id}">${thoat(m.chu)}</span></p>`
+    ).join("");
   }).join("");
 }
 
@@ -4258,7 +4303,7 @@ function xeMauDai(m, tran) {
 
   let truoc = "";
   return khuc.map((chu, k) => {
-    const phan = { id: m.id, chu, truoc, sau: khuc.slice(k + 1).join("") };
+    const phan = { id: m.id, chu, gio: m.gio, truoc, sau: khuc.slice(k + 1).join("") };
     truoc += chu;
     return phan;
   });
