@@ -1234,7 +1234,9 @@ button.lich-o:active { transform: scale(.88); }
 .khu-sach {
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  gap: 1.1rem; padding: .8rem .8rem .4rem;
+  /* Chừa tối đa chỗ cho tờ giấy: đệm hai đầu và khoảng hở giữa các cụm
+     đều kéo xuống hết mức, thanh điều sổ nằm sát ngay trên bốn nút. */
+  gap: .5rem; padding: .5rem .8rem .1rem;
   /* Điểm nhìn gần hơn thì tờ giấy nghiêng ra trông có khối hẳn.
      Hạ điểm nhìn lên cao một chút, như đang cúi xuống quyển sổ. */
   perspective: 1150px;
@@ -1255,7 +1257,7 @@ button.lich-o:active { transform: scale(.88); }
 
 .quyen {
   display: flex; flex-direction: column; align-items: center;
-  width: 100%; height: 100%; gap: .7rem;
+  width: 100%; height: 100%; gap: .25rem;
   animation: moSo .55s var(--muot) both;
 }
 /* Khoảng trống co giãn đẩy cụm nút xuống tận đáy */
@@ -1448,48 +1450,27 @@ button.lich-o:active { transform: scale(.88); }
 /* Ảnh rộng gần hết trang thì để thẳng, nghiêng đi trông cẩu thả. */
 .trang-noi .anh-trong-bai[data-thang] img { transform: rotate(0); }
 
-/* Đang sửa: hiện hai nút tăng giảm cỡ ngay dưới ảnh.
-   Cả cụm nút nằm ngoài dòng chảy (position: absolute) nên không hề
-   động tới phép đo cắt trang ở trên. */
-.co-anh { display: none; }
+/* Đang sửa: chạm vào ảnh để chọn nó, rồi chỉnh bằng thanh nút dưới sổ.
+   Không đặt nút nào lên chính tấm ảnh — nút nằm trong vùng sửa chữ thì
+   nhãn của nó bị nhặt vào bài, mà treo dưới ảnh thì che mất dòng sau. */
 .trang-noi[contenteditable] .anh-trong-bai img {
-  outline: 2px dashed color-mix(in srgb, var(--nhan) 55%, transparent);
+  outline: 2px dashed color-mix(in srgb, var(--nhan) 45%, transparent);
   outline-offset: 3px;
+  cursor: pointer;
 }
-.trang-noi[contenteditable] .co-anh {
-  display: flex; align-items: center; gap: .3rem;
-  position: absolute; left: 50%; bottom: -.55rem;
-  transform: translateX(-50%);
-  background: var(--mat); border: 1px solid var(--vien);
-  border-radius: 999px; padding: .1rem .25rem;
-  box-shadow: var(--bong-1);
-  z-index: 2;
-}
-.co-anh button {
-  -webkit-appearance: none; appearance: none;
-  border: 0; background: transparent; cursor: pointer;
-  color: var(--nhan); font: 600 .8rem/1 var(--than);
-  width: 1.35rem; height: 1.35rem; border-radius: 50%;
-  display: grid; place-items: center;
-}
-.co-anh button:active { background: var(--nhan-nen); }
-.co-anh .so {
-  font: 500 .56rem/1 var(--than); color: var(--chu-mo);
-  min-width: 2.1rem; text-align: center;
-  pointer-events: none; white-space: nowrap;
+.trang-noi[contenteditable] .anh-trong-bai.dang-chon img {
+  outline: 2.5px solid var(--nhan);
 }
 
-.trang-chan {
-  flex: none;
-  margin: .5rem 0 0; padding-top: .5rem;
-  border-top: 1px solid var(--vien-mo);
-  font-family: var(--may); font-size: .64rem;
-  color: var(--chu-mo); text-align: center;
-}
+/* Chân trang cũ nằm TRONG tờ giấy, ăn mất mấy dòng chữ mà chỉ để ghi số
+   trang. Nay bỏ hẳn: số trang xuống nằm giữa hai mũi tên ở thanh dưới. */
 
+/* Thanh điều sổ: gấp sổ · lùi trang · số trang · tới trang.
+   Kéo sát xuống thanh bốn nút, chừa lại tối đa chỗ cho trang giấy. */
 .dieu-sach {
-  display: flex; align-items: center; gap: 1.2rem;
-  margin-bottom: .35rem;
+  display: flex; align-items: center; justify-content: center;
+  gap: .5rem;
+  margin: .3rem 0 0;
 }
 
 /* Nút sửa nép ở góc tờ giấy, mờ đi cho khỏi chiếm mắt lúc đang đọc */
@@ -1541,10 +1522,42 @@ button.lich-o:active { transform: scale(.88); }
 .nut-lat:active { transform: scale(.88); background: var(--nhan-nen); }
 .nut-lat[disabled] { opacity: .32; cursor: default; }
 .so-trang {
-  font-family: var(--may); font-size: .78rem; color: var(--chu-mo);
-  font-variant-numeric: tabular-nums; min-width: 5rem; text-align: center;
+  font-family: var(--may); font-size: .74rem; color: var(--chu-mo);
+  font-variant-numeric: tabular-nums; min-width: 4.2rem; text-align: center;
 }
-.dong-so { color: var(--chu-mo); font-size: .8rem; padding: .3rem .8rem; }
+/* Gấp sổ: nay là một biểu tượng quyển sổ đóng, đứng cùng hàng với hai
+   mũi tên lật trang thay vì một dòng chữ riêng ăn thêm một hàng. */
+.nut-lat.nut-gap {
+  width: 2.2rem; height: 2.2rem;
+  margin-right: .35rem;
+}
+.nut-lat svg {
+  width: 1.05rem; height: 1.05rem;
+  fill: none; stroke: var(--chu-nhat);
+  stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round;
+}
+
+/* Thanh chỉnh ảnh: chỉ hiện khi đang sửa và anh đã chạm chọn một tấm. */
+.thanh-anh {
+  display: flex; align-items: center; justify-content: center;
+  gap: .35rem; margin-top: .4rem;
+}
+.thanh-anh .nhan-co {
+  font: 500 .68rem/1 var(--than); color: var(--chu-mo);
+  font-variant-numeric: tabular-nums;
+  min-width: 2.6rem; text-align: center;
+}
+.thanh-anh .nut-tron {
+  -webkit-appearance: none; appearance: none;
+  width: 2.1rem; height: 2.1rem; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--mat); border: 1px solid var(--vien);
+  color: var(--nhan); font: 600 1rem/1 var(--than);
+  box-shadow: var(--bong-1);
+  transition: transform .15s var(--bat), background .15s;
+}
+.thanh-anh .nut-tron:active { transform: scale(.88); background: var(--nhan-nen); }
+.thanh-anh .nut-tron.xoa { color: var(--do); font-size: .66rem; width: auto; padding: 0 .7rem; border-radius: 999px; }
 
 .bia {
   width: min(19rem, 76vw);
@@ -2220,6 +2233,12 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
     <div class="quyen" id="quyen" hidden>
       <div class="giay" id="giay"></div>
       <div class="dieu-sach" id="dieu-sach">
+        <button class="nut-lat nut-gap" id="dong-so" aria-label="Gấp sổ lại" title="Gấp sổ lại">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v15H6.5A2.5 2.5 0 0 0 4 20.5z"/>
+            <path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H19v3H6.5"/>
+          </svg>
+        </button>
         <button class="nut-lat" id="lat-lui" aria-label="Trang trước">‹</button>
         <span class="so-trang" id="so-trang"></span>
         <button class="nut-lat" id="lat-toi" aria-label="Trang sau">›</button>
@@ -2228,7 +2247,12 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
         <button class="nut chinh" id="sua-xong">Xong</button>
         <button class="nut" id="sua-thoi">Bỏ sửa</button>
       </div>
-      <button class="nut nho dong-so" id="dong-so">Gấp sổ lại</button>
+      <div class="thanh-anh" id="thanh-anh" hidden>
+        <button class="nut-tron" id="anh-nho" aria-label="Thu nhỏ ảnh">&minus;</button>
+        <span class="nhan-co" id="anh-co">78%</span>
+        <button class="nut-tron" id="anh-to" aria-label="Phóng to ảnh">+</button>
+        <button class="nut-tron xoa" id="anh-xoa">Xoá ảnh</button>
+      </div>
     </div>
   </div>
 
@@ -4128,15 +4152,13 @@ function veCacKhoi(khoi) {
       const g = k.mau[0].g;
       const pc = coAnhPhanTram(g);
       const ng = tyLeAnh.get(g.id) || 1.33;
+      // Tuyệt đối KHÔNG nhét nút bấm vào đây. Cả vùng này nằm trong ô sửa
+      // chữ, nên mọi chữ trong nút — kể cả cái nhãn "78%" — bị lượt gom
+      // chữ nhặt luôn vào bài. Nút chỉnh ảnh nay nằm ở thanh dưới sổ.
       // loading="lazy" từng làm ảnh không tải trong tờ giấy đo, nên bỏ.
       return `<div class="anh-trong-bai"${pc >= 92 ? " data-thang" : ""}
         style="--rong:${pc}%;--ngang:${ng.toFixed(3)}">
         <img src="${urlCuaAnh(g)}" data-anh="${g.id}" alt="">
-        <span class="co-anh" contenteditable="false">
-          <button type="button" data-co-anh="-6" aria-label="Thu nhỏ ảnh">&minus;</button>
-          <span class="so">${pc}%</span>
-          <button type="button" data-co-anh="6" aria-label="Phóng to ảnh">+</button>
-        </span>
       </div>`;
     }
     return `<p>` + k.mau.map((m) =>
@@ -4188,6 +4210,50 @@ function nguyenLoi(ds) {
  * @param {Array} khoi Các khối của ngày.
  * @returns {Array<Array>} Mỗi phần tử là các khối thuộc một trang.
  */
+/**
+ * Xẻ một mẩu ghi quá dài thành nhiều khúc, mỗi khúc vừa đúng một trang.
+ *
+ * Cắt ở ranh giới chữ nên không bao giờ đứt giữa một từ. Mỗi khúc mang
+ * theo `truoc` và `sau` — phần chữ nằm ở các trang khác — để lúc anh sửa
+ * một trang, app ghép lại được nguyên văn mẩu ghi chứ không cắt cụt.
+ *
+ * Tìm điểm cắt bằng phép chia đôi: mỗi khúc chỉ mất khoảng mười lần đo
+ * thay vì dò từng chữ một, nên đoạn dán dài mấy nghìn chữ vẫn mở nhanh.
+ *
+ * @param {{id: number, chu: string}} m Mẩu ghi cần xẻ.
+ * @param {(ds: Array) => boolean} tran Hàm đo: dãy khối này có tràn trang không.
+ * @returns {Array<{id: number, chu: string, truoc: string, sau: string}>}
+ */
+function xeMauDai(m, tran) {
+  // Giữ lại cả dấu cách lẫn dấu xuống dòng để ghép lại là khớp nguyên văn.
+  const tu = String(m.chu).split(/(\s+)/).filter((x) => x !== "");
+  const khuc = [];
+
+  let i = 0;
+  while (i < tu.length) {
+    let thap = 1, cao = tu.length - i, vua = 1;
+    while (thap <= cao) {
+      const giua = (thap + cao) >> 1;
+      const thu = tu.slice(i, i + giua).join("");
+      if (tran([{ loai: "van", mau: [{ id: m.id, chu: thu }] }])) {
+        cao = giua - 1;
+      } else {
+        vua = giua; thap = giua + 1;
+      }
+    }
+    khuc.push(tu.slice(i, i + vua).join(""));
+    i += vua;
+  }
+  if (!khuc.length) khuc.push(String(m.chu));
+
+  let truoc = "";
+  return khuc.map((chu, k) => {
+    const phan = { id: m.id, chu, truoc, sau: khuc.slice(k + 1).join("") };
+    truoc += chu;
+    return phan;
+  });
+}
+
 function catTrang(khoi) {
   if (!khoi.length) return [[]];
 
@@ -4217,9 +4283,16 @@ function catTrang(khoi) {
       if (cum.length) dang.push({ loai: "van", mau: cum });
       if (dang.length) { trang.push(dang); dang = []; }
       cum = [m];
+      // Mẩu này một mình cũng không vừa một trang — hay gặp khi anh dán
+      // vào một đoạn dài. Trước đây cứ thế nhét trọn vào một trang, phần
+      // thừa bị `overflow: hidden` xén mất mà cũng không sang trang mới.
+      // Nay xẻ nó ra theo chữ, mỗi trang một khúc.
       if (tran([{ loai: "van", mau: cum }])) {
-        trang.push([{ loai: "van", mau: cum }]);
-        cum = [];
+        const cacPhan = xeMauDai(m, tran);
+        for (let i = 0; i < cacPhan.length - 1; i++) {
+          trang.push([{ loai: "van", mau: [cacPhan[i]] }]);
+        }
+        cum = [cacPhan[cacPhan.length - 1]];
       }
     }
     if (cum.length) dang.push({ loai: "van", mau: cum });
@@ -4248,7 +4321,6 @@ function moToDo() {
         <p class="trang-ngay-lon">Thứ sáu</p>
         <h2 class="trang-tieu">Ngày 04 tháng 9 năm 2026</h2>
         <div class="trang-noi"></div>
-        <p class="trang-chan">— 1 —</p>
       </article>`;
   }
   khung.appendChild(toDo);
@@ -4351,7 +4423,6 @@ function dungToGiay(i, lop) {
       : `<p class="trang-ngay-lon">tiếp theo</p>
          <h2 class="trang-tieu mo">Ngày ${String(t.ngay).padStart(2, "0")} tháng ${t.thang}</h2>`}
     <div class="trang-noi">${noi}</div>
-    <p class="trang-chan">${tr.tong > 1 ? `${tr.phan}/${tr.tong} · ` : ""}— ${i + 1} —</p>
     <button class="nut-sua-trang" data-them-anh aria-label="Thêm ảnh vào trang này" title="Thêm ảnh">
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <rect x="3" y="4.5" width="18" height="15" rx="2.6"/>
@@ -4395,9 +4466,45 @@ function moSuaTrang() {
   o.setAttribute("contenteditable", "plaintext-only");
   if (o.contentEditable !== "plaintext-only") o.setAttribute("contenteditable", "true");
 
+  /* Tự tay chèn dấu xuống dòng thay vì để trình duyệt làm.
+
+     Đây là chỗ đã sửa hụt hai lần. Mỗi trình duyệt hiểu phím Enter một
+     kiểu: chỗ thì chèn thẻ <br>, chỗ thì xẻ đoạn ra làm hai <p>, chỗ thì
+     bọc dòng mới vào một <div> nằm NGOÀI thẻ mang mã của mẩu ghi. Cả ba
+     kiểu ấy đều làm lượt gom chữ lúc lưu nhìn không ra, nên bấm Xong là
+     dấu xuống dòng bốc hơi.
+
+     Chặn Enter rồi tự chèn ký tự "\n" ngay tại con trỏ thì dấu xuống dòng
+     luôn nằm GỌN TRONG thẻ mang mã — lúc lưu chỉ việc đọc ra, không còn
+     phải đoán ý trình duyệt. `insertText` tuy đã cũ nhưng chạy đúng trên
+     mọi máy, kể cả Safari trên iPhone.
+
+     Vùng chữ đã có `white-space: pre-wrap` nên ký tự ấy hiện ra thành
+     dòng mới thật, chứ không bị gộp lại. */
+  o.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" || e.isComposing) return;
+    e.preventDefault();
+    let xong = false;
+    try { xong = document.execCommand("insertText", false, "\n"); } catch (loi) { xong = false; }
+    if (xong) return;
+
+    // Máy nào không nhận execCommand thì chèn tay bằng Range.
+    const chon = window.getSelection();
+    if (!chon || !chon.rangeCount) return;
+    const vung = chon.getRangeAt(0);
+    vung.deleteContents();
+    const nut = document.createTextNode("\n");
+    vung.insertNode(nut);
+    vung.setStartAfter(nut);
+    vung.collapse(true);
+    chon.removeAllRanges();
+    chon.addRange(vung);
+  });
+
   o.focus();
   $("dieu-sach").hidden = true;
   $("thanh-sua").hidden = false;
+  boChonAnh();
 }
 
 /**
@@ -4415,6 +4522,8 @@ async function dongSuaTrang(luu) {
   }
   $("dieu-sach").hidden = false;
   $("thanh-sua").hidden = true;
+  anhDangChon = null;
+  $("thanh-anh").hidden = true;
 
   if (!luu || !o) { if (!luu) veLaiTrangSach(); return; }
 
@@ -4474,10 +4583,18 @@ async function dongSuaTrang(luu) {
 
     // Chữ rơi ra ngoài mọi thẻ mang mã: nối vào mẩu đứng ngay trước nó,
     // kẻo lưu xong là mất. Khác khối nghĩa là dòng mới.
-    if (!chu.trim()) continue;
     const dich = dangGom || maDau;
     if (!dich) continue;
-    themVao(dich, (khoiCua(n) === khoiTruoc ? " " : "\n") + chu.trim());
+    if (!chu.trim()) {
+      // Không có chữ nào, nhưng CÓ dấu xuống dòng: đây chính là dòng
+      // trống anh vừa tạo bằng Enter. Bỏ qua nó là mất chỗ ngắt — lỗi
+      // "sửa thì xuống dòng được, lưu lại thì về chỗ cũ" nằm ở đây.
+      if (chu.indexOf("\n") >= 0) themVao(dich, "\n");
+      continue;
+    }
+    // Gọn dấu cách hai đầu mà GIỮ dấu xuống dòng ở giữa.
+    const sach = chu.replace(/^[^\S\n]+|[^\S\n]+$/g, "");
+    themVao(dich, (khoiCua(n) === khoiTruoc ? " " : "\n") + sach);
     khoiTruoc = khoiCua(n);
   }
 
@@ -4493,16 +4610,29 @@ async function dongSuaTrang(luu) {
     if (k.loai === "anh") anhCuaTrang.add(k.mau[0].id);
   }
 
+  /* Mẩu quá dài bị xẻ ra nhiều trang: trang này chỉ giữ một khúc. Phải
+     ghép lại khúc trước và khúc sau, kẻo lưu xong là cụt mất phần nằm ở
+     trang khác. `xeMauDai()` đã kèm sẵn hai phần ấy vào từng khúc. */
+  const ghepKhuc = new Map();
+  for (const k of (tr && tr.khoi ? tr.khoi : [])) {
+    if (k.loai === "anh") continue;
+    for (const m of k.mau) {
+      if (m.truoc || m.sau) ghepKhuc.set(m.id, { truoc: m.truoc || "", sau: m.sau || "" });
+    }
+  }
+
   let doi = 0;
   for (const id of cuaTrang) {
     const g = soGhi.find((x) => x.id === id);
     if (!g) continue;
 
     const chuMoi = donDong(moi.get(id) || "");
+    const khuc = ghepKhuc.get(id);
+    const dayDu = khuc ? donDong(khuc.truoc + chuMoi + khuc.sau) : chuMoi;
     const boAnh = g.anh && anhCuaTrang.has(id) && !anhConLai.has(id);
     const conAnh = g.anh && !boAnh;
 
-    if (!chuMoi && !conAnh) {
+    if (!dayDu && !conAnh) {
       // Không còn chữ, cũng không còn ảnh: mẩu này coi như anh bỏ hẳn.
       await xoaMau(id);
       soGhi = soGhi.filter((x) => x.id !== id);
@@ -4512,7 +4642,7 @@ async function dongSuaTrang(luu) {
     }
 
     let sua = false;
-    if (chuMoi !== (g.chu || "").trim()) { g.chu = chuMoi; sua = true; }
+    if (dayDu !== (g.chu || "").trim()) { g.chu = dayDu; sua = true; }
     if (boAnh) {
       g.anh = null;
       if (urlAnh.has(id)) { URL.revokeObjectURL(urlAnh.get(id)); urlAnh.delete(id); }
@@ -4618,18 +4748,64 @@ function mauTaiConTro() {
   return cuoi ? Number(cuoi.dataset.id) : null;
 }
 
+/* ------------------------------------------------------------
+   CHỈNH ẢNH TRÊN TRANG SỔ
+
+   Nút chỉnh KHÔNG được nằm trên tấm ảnh: cả vùng trang là ô sửa chữ,
+   nên nhãn của nút bị lượt gom chữ nhặt luôn vào bài (đã có lần chữ
+   "78%" chui vào giữa đoạn văn), mà treo dưới ảnh thì che mất dòng sau.
+   Nay chạm vào ảnh là chọn nó, rồi chỉnh bằng thanh nút dưới sổ.
+   ------------------------------------------------------------ */
+
+/** Mã tấm ảnh đang được chọn để chỉnh, hoặc null. */
+let anhDangChon = null;
+
 /**
- * Tăng hoặc giảm cỡ một tấm ảnh trên trang sổ, mỗi lần một nấc nhỏ.
+ * Chọn một tấm ảnh trên trang, mở thanh chỉnh ảnh.
+ * Chạm lại đúng tấm đang chọn thì bỏ chọn.
+ * @param {number} id Mã mẩu ghi mang ảnh.
+ */
+function chonAnh(id) {
+  anhDangChon = anhDangChon === id ? null : id;
+  capNhatThanhAnh();
+}
+
+/** Bỏ chọn ảnh và giấu thanh chỉnh ảnh. */
+function boChonAnh() {
+  anhDangChon = null;
+  capNhatThanhAnh();
+}
+
+/** Vẽ lại thanh chỉnh ảnh và viền quanh tấm đang chọn. */
+function capNhatThanhAnh() {
+  const khung = $("giay");
+  if (khung) {
+    khung.querySelectorAll(".anh-trong-bai.dang-chon")
+      .forEach((e) => e.classList.remove("dang-chon"));
+  }
+  const g = anhDangChon ? soGhi.find((x) => x.id === anhDangChon) : null;
+  if (!g || !dangSuaTrang) {
+    anhDangChon = null;
+    $("thanh-anh").hidden = true;
+    return;
+  }
+  const im = khung && khung.querySelector(`img[data-anh="${g.id}"]`);
+  if (im && im.parentElement) im.parentElement.classList.add("dang-chon");
+  $("anh-co").textContent = coAnhPhanTram(g) + "%";
+  $("thanh-anh").hidden = false;
+}
+
+/**
+ * Tăng hoặc giảm cỡ tấm ảnh đang chọn, mỗi lần một nấc nhỏ.
  *
  * Trước đây chạm vào ảnh là xoay vòng ba cỡ cố định, muốn nhích thêm
- * một tí cũng không được. Nay hai nút cộng trừ ngay dưới ảnh, mỗi lần
- * 6 phần trăm, chặn trong khoảng 20 đến 100.
+ * một tí cũng không được. Nay mỗi lần 6 phần trăm, chặn trong khoảng
+ * 20 đến 100 — dưới 20 thì ảnh bé như con tem, trên 100 thì tràn lề.
  *
- * @param {number} id Mã mẩu ghi mang ảnh.
  * @param {number} buoc Số phần trăm cộng thêm; số âm là thu nhỏ.
  */
-async function chinhCoAnh(id, buoc) {
-  const g = soGhi.find((x) => x.id === id);
+async function chinhCoAnh(buoc) {
+  const g = anhDangChon ? soGhi.find((x) => x.id === anhDangChon) : null;
   if (!g) return;
 
   const cu = coAnhPhanTram(g);
@@ -4639,16 +4815,48 @@ async function chinhCoAnh(id, buoc) {
   await luuMau(g);
 
   // Đổi ngay trên giấy, khỏi dựng lại cả trang cho anh khỏi mất chỗ đang sửa.
-  const anh = $("giay").querySelector(`img[data-anh="${id}"]`);
-  const khung = anh && anh.parentElement;
-  if (khung) {
-    khung.style.setProperty("--rong", moi + "%");
-    if (moi >= 92) khung.setAttribute("data-thang", "");
-    else khung.removeAttribute("data-thang");
-    const so = khung.querySelector(".co-anh .so");
-    if (so) so.textContent = moi + "%";
+  const im = $("giay").querySelector(`img[data-anh="${g.id}"]`);
+  const o = im && im.parentElement;
+  if (o) {
+    o.style.setProperty("--rong", moi + "%");
+    if (moi >= 92) o.setAttribute("data-thang", "");
+    else o.removeAttribute("data-thang");
   }
+  $("anh-co").textContent = moi + "%";
   if (navigator.vibrate) { try { navigator.vibrate(6); } catch (e) {} }
+}
+
+/**
+ * Xoá tấm ảnh đang chọn khỏi sổ.
+ *
+ * Mẩu ghi nào chỉ có mỗi ảnh thì bỏ hẳn mẩu ấy; mẩu còn chữ thì chỉ gỡ
+ * ảnh ra, chữ và mốc giờ giữ nguyên.
+ */
+async function xoaAnhDangChon() {
+  const g = anhDangChon ? soGhi.find((x) => x.id === anhDangChon) : null;
+  if (!g) return;
+
+  const id = g.id;
+  boChonAnh();
+
+  // Đang sửa dở thì chốt chữ trước, kẻo bản vẽ lại nuốt mất chỗ vừa gõ.
+  if (dangSuaTrang) await dongSuaTrang(true);
+
+  const van = soGhi.find((x) => x.id === id);
+  if (!van) return;
+
+  if ((van.chu || "").trim()) {
+    van.anh = null;
+    await luuMau(van);
+  } else {
+    await xoaMau(id);
+    soGhi = soGhi.filter((x) => x.id !== id);
+  }
+  if (urlAnh.has(id)) { URL.revokeObjectURL(urlAnh.get(id)); urlAnh.delete(id); }
+  tyLeAnh.delete(id);
+
+  veLaiTrangSach();
+  baoNgan("Đã xoá ảnh", "", null, 2200);
 }
 
 /** Dựng lại cuốn sổ nhưng giữ người đọc ở đúng trang đang mở. */
@@ -4678,7 +4886,10 @@ function veLaiTrangSach() {
 function capNhatDieuSach() {
   $("lat-lui").disabled = trangDangMo <= 0;
   $("lat-toi").disabled = trangDangMo >= cacTrang.length - 1;
-  $("so-trang").textContent = `${trangDangMo + 1} / ${cacTrang.length}`;
+  const tr = cacTrang[trangDangMo];
+  // Ngay dai chiem nhieu trang thi ghi them "2/3" cho biet dang o khuc nao.
+  const phan = tr && tr.tong > 1 ? ` · ${tr.phan}/${tr.tong}` : "";
+  $("so-trang").textContent = `${trangDangMo + 1} / ${cacTrang.length}${phan}`;
 }
 
 /**
@@ -5610,16 +5821,14 @@ function ganSuKien() {
   $("dong-so").addEventListener("click", gapSo);
   $("sua-xong").addEventListener("click", () => dongSuaTrang(true));
   $("sua-thoi").addEventListener("click", () => dongSuaTrang(false));
+  $("anh-nho").addEventListener("click", () => chinhCoAnh(-6));
+  $("anh-to").addEventListener("click", () => chinhCoAnh(6));
+  $("anh-xoa").addEventListener("click", xoaAnhDangChon);
   $("giay").addEventListener("click", (e) => {
-    // Đang sửa mà bấm nút cộng trừ dưới ảnh: nhích cỡ từng nấc nhỏ.
-    const nutCo = e.target.closest("[data-co-anh]");
-    if (nutCo) {
-      e.preventDefault();
-      const khung = nutCo.closest(".anh-trong-bai");
-      const im = khung && khung.querySelector("img[data-anh]");
-      if (im) chinhCoAnh(Number(im.dataset.anh), Number(nutCo.dataset.coAnh));
-      return;
-    }
+    // Đang sửa mà chạm vào ảnh: chọn tấm ấy, thanh chỉnh ảnh hiện ra dưới sổ.
+    const im = e.target.closest("img[data-anh]");
+    if (im && dangSuaTrang) { chonAnh(Number(im.dataset.anh)); return; }
+
 
     if (e.target.closest("[data-sua-trang]")) {
       dangSuaTrang ? dongSuaTrang(true) : moSuaTrang();
