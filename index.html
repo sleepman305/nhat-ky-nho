@@ -2034,6 +2034,39 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
   color: var(--chu); font-weight: 600;
 }
 .hang-nut { display: flex; gap: .55rem; flex-wrap: wrap; }
+/* Sao lưu: hàng chọn nhịp, và danh sách bản sao đang giữ */
+.luoi-nhip { display: flex; flex-wrap: wrap; gap: .4rem; }
+.luoi-nhip button {
+  flex: 1 1 auto; min-width: 4.6rem;
+  padding: .42rem .5rem; border-radius: 9px;
+  background: var(--mat); border: 1px solid var(--vien);
+  color: var(--chu-nhat); font: 500 .76rem/1.2 var(--than);
+  transition: background .15s, border-color .15s, color .15s;
+}
+.luoi-nhip button[aria-pressed="true"] {
+  background: var(--nhan-nen); border-color: var(--nhan); color: var(--nhan);
+}
+.ban-sao {
+  display: flex; align-items: center; gap: .5rem;
+  padding: .5rem .1rem;
+  border-bottom: 1px solid var(--vien-mo);
+}
+.ban-sao:last-child { border-bottom: 0; }
+.ban-sao .tin { flex: 1 1 auto; min-width: 0; }
+.ban-sao .luc {
+  display: block; font: 500 .8rem/1.3 var(--than); color: var(--chu);
+}
+.ban-sao .phu {
+  display: block; font: 400 .68rem/1.3 var(--may); color: var(--chu-mo);
+  font-variant-numeric: tabular-nums;
+}
+.ban-sao button {
+  flex: none; padding: .3rem .55rem; border-radius: 999px;
+  background: var(--mat); border: 1px solid var(--vien);
+  color: var(--chu-nhat); font: 500 .68rem/1 var(--than);
+}
+.ban-sao button.xoa { color: var(--do); }
+.chua-co-sao { font: .78rem/1.5 var(--than); color: var(--chu-mo); padding: .4rem 0; }
 .bao { font-size: .84rem; color: var(--nhan); margin: .6rem 0 0; min-height: 1.2em; }
 
 /* ============ MÀN KHÓA ============ */
@@ -2397,15 +2430,28 @@ textarea.o-nhap { resize: vertical; min-height: 4.5rem; font-family: var(--de); 
 
   <section class="phan">
     <h3>Sao lưu</h3>
-    <div class="hang-nut">
-      <button class="nut chinh" id="nut-xuat">Xuất ra file</button>
+
+    <label class="nhan-nho">Tự giữ bản sao trong máy</label>
+    <div class="luoi-nhip" id="luoi-nhip"></div>
+    <p class="ghi-chu" id="tinh-sao-luu"></p>
+
+    <div class="hang-nut" style="margin-top:.7rem">
+      <button class="nut chinh" id="nut-xuat">Sao lưu ra Tệp</button>
+      <button class="nut" id="nut-sao-ngay">Giữ bản sao ngay</button>
       <button class="nut" id="nut-nhap">Nạp từ file</button>
       <button class="nut" id="nut-in">In thành sách</button>
     </div>
     <input type="file" id="o-nhap-file" accept=".zip,.md,.json" multiple hidden>
+
+    <label class="nhan-nho" style="margin-top:1rem">Các bản sao đang giữ</label>
+    <div id="ds-ban-sao"></div>
+
     <p class="ghi-chu">
-      Xuất ra một file <code>.zip</code> gồm nhật ký dạng chữ và toàn bộ ảnh. Anh cất
-      vào đâu tuỳ ý — app không tự gửi đi đâu cả. Nạp lại được trên máy khác.
+      <b>Bản sao trong máy</b> cứu được lúc anh sửa nhầm hay xoá nhầm, nhưng nó nằm
+      cùng chỗ với nhật ký gốc — gỡ app đi là mất cả. <b>Sao lưu ra Tệp</b> mới là
+      bản dự phòng thật, cất được vào iCloud Drive hay ngay trong máy.
+      Việc ấy iOS bắt buộc phải có một cú chạm của anh, trang web không được tự ghi
+      file vào máy. App sẽ tự nhắc khi bản ra Tệp đã cũ.
     </p>
     <p class="bao" id="bao-cai"></p>
   </section>
@@ -2506,7 +2552,13 @@ const MAC_DINH = {
   coSo: 1,
 
   // --- Nút ghi âm ---
-  dangNut: "tron"
+  dangNut: "tron",
+
+  // --- Sao lưu ---
+  // Nhịp tự giữ bản sao TRONG MÁY: tat | moLan | 1h | 6h | ngay
+  nhipSaoLuu: "moLan",
+  lucSaoCuoi: 0,      // mốc bản sao trong máy gần nhất
+  lucXuatCuoi: 0      // mốc lần xuất ra Tệp gần nhất
 };
 
 /** Năm phông chữ cho phép chọn, tất cả đều có đủ dấu tiếng Việt. */
@@ -2680,17 +2732,23 @@ function bam(s) {
    ============================================================ */
 
 const TEN_KHO = "nhat-ky-nho-so", NGAN = "ghi";
+/** Ngăn chứa các bản sao tự động. Mỗi bản là một gói .zip đã đóng sẵn. */
+const NGAN_SAO = "sao-luu";
 
 /** Mở kho, tạo mới nếu chưa có. @returns {Promise<IDBDatabase|null>} */
 function moKho() {
   return new Promise((xong) => {
     if (!window.indexedDB) { xong(null); return; }
     let yc;
-    try { yc = indexedDB.open(TEN_KHO, 1); } catch (e) { xong(null); return; }
+    // Phiên bản 2: thêm ngăn chứa bản sao. Kho cũ tự nâng lên, không mất gì.
+    try { yc = indexedDB.open(TEN_KHO, 2); } catch (e) { xong(null); return; }
     yc.onupgradeneeded = () => {
       const db = yc.result;
       if (!db.objectStoreNames.contains(NGAN)) {
         db.createObjectStore(NGAN, { keyPath: "id" }).createIndex("ngay", "ngay");
+      }
+      if (!db.objectStoreNames.contains(NGAN_SAO)) {
+        db.createObjectStore(NGAN_SAO, { keyPath: "id" });
       }
     };
     yc.onsuccess = () => xong(yc.result);
@@ -5347,6 +5405,7 @@ function moCai() {
   $("nhap-nguoi").value = ch.nguoi;
   $("nhap-cham").value = ch.chamNgon;
   veLuoiBia(); veCheDo(); veLuoiTong(); veKhuChuNghia(); veKhuKhoa();
+  veLuoiNhip(); veTinhSaoLuu(); veDsBanSao();
   const soAnh = soGhi.filter((g) => g.anh).length;
   $("mo-ta-kho").textContent = soGhi.length
     ? `${soGhi.length} mẩu ghi, ${nhomTheoNgay().size} ngày, ${soAnh} ảnh.`
@@ -5765,7 +5824,318 @@ async function bungZip(goi) {
   return ket;
 }
 
-/** Gói toàn bộ nhật ký thành .zip rồi tải xuống. */
+/* ============================================================
+   SAO LƯU
+
+   Hai lớp, và phải nói rõ vì sao lại phải hai:
+
+   LỚP TRONG MÁY — thật sự tự động. Cứ đến nhịp anh chọn là app tự đóng
+   một gói .zip rồi cất vào kho của chính nó, không cần anh làm gì. Lớp
+   này cứu được những tai nạn hay gặp nhất: sửa nhầm, xoá nhầm, hoặc app
+   lỗi. Nhưng nó nằm CÙNG CHỖ với dữ liệu gốc, nên nếu iOS dọn dữ liệu
+   web hay anh gỡ app thì nó đi theo.
+
+   LỚP RA TỆP — cứu được cả những cái trên. Nhưng iOS không cho trang web
+   tự ghi file: mỗi lần lưu vào Tệp đều phải có một cú chạm của anh. Đây
+   là hàng rào của hệ điều hành, không lách được bằng bất cứ mẹo nào —
+   nếu lách được thì trang web nào cũng rải file vào máy anh.
+
+   Nên app làm điều tử tế nhất còn lại: tự nhắc khi bản ra Tệp đã cũ, và
+   rút việc xuất xuống còn đúng một chạm.
+   ============================================================ */
+/** Các nhịp cho anh chọn, kèm tên gọi. */
+const TEN_NHIP = [
+  { ma: "moLan", ten: "Mỗi lần mở app" },
+  { ma: "1h", ten: "1 giờ" },
+  { ma: "6h", ten: "6 giờ" },
+  { ma: "ngay", ten: "Mỗi ngày" },
+  { ma: "tat", ten: "Tắt" }
+];
+
+/** Vẽ hàng chọn nhịp tự sao lưu. */
+function veLuoiNhip() {
+  const o = $("luoi-nhip");
+  if (!o) return;
+  o.innerHTML = TEN_NHIP.map((n) =>
+    `<button type="button" data-nhip="${n.ma}" aria-pressed="${ch.nhipSaoLuu === n.ma}">${n.ten}</button>`
+  ).join("");
+}
+
+/**
+ * Đổi một khoảng thời gian thành lời nói thường: "3 giờ trước".
+ * @param {number} moc Mốc thời gian tính bằng mili giây.
+ * @returns {string}
+ */
+function noiLucNao(moc) {
+  if (!moc) return "chưa lần nào";
+  const phut = Math.floor((Date.now() - moc) / 60000);
+  if (phut < 1) return "vừa xong";
+  if (phut < 60) return `${phut} phút trước`;
+  const gio = Math.floor(phut / 60);
+  if (gio < 24) return `${gio} giờ trước`;
+  const ngay = Math.floor(gio / 24);
+  return ngay === 1 ? "hôm qua" : `${ngay} ngày trước`;
+}
+
+/** Đổi số byte thành chuỗi gọn cho người đọc. */
+function coGon(b) {
+  if (b < 1024) return b + " B";
+  if (b < 1048576) return (b / 1024).toFixed(0) + " KB";
+  return (b / 1048576).toFixed(1) + " MB";
+}
+
+/** Viết một dòng cho biết tình hình sao lưu, có nhắc khi bản ra Tệp đã cũ. */
+function veTinhSaoLuu() {
+  const o = $("tinh-sao-luu");
+  if (!o) return;
+  const trong = `Bản trong máy: ${noiLucNao(ch.lucSaoCuoi)}.`;
+  const raTep = `Ra Tệp: ${noiLucNao(ch.lucXuatCuoi)}.`;
+  const cu = !ch.lucXuatCuoi || Date.now() - ch.lucXuatCuoi > 7 * 86400e3;
+  o.innerHTML = `${trong} ${raTep}` +
+    (cu ? ` <b>Nên xuất một bản ra Tệp để cho chắc.</b>` : "");
+}
+
+/** Vẽ danh sách bản sao đang giữ trong máy. */
+async function veDsBanSao() {
+  const o = $("ds-ban-sao");
+  if (!o) return;
+  const cac = await dsBanSao();
+  if (!cac.length) {
+    o.innerHTML = `<p class="chua-co-sao">Chưa có bản sao nào.</p>`;
+    return;
+  }
+  o.innerHTML = cac.map((b) => {
+    const d = new Date(b.luc);
+    return `<div class="ban-sao">
+      <span class="tin">
+        <span class="luc">${maNgay(d)} · ${maGio(d)}</span>
+        <span class="phu">${b.soNgay} ngày · ${b.soMau} mẩu · ${coGon(b.co)} · ${noiLucNao(b.id)}</span>
+      </span>
+      <button type="button" data-sao-xuat="${b.id}">Ra Tệp</button>
+      <button type="button" data-sao-phuc="${b.id}">Khôi phục</button>
+      <button type="button" class="xoa" data-sao-xoa="${b.id}" aria-label="Xoá bản sao">Xoá</button>
+    </div>`;
+  }).join("");
+}
+
+/**
+ * Khôi phục từ một bản sao đang giữ.
+ *
+ * Dùng chính đường nạp file sẵn có, nên mẩu nào đã có thì bỏ qua — khôi
+ * phục là THÊM LẠI những gì đã mất, không xoá đè lên cái đang có. Muốn
+ * quay hẳn về ngày ấy thì xoá sạch trước rồi hãy khôi phục.
+ *
+ * @param {number} id Mã bản sao.
+ * @returns {Promise<void>}
+ */
+async function khoiPhucBanSao(id) {
+  const cac = await dsBanSao();
+  const b = cac.find((x) => x.id === id);
+  if (!b) return;
+  $("bao-cai").textContent = "Đang khôi phục…";
+  await napTuFile([new File([b.goi], "sao-luu.zip", { type: "application/zip" })]);
+  veTinhSaoLuu();
+}
+
+
+/** Giữ lại bấy nhiêu bản sao gần nhất, cũ hơn thì bỏ. */
+const SO_BAN_SAO = 10;
+
+/** Nhịp tự sao lưu, tính bằng mili giây. 0 nghĩa là cứ mở app là làm. */
+const NHIP_SAO = { tat: -1, moLan: 0, "1h": 3600e3, "6h": 21600e3, ngay: 86400e3 };
+
+/**
+ * Cất một bản sao vào kho.
+ * @param {Blob} goi Gói .zip.
+ * @param {object} tin Vài con số để hiện ra cho anh xem.
+ * @returns {Promise<void>}
+ */
+async function catBanSao(goi, tin) {
+  const db = await moKho();
+  if (!db) return;
+  try {
+    await new Promise((xong, hong) => {
+      const gd = db.transaction(NGAN_SAO, "readwrite");
+      gd.objectStore(NGAN_SAO).put({
+        id: Date.now(), luc: new Date().toISOString(),
+        soNgay: tin.soNgay, soMau: tin.soMau, co: goi.size, dau: tin.dau, goi
+      });
+      gd.oncomplete = xong; gd.onerror = () => hong(gd.error);
+    });
+  } finally { db.close(); }
+}
+
+/**
+ * Danh sách bản sao, mới nhất đứng trước.
+ * @returns {Promise<Array>}
+ */
+async function dsBanSao() {
+  const db = await moKho();
+  if (!db) return [];
+  try {
+    const cac = await new Promise((xong) => {
+      const yc = db.transaction(NGAN_SAO, "readonly").objectStore(NGAN_SAO).getAll();
+      yc.onsuccess = () => xong(yc.result || []);
+      yc.onerror = () => xong([]);
+    });
+    return cac.sort((a, b) => b.id - a.id);
+  } finally { db.close(); }
+}
+
+/**
+ * Bỏ một bản sao.
+ * @param {number} id Mã bản sao.
+ * @returns {Promise<void>}
+ */
+async function xoaBanSao(id) {
+  const db = await moKho();
+  if (!db) return;
+  try {
+    await new Promise((xong) => {
+      const gd = db.transaction(NGAN_SAO, "readwrite");
+      gd.objectStore(NGAN_SAO).delete(id);
+      gd.oncomplete = xong; gd.onerror = xong;
+    });
+  } finally { db.close(); }
+}
+
+/**
+ * Dấu nhận dạng của kho lúc này.
+ *
+ * Dùng để khỏi cất hai bản sao y hệt nhau: ngày nào anh không ghi gì thì
+ * mở app mười lần cũng chỉ có một bản, đỡ phí chỗ.
+ *
+ * @returns {string}
+ */
+function dauCuaKho() {
+  let chu = 0, anh = 0, moi = 0;
+  for (const g of soGhi) {
+    chu += (g.chu || "").length;
+    if (g.anh) anh++;
+    if (g.id > moi) moi = g.id;
+  }
+  return `${soGhi.length}.${chu}.${anh}.${moi}`;
+}
+
+/**
+ * Tự cất một bản sao nếu đã tới nhịp và kho có gì đó đổi khác.
+ *
+ * @param {boolean} epBuoc true thì làm ngay, không xét nhịp (nút bấm tay).
+ * @returns {Promise<string>} Một câu ngắn kể việc đã làm.
+ */
+async function tuSaoLuu(epBuoc) {
+  if (!soGhi.length) return "Chưa có gì để sao lưu.";
+
+  const nhip = NHIP_SAO[ch.nhipSaoLuu];
+  if (!epBuoc) {
+    if (nhip === undefined || nhip < 0) return "";
+    if (nhip > 0 && Date.now() - (ch.lucSaoCuoi || 0) < nhip) return "";
+  }
+
+  const dau = dauCuaKho();
+  const cac = await dsBanSao();
+  if (!epBuoc && cac.length && cac[0].dau === dau) {
+    // Không có gì mới từ bản trước: đừng cất bản y hệt.
+    ch.lucSaoCuoi = Date.now(); luuCauHinh();
+    return "";
+  }
+
+  try {
+    const { goi, soNgay, soMau } = await goiNhatKy();
+    await catBanSao(goi, { soNgay, soMau, dau });
+    for (const cu of (await dsBanSao()).slice(SO_BAN_SAO)) await xoaBanSao(cu.id);
+    ch.lucSaoCuoi = Date.now(); luuCauHinh();
+    return `Đã giữ một bản sao ${soNgay} ngày.`;
+  } catch (e) {
+    return "Sao lưu không xong.";
+  }
+}
+
+/**
+ * Xin hệ điều hành giữ dữ liệu lại, đừng dọn khi máy chật.
+ *
+ * iOS có thể xoá dữ liệu web của app nếu lâu không mở hoặc máy hết chỗ.
+ * Xin được thì nguy cơ ấy giảm hẳn; không xin được cũng chẳng sao, đó
+ * chính là lý do vẫn phải có bản ra Tệp.
+ *
+ * @returns {Promise<void>}
+ */
+async function xinGiuDuLieu() {
+  try {
+    if (navigator.storage && navigator.storage.persist) await navigator.storage.persist();
+  } catch (e) { }
+}
+
+/**
+ * Đóng toàn bộ nhật ký thành một gói .zip.
+ *
+ * Trong gói có hai thứ: bản cho người đọc (mỗi ngày một file `.md`, ảnh để
+ * riêng trong thư mục `anh/`) và bản cho máy đọc (`nhat-ky-nho.json`) để
+ * nạp lại vẫn giữ nguyên từng mốc thời gian.
+ *
+ * @returns {Promise<{goi: Blob, soNgay: number, soMau: number}>}
+ */
+async function goiNhatKy() {
+  const bd = new TextEncoder();
+  const muc = [];
+  const nhom = nhomTheoNgay();
+
+  for (const [ngay, ds] of nhom) {
+    let chu = "";
+    for (const g of ds) {
+      chu += `\n## ${maGio(new Date(g.luc))}\n`;
+      if (g.anh) {
+        const ten = `${ngay}-${maGio(new Date(g.luc)).replace(":", "")}-${g.id % 1000}.jpg`;
+        muc.push({ ten: `anh/${ten}`, du: new Uint8Array(await g.anh.arrayBuffer()) });
+        chu += `![](anh/${ten})\n`;
+      }
+      if (g.chu) chu += `${g.chu}\n`;
+    }
+    muc.push({ ten: `${ngay}.md`, du: bd.encode(chu.trim() + "\n") });
+  }
+
+  muc.push({
+    ten: "nhat-ky-nho.json",
+    du: bd.encode(JSON.stringify({
+      cauHinh: ch,
+      ghi: soGhi.map((g) => ({ id: g.id, ngay: g.ngay, luc: g.luc, chu: g.chu, coAnh: !!g.anh }))
+    }, null, 2))
+  });
+
+  return { goi: dongGoiZip(muc), soNgay: nhom.size, soMau: soGhi.length };
+}
+
+/**
+ * Đưa một file ra ngoài app.
+ *
+ * Trên iPhone thì mở bảng chia sẻ của hệ điều hành, anh chọn "Lưu vào Tệp"
+ * là file nằm trong iCloud Drive hay ngay trong máy tuỳ anh. Máy nào không
+ * có bảng chia sẻ thì lùi về lối tải xuống thường.
+ *
+ * Bắt buộc phải có cú chạm của anh mới gọi được — iOS không cho trang web
+ * tự ý ghi file, và đó là lý do việc sao lưu ra Tệp không thể tự động.
+ *
+ * @param {Blob} goi Nội dung file.
+ * @param {string} ten Tên file.
+ * @returns {Promise<boolean>} true nếu đã đưa ra được.
+ */
+async function chiaSeTep(goi, ten) {
+  const tep = new File([goi], ten, { type: "application/zip" });
+  if (navigator.canShare && navigator.canShare({ files: [tep] })) {
+    try { await navigator.share({ files: [tep], title: ten }); return true; }
+    catch (e) {
+      // Anh bấm Huỷ trên bảng chia sẻ: không phải lỗi, đừng lùi về tải xuống.
+      if (e && e.name === "AbortError") return false;
+    }
+  }
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(goi);
+  a.download = ten;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  return true;
+}
+
 async function xuatRaFile() {
   if (!soGhi.length) { $("bao-cai").textContent = "Chưa có gì để xuất."; return; }
 
@@ -5773,42 +6143,16 @@ async function xuatRaFile() {
   nut.textContent = "Đang gói…"; nut.disabled = true;
 
   try {
-    const bd = new TextEncoder();
-    const muc = [];
-    const nhom = nhomTheoNgay();
+    const { goi, soNgay } = await goiNhatKy();
+    const xong = await chiaSeTep(goi, `nhat-ky-nho-${maNgay(new Date())}.zip`);
+    if (!xong) { $("bao-cai").textContent = "Anh đã huỷ."; return; }
 
-    for (const [ngay, ds] of nhom) {
-      let chu = "";
-      for (const g of ds) {
-        chu += `\n## ${maGio(new Date(g.luc))}\n`;
-        if (g.anh) {
-          const ten = `${ngay}-${maGio(new Date(g.luc)).replace(":", "")}-${g.id % 1000}.jpg`;
-          muc.push({ ten: `anh/${ten}`, du: new Uint8Array(await g.anh.arrayBuffer()) });
-          chu += `![](anh/${ten})\n`;
-        }
-        if (g.chu) chu += `${g.chu}\n`;
-      }
-      muc.push({ ten: `${ngay}.md`, du: bd.encode(chu.trim() + "\n") });
-    }
-
-    // Kèm bản máy đọc, để nạp lại giữ nguyên từng mốc thời gian.
-    muc.push({
-      ten: "nhat-ky-nho.json",
-      du: bd.encode(JSON.stringify({
-        cauHinh: ch,
-        ghi: soGhi.map((g) => ({ id: g.id, ngay: g.ngay, luc: g.luc, chu: g.chu, coAnh: !!g.anh }))
-      }, null, 2))
-    });
-
-    const nay = maNgay(new Date());
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(dongGoiZip(muc));
-    a.download = `nhat-ky-nho-${nay}.zip`;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
     daXuatLan = true;
+    ch.lucXuatCuoi = Date.now();
+    luuCauHinh();
     $("da-luu-chua").textContent = "Đã xuất xong, giờ xoá thì vẫn còn bản dự phòng.";
-    $("bao-cai").textContent = `Đã gói ${nhom.size} ngày.`;
+    $("bao-cai").textContent = `Đã gói ${soNgay} ngày.`;
+    veTinhSaoLuu();
   } catch (e) {
     $("bao-cai").textContent = "Gói không xong. Thử lại xem sao.";
   } finally {
@@ -6327,6 +6671,49 @@ function ganSuKien() {
   khung.addEventListener("pointercancel", thoiKeo);
 
   $("nut-xuat").addEventListener("click", xuatRaFile);
+
+  // --- Sao lưu ---
+  $("luoi-nhip").addEventListener("click", async (e) => {
+    const n = e.target.closest("[data-nhip]");
+    if (!n) return;
+    ch.nhipSaoLuu = n.dataset.nhip;
+    luuCauHinh();
+    veLuoiNhip();
+    const loi = await tuSaoLuu(false);
+    if (loi) { $("bao-cai").textContent = loi; veDsBanSao(); }
+    veTinhSaoLuu();
+  });
+
+  $("nut-sao-ngay").addEventListener("click", async () => {
+    const nut = $("nut-sao-ngay"), cu = nut.textContent;
+    nut.textContent = "Đang giữ…"; nut.disabled = true;
+    $("bao-cai").textContent = await tuSaoLuu(true);
+    nut.textContent = cu; nut.disabled = false;
+    veDsBanSao(); veTinhSaoLuu();
+  });
+
+  $("ds-ban-sao").addEventListener("click", async (e) => {
+    const xuat = e.target.closest("[data-sao-xuat]");
+    if (xuat) {
+      const id = Number(xuat.dataset.saoXuat);
+      const b = (await dsBanSao()).find((x) => x.id === id);
+      if (!b) return;
+      const d = new Date(b.luc);
+      const xong = await chiaSeTep(b.goi, `nhat-ky-nho-${maNgay(d)}-${maGio(d).replace(":", "")}.zip`);
+      if (xong) { ch.lucXuatCuoi = Date.now(); luuCauHinh(); veTinhSaoLuu(); }
+      return;
+    }
+
+    const phuc = e.target.closest("[data-sao-phuc]");
+    if (phuc) { khoiPhucBanSao(Number(phuc.dataset.saoPhuc)); return; }
+
+    const xoa = e.target.closest("[data-sao-xoa]");
+    if (xoa) {
+      await xoaBanSao(Number(xoa.dataset.saoXoa));
+      veDsBanSao();
+      $("bao-cai").textContent = "Đã bỏ một bản sao.";
+    }
+  });
   $("nut-nhap").addEventListener("click", () => $("o-nhap-file").click());
   $("o-nhap-file").addEventListener("change", (e) => {
     const ds = [...(e.target.files || [])];
@@ -6463,11 +6850,21 @@ ganSuKien();
   await napAnhBia();
   if (ch.kieuKhoa !== "khong" && ch.bamKhoa) hienManKhoa();
   else diToi("ghi");
+
+  // Xin hệ điều hành đừng dọn dữ liệu, rồi tự giữ một bản sao nếu tới nhịp.
+  // Để sau cùng vì cả hai đều không gấp — đừng bắt anh đợi mới thấy nhật ký.
+  xinGiuDuLieu();
+  setTimeout(() => tuSaoLuu(false), 2500);
 })();
 
-// Quay lại app sau một lúc: ngày có thể đã sang hôm khác, vẽ lại cho đúng.
+/* Quay lại app sau một lúc. Ngày có thể đã sang hôm khác nên vẽ lại cho
+   đúng, và cũng là dịp ngó xem đã tới nhịp sao lưu chưa — anh để "1 giờ"
+   thì đây mới là chỗ nhịp ấy thật sự chạy, chứ app mở suốt cả buổi thì
+   lúc khởi động chỉ có một lần. */
 document.addEventListener("visibilitychange", () => {
-  if (!document.hidden && $("man-ghi").classList.contains("hien")) veManGhi();
+  if (document.hidden) return;
+  if ($("man-ghi").classList.contains("hien")) veManGhi();
+  tuSaoLuu(false);
 });
 
 /* Bộ nhớ đệm ngoại tuyến.
