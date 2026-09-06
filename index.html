@@ -1388,15 +1388,17 @@ button.lich-o:active { transform: scale(.88); }
   text-align: justify; hyphens: auto;
 }
 .trang-noi p {
-  margin: 0 0 1.62rem;
+  /* Cách nhau đúng nửa dòng kẻ. Trước để hở nguyên một dòng nên trang
+     nhìn rời rạc, mà chỗ anh tự xuống dòng lại càng hở toang. */
+  margin: 0 0 .5rem;
   text-wrap: pretty;
   /* Giữ chỗ xuống dòng anh tự gõ. Thiếu dòng này thì HTML gộp hết
      lại thành một dòng liền, và chỗ ngắt anh vừa đặt biến mất. */
   white-space: pre-wrap;
 }
 .trang-noi p:last-of-type { margin-bottom: 0; }
-/* Thụt đầu dòng từ đoạn thứ hai, như sách in */
-.trang-noi p + p { text-indent: 1.4em; }
+/* Không thụt đầu dòng: nhật ký viết tự do, đoạn dài đoạn ngắn xen nhau
+   nên thụt lề chỗ có chỗ không, nhìn rối hơn là đẹp. */
 
 /* Ảnh nằm giữa mạch bài, đúng chỗ anh chụp nó.
    Ba cỡ để chọn: nhỏ nép bên, vừa, và rộng hết trang. */
@@ -1406,16 +1408,20 @@ button.lich-o:active { transform: scale(.88); }
   position: relative;
 }
 .trang-noi .anh-trong-bai img {
-  display: block; max-width: 100%;
+  display: block;
+  /* Để ảnh tự giữ tỷ lệ của nó: chỉ chặn bề ngang và chiều cao, không
+     ép vào khuôn. Trước đây em cắt ảnh cho vừa khung nên mất đầu mất
+     đuôi — tấm ảnh kỷ niệm mà bị xén thì còn gì là kỷ niệm. */
+  width: auto; height: auto;
+  max-width: 100%;
   border-radius: 3px;
   border: 4px solid var(--mat);
   box-shadow: 0 1px 4px rgba(0,0,0,.24);
-  object-fit: cover; object-position: center;
-  transform: rotate(-.9deg);
+  transform: rotate(-.8deg);
 }
-.trang-noi .anh-trong-bai[data-co="1"] img { width: 45%;  max-height: 6.5rem; }
-.trang-noi .anh-trong-bai[data-co="2"] img { width: 68%;  max-height: 9.5rem; }
-.trang-noi .anh-trong-bai[data-co="3"] img { width: 100%; max-height: 13rem; transform: rotate(0); }
+.trang-noi .anh-trong-bai[data-co="1"] img { max-width: 52%;  max-height: 7rem; }
+.trang-noi .anh-trong-bai[data-co="2"] img { max-width: 78%;  max-height: 11rem; }
+.trang-noi .anh-trong-bai[data-co="3"] img { max-width: 100%; max-height: 15rem; transform: rotate(0); }
 
 /* Đang sửa: chạm vào ảnh để đổi cỡ */
 .trang-noi[contenteditable] .anh-trong-bai img {
@@ -2480,6 +2486,24 @@ const THANG = ["Tháng một", "Tháng hai", "Tháng ba", "Tháng tư", "Tháng 
 const $ = (id) => document.getElementById(id);
 const thoat = (s) => String(s).replace(/[&<>"']/g,
   (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+/**
+ * Gọn hai đầu một đoạn chữ nhưng GIỮ NGUYÊN chỗ xuống dòng ở giữa.
+ *
+ * Dùng khi lưu lại chữ anh vừa sửa trong sổ. `trim()` thường đã giữ được
+ * dấu xuống dòng ở giữa rồi, nhưng contenteditable còn hay rắc thêm dấu
+ * cách thừa quanh chỗ ngắt và đẻ ra vài dòng trống liền nhau mỗi lần nhấn
+ * Enter — để nguyên thì trang sổ hở toang từng mảng.
+ *
+ * @param {string} s Chữ thô nhặt từ trang giấy.
+ * @returns {string} Chữ đã gọn: hai đầu sạch, ba dòng trống trở lên gộp
+ *   còn một, dấu xuống dòng anh tự đặt thì còn nguyên.
+ */
+const donDong = (s) => String(s)
+  .replace(/[^\S\n]+\n/g, "\n")
+  .replace(/\n[^\S\n]+/g, "\n")
+  .replace(/\n{3,}/g, "\n\n")
+  .replace(/^\s+|\s+$/g, "");
 
 /** Nạp cấu hình đã lưu. Hỏng hoặc bị chặn thì dùng mặc định, app vẫn chạy. */
 function napCauHinh() {
@@ -4307,25 +4331,41 @@ async function dongSuaTrang(luu) {
     // duyệt chèn thẻ <br>, mà textContent coi thẻ ấy là rỗng nên nuốt
     // mất chỗ xuống dòng. innerText đọc đúng như mắt nhìn thấy.
     const chu = (e.innerText || e.textContent || "").replace(/ /g, " ").trim();
-    moi.set(id, moi.has(id) ? (moi.get(id) + " " + chu).trim() : chu);
+    // Mỗi mẩu chỉ được vẽ ra ĐÚNG MỘT thẻ. Gặp thẻ thứ hai mang cùng mã
+    // nghĩa là anh vừa nhấn Enter giữa đoạn: trình duyệt xẻ đôi thẻ ấy ra
+    // làm hai nửa. Nối lại bằng DẤU XUỐNG DÒNG — trước nối bằng dấu cách
+    // nên đúng chỗ anh vừa ngắt lại dính liền như cũ, "lưu xong là mất".
+    moi.set(id, moi.has(id) ? moi.get(id) + "\n" + chu : chu);
     mauCuoi = id;
   });
 
   /* Chữ gõ thêm có thể rơi ra ngoài mọi thẻ mang mã — hay gặp khi nhấn
      Enter ở cuối đoạn, trình duyệt tạo dòng mới nằm ngoài. Nhặt hết chỗ
      chữ lạc ấy nối vào mẩu đứng ngay trước nó, kẻo lưu xong là mất. */
+  /** Khối (đoạn văn) chứa một nút, dùng để biết chữ có sang dòng mới không. */
+  const khoiCua = (n) => {
+    const e = n.nodeType === 1 ? n : n.parentElement;
+    return e ? e.closest("p, div, li, .trang-noi") : null;
+  };
   const soat = document.createTreeWalker(o, NodeFilter.SHOW_TEXT);
-  let mocHienTai = null;
+  let mocHienTai = null, khoiMoc = null;
   for (let n = soat.nextNode(); n; n = soat.nextNode()) {
     const trong = n.parentElement && n.parentElement.closest(".mau-chu");
-    if (trong) { mocHienTai = Number(trong.dataset.id); continue; }
+    if (trong) {
+      mocHienTai = Number(trong.dataset.id);
+      khoiMoc = khoiCua(trong);
+      continue;
+    }
 
-    const lac = (n.nodeValue || "").replace(/ /g, " ").trim();
+    const lac = (n.nodeValue || "").replace(/\u00A0/g, " ").trim();
     if (!lac) continue;
 
     const dich = mocHienTai || mauCuoi;
     if (!dich) continue;
-    moi.set(dich, ((moi.get(dich) || "") + " " + lac).trim());
+    // Chữ lạc nằm ở khối khác với mẩu đứng ngay trước nó: ấy là dòng mới
+    // anh vừa tạo bằng Enter, nối bằng dấu xuống dòng. Còn cùng một khối
+    // thì chỉ là chữ gõ thêm ngay cạnh, nối bằng dấu cách như cũ.
+    moi.set(dich, (moi.get(dich) || "") + (khoiCua(n) === khoiMoc ? " " : "\n") + lac);
   }
 
   // Ảnh nào còn trên giấy sau khi anh sửa. Ảnh vắng mặt nghĩa là anh
@@ -4345,7 +4385,7 @@ async function dongSuaTrang(luu) {
     const g = soGhi.find((x) => x.id === id);
     if (!g) continue;
 
-    const chuMoi = (moi.get(id) || "").trim();
+    const chuMoi = donDong(moi.get(id) || "");
     const boAnh = g.anh && anhCuaTrang.has(id) && !anhConLai.has(id);
     const conAnh = g.anh && !boAnh;
 

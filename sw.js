@@ -17,7 +17,7 @@
   Nhật ký nằm trong IndexedDB, không đi qua đây.
 */
 
-const TEN_DEM = "nhat-ky-nho-v24";
+const TEN_DEM = "nhat-ky-nho-v25";
 
 /** Những thứ phải có sẵn ngay từ lúc cài, không chờ người dùng mở tới. */
 const CAN_TRUOC = [
