@@ -316,6 +316,12 @@
   --tren: env(safe-area-inset-top, 0px);
   --duoi: env(safe-area-inset-bottom, 0px);
 
+  /* Khoảng cách dòng kẻ của trang sổ. Vừa là `line-height` của chữ, vừa
+     là bước của những vạch kẻ vẽ trên tờ giấy — một biến lo cả hai, nên
+     anh phóng chữ to lên thì dòng kẻ giãn ra theo, chữ vẫn nằm đúng
+     trên vạch chứ không trôi lệch dần. */
+  --dong: calc(1.62rem * var(--co-so, 1));
+
   /* Nhịp chuyển động: bật nhẹ như vật có khối lượng, không giật cục. */
   --bat: cubic-bezier(.34, 1.4, .5, 1);
   --muot: cubic-bezier(.22, .8, .3, 1);
@@ -1270,7 +1276,9 @@ button.lich-o:active { transform: scale(.88); }
 /* Khối giấy: các trang xếp chồng, lật quanh mép trái */
 .giay {
   position: relative;
-  width: min(22rem, 92vw);
+  /* Rộng thêm được chữ nào hay chữ ấy: mỗi ký tự lọt thêm vào một dòng
+     là khe chữ bớt phải giãn. */
+  width: min(25rem, 96vw);
   /* Trước đây khoá tỷ lệ 3/4.1 nên tờ giấy lùn, phí mất khoảng trống
      phía dưới. Giờ cho nó cao hết chỗ còn lại, chứa được nhiều chữ hơn
      mà vẫn chừa đúng chỗ cho cụm nút. */
@@ -1286,14 +1294,15 @@ button.lich-o:active { transform: scale(.88); }
   position: absolute; inset: 0;
   border-radius: 3px 12px 12px 3px;
   background:
-    repeating-linear-gradient(0deg, transparent 0 1.62rem,
-      color-mix(in srgb, var(--nhan) 12%, transparent) 1.62rem 1.63rem),
+    repeating-linear-gradient(0deg, transparent 0 var(--dong),
+      color-mix(in srgb, var(--nhan) 12%, transparent) var(--dong) calc(var(--dong) + 1px)),
     linear-gradient(105deg,
       color-mix(in srgb, var(--mat) 92%, var(--nhan)) 0%,
       var(--mat) 8%, var(--mat) 100%);
   border: 1px solid var(--vien-mo);
   box-shadow: var(--bong-2);
-  padding: 1.6rem 1.4rem 1rem 1.7rem;
+  /* Lề trong vừa đủ thoáng. Rộng quá là cướp mất chữ của mỗi dòng. */
+  padding: 1.5rem 1.1rem 1rem 1.25rem;
   overflow: hidden;
   transform-origin: left center;
   backface-visibility: hidden;
@@ -1388,23 +1397,21 @@ button.lich-o:active { transform: scale(.88); }
 .trang-tieu.mo { font-weight: 400; font-size: 1.06rem; opacity: .62; }
 .trang-noi {
   flex: 1 1 auto; min-height: 0; overflow: hidden;
-  font-family: var(--de); font-size: .97rem;
-  line-height: 1.62rem;   /* khớp đúng khoảng dòng kẻ của tờ giấy */
+  /* KHÔNG khai báo font-family/font-size ở đây. Khối `.trang-noi` phía
+     trên đã lấy phông, cỡ, màu từ cài đặt của anh; viết lại ở đây thì do
+     cùng độ ưu tiên mà đứng sau, nó đè mất — bao lâu nay anh đổi phông
+     đổi cỡ cho sổ mà không thấy gì nhúc nhích là vì hai dòng ấy. */
+  line-height: var(--dong);   /* khớp đúng khoảng dòng kẻ của tờ giấy */
 
-  /* KHÔNG căn đều hai bên.
+  /* Căn đều hai bên, mép phải thẳng như trang sách in.
 
-     Cột chữ trên điện thoại chỉ rộng chừng 34 ký tự. Căn đều hai bên trên
-     một cột hẹp thế thì trình duyệt phải kéo giãn khe chữ để dồn cho kín
-     mép phải — đo thật trên máy: khe rộng nhất gấp 2,68 lần khe hẹp nhất
-     (3,11 lên 8,34 điểm ảnh). Đó chính là cái "chỗ thừa chỗ khít".
-
-     Nhà in giải quyết bằng cách gạch nối cuối dòng, nhưng tiếng Việt
-     không có bộ luật gạch nối trong trình duyệt nên đường ấy cụt.
-
-     Bỏ căn đều thì mọi khe chữ đều tăm tắp (lệch 0,01 điểm ảnh) mà VẪN
-     đúng bấy nhiêu dòng — đo rồi, không mất một dòng nào. `text-wrap:
-     pretty` lo cho mép phải khỏi so le quá đáng. */
-  text-align: left;
+     Cái giá của nó là khe chữ phải giãn ra để dồn cho kín mép phải, và
+     cột càng hẹp thì giãn càng lộ. Nên chỗ cần lo không phải là kiểu căn
+     lề mà là BỀ NGANG CỘT: cột càng nhiều chữ, khe càng đều. Vì thế tờ
+     giấy đã được nới rộng ra và lề trong thu bớt lại. */
+  text-align: justify;
+  /* Dòng cuối đoạn để tự nhiên, kéo giãn nó ra là hỏng cả đoạn. */
+  text-align-last: left;
 }
 .trang-noi p {
   /* KHÔNG hở giữa các dòng ghi. Giấy có dòng kẻ cách nhau 1.62rem, hở
@@ -1428,7 +1435,7 @@ button.lich-o:active { transform: scale(.88); }
 .trang-noi p:last-of-type { margin-bottom: 0; }
 /* Ngày sang khúc khác (hai mẩu cách nhau quá hai tiếng): hở đúng một
    dòng kẻ. Đầu trang thì thôi, hở ở đó chỉ phí chỗ. */
-.trang-noi .dau-cum:not(:first-child) { margin-top: 1.62rem; }
+.trang-noi .dau-cum:not(:first-child) { margin-top: var(--dong); }
 .trang-noi .trong-trang { text-indent: 0; }
 
 /* Giờ mở đầu mỗi dòng: "08h00: Minh béo đi học về."
