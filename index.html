@@ -1391,30 +1391,41 @@ button.lich-o:active { transform: scale(.88); }
 /* Thụt đầu dòng từ đoạn thứ hai, như sách in */
 .trang-noi p + p { text-indent: 1.4em; }
 
-.trang-noi .anh-dan {
-  display: flex; flex-wrap: wrap; gap: .5rem;
-  margin: 1.1rem 0 .2rem;
-  flex: none;
+/* Ảnh nằm giữa mạch bài, đúng chỗ anh chụp nó.
+   Ba cỡ để chọn: nhỏ nép bên, vừa, và rộng hết trang. */
+.trang-noi .anh-trong-bai {
+  margin: .9rem 0;
+  display: flex; justify-content: center;
+  position: relative;
 }
-.trang-noi .anh-dan img {
-  display: block; width: calc(50% - .25rem);
-  /* Chặn chiều cao: ảnh dọc mà để tự do thì cao gấp mấy lần bề ngang,
-     tràn khỏi tờ giấy và bị mép trang xén ngang. Cắt gọn theo khung
-     rồi lấy phần giữa — chỗ đáng nhìn nhất của một tấm ảnh. */
-  max-height: 8.5rem;
-  object-fit: cover;
-  object-position: center;
+.trang-noi .anh-trong-bai img {
+  display: block; max-width: 100%;
   border-radius: 3px;
   border: 4px solid var(--mat);
-  box-shadow: 0 1px 3px rgba(0,0,0,.22);
-  transform: rotate(-1.2deg);
+  box-shadow: 0 1px 4px rgba(0,0,0,.24);
+  object-fit: cover; object-position: center;
+  transform: rotate(-.9deg);
 }
-.trang-noi .anh-dan img:nth-child(even) { transform: rotate(1.4deg); }
-.trang-noi .anh-dan img:only-child { width: 68%; max-height: 11rem; }
-.trang-noi .trong-trang {
-  color: var(--chu-mo); font-style: italic; font-size: .9rem;
+.trang-noi .anh-trong-bai[data-co="1"] img { width: 45%;  max-height: 6.5rem; }
+.trang-noi .anh-trong-bai[data-co="2"] img { width: 68%;  max-height: 9.5rem; }
+.trang-noi .anh-trong-bai[data-co="3"] img { width: 100%; max-height: 13rem; transform: rotate(0); }
+
+/* Đang sửa: chạm vào ảnh để đổi cỡ */
+.trang-noi[contenteditable] .anh-trong-bai img {
+  cursor: pointer;
+  outline: 2px dashed color-mix(in srgb, var(--nhan) 55%, transparent);
+  outline-offset: 3px;
 }
-/* Số trang nằm sát mép dưới tờ giấy, như sách in */
+.trang-noi[contenteditable] .anh-trong-bai::after {
+  content: "chạm để đổi cỡ";
+  position: absolute; left: 50%; bottom: -.2rem;
+  transform: translateX(-50%);
+  font-family: var(--than); font-size: .56rem;
+  color: var(--nhan); background: var(--mat);
+  padding: .05rem .4rem; border-radius: 999px;
+  pointer-events: none; white-space: nowrap;
+}
+
 .trang-chan {
   flex: none;
   margin: .5rem 0 0; padding-top: .5rem;
@@ -3941,36 +3952,64 @@ let trangDangMo = 0;
 let dangLat = false;
 
 /**
- * Ghép các mẩu ghi thành đoạn văn, MỖI MẨU BỌC TRONG MỘT THẺ MANG ID.
+ * Chia nội dung một ngày thành các KHỐI nối tiếp nhau.
  *
- * Nhìn thì vẫn liền mạch như một bài viết, nhưng bên trong từng câu vẫn
- * nhớ nó thuộc mẩu ghi nào. Nhờ vậy anh sửa chữ ngay trên trang sổ thì
- * app biết phải cập nhật đúng mẩu, không đụng tới mốc thời gian.
+ * Mỗi khối là một đoạn văn hoặc một tấm ảnh, xếp đúng thứ tự anh đã ghi.
+ * Trước đây em gom hết ảnh dồn xuống cuối — nhìn thì gọn nhưng phá mạch:
+ * đọc tới đoạn "thấy đám mây đẹp" mà ảnh đám mây lại nằm tận trang sau.
  *
  * @param {Array} ds Các mẩu ghi trong một ngày, theo thứ tự thời gian.
- * @returns {Array<Array<{id:number, chu:string}>>} Các đoạn, mỗi đoạn là
- *   danh sách mẩu góp mặt trong đó.
+ * @returns {Array<{loai:string, mau:Array}>} Danh sách khối.
  */
-function nguyenLoiCoDau(ds) {
-  const co = ds.filter((g) => g.chu && g.chu.trim());
-  if (!co.length) return [];
-
-  const doan = [];
+function dungKhoi(ds) {
+  const khoi = [];
   let cum = [], truoc = null;
 
-  for (const g of co) {
-    const d = new Date(g.luc);
-    let x = g.chu.trim();
-    if (!/[.!?…]$/.test(x)) x += ".";
+  const chotVan = () => {
+    if (cum.length) { khoi.push({ loai: "van", mau: cum }); cum = []; }
+  };
 
-    if (truoc && (d - truoc) / 60000 > 120 && cum.length) {
-      doan.push(cum); cum = [];
+  for (const g of ds) {
+    const d = new Date(g.luc);
+    const chu = (g.chu || "").trim();
+
+    // Cách nhau lâu quá thì sang đoạn mới, như ngày đã chuyển khúc.
+    if (truoc && (d - truoc) / 60000 > 120) chotVan();
+
+    if (chu) {
+      let x = chu;
+      if (!/[.!?…]$/.test(x)) x += ".";
+      cum.push({ id: g.id, chu: x });
     }
-    cum.push({ id: g.id, chu: x });
+
+    // Ảnh đứng riêng một khối, ngay sau lời kể về nó.
+    if (urlCuaAnh(g)) {
+      chotVan();
+      khoi.push({ loai: "anh", mau: [{ id: g.id, g }] });
+    }
     truoc = d;
   }
-  if (cum.length) doan.push(cum);
-  return doan;
+  chotVan();
+  return khoi;
+}
+
+/**
+ * Dựng HTML cho một dãy khối.
+ * @param {Array} khoi Các khối cần vẽ.
+ * @returns {string}
+ */
+function veCacKhoi(khoi) {
+  return khoi.map((k) => {
+    if (k.loai === "anh") {
+      const g = k.mau[0].g;
+      return `<div class="anh-trong-bai" data-co="${g.coAnh || 2}">
+        <img src="${urlCuaAnh(g)}" data-anh="${g.id}" alt="" loading="lazy">
+      </div>`;
+    }
+    return `<p>` + k.mau.map((m) =>
+      `<span class="mau-chu" data-id="${m.id}">${thoat(m.chu)}</span>`
+    ).join(" ") + `</p>`;
+  }).join("");
 }
 
 /**
@@ -4007,64 +4046,55 @@ function nguyenLoi(ds) {
 }
 
 /**
- * Cắt các đoạn văn của một ngày thành từng trang vừa khổ giấy.
+ * Cắt nội dung một ngày thành từng trang vừa khổ giấy.
  *
- * Không ước lượng theo số ký tự nữa — cách ấy lúc thừa lúc thiếu vì chữ
- * canh đều hai bên, cỡ chữ đổi theo cài đặt máy. Thay vào đó dựng hẳn một
- * tờ giấy ẩn rồi rót từng câu vào, hễ tràn khỏi mép thì rút câu vừa rồi ra
- * và sang trang. Chậm hơn một chút, nhưng trang nào cũng đầy tới dòng cuối
- * mà không mất một chữ nào.
+ * Rót từng khối vào tờ giấy đo thật, hễ tràn thì chốt trang rồi mở trang
+ * mới. Khối chữ dài quá một trang thì tách theo từng mẩu; ảnh không xé
+ * nhỏ được nên nếu không vừa, nó sang trang sau nguyên vẹn.
  *
- * @param {string[]} doan Các đoạn văn của ngày.
- * @returns {string[][]} Mỗi phần tử là các đoạn thuộc về một trang.
+ * @param {Array} khoi Các khối của ngày.
+ * @returns {Array<Array>} Mỗi phần tử là các khối thuộc một trang.
  */
-function catTrang(doan) {
-  if (!doan.length) return [[]];
+function catTrang(khoi) {
+  if (!khoi.length) return [[]];
 
   const o = moToDo();
-  if (!o) return [doan];   // không đo được thì để nguyên một trang
+  if (!o) return [khoi];
 
   const trang = [];
   let dang = [];
 
-  /** Thử đổ danh sách đoạn vào tờ đo, xem có tràn khỏi mép không. */
   const tran = (ds) => {
-    o.innerHTML = veCacDoan(ds);
+    o.innerHTML = veCacKhoi(ds);
     return o.scrollHeight > o.clientHeight + 1;
   };
 
-  for (const d of doan) {
-    if (!tran([...dang, d])) { dang.push(d); continue; }
+  for (const k of khoi) {
+    if (!tran([...dang, k])) { dang.push(k); continue; }
 
-    // Đoạn này làm tràn: rót từng mẩu một cho tới khi hết chỗ.
-    let cum = [];
-    for (const m of d) {
-      if (!tran([...dang, [...cum, m]])) { cum.push(m); continue; }
-      if (cum.length) dang.push(cum);
-      if (dang.length) trang.push(dang);
-      dang = []; cum = [m];
-      // Mẩu dài hơn cả một trang thì đành để nó đứng riêng.
-      if (tran([cum])) { trang.push([cum]); cum = []; }
+    if (k.loai === "anh") {
+      if (dang.length) { trang.push(dang); dang = []; }
+      dang.push(k);
+      continue;
     }
-    if (cum.length) dang.push(cum);
+
+    let cum = [];
+    for (const m of k.mau) {
+      if (!tran([...dang, { loai: "van", mau: [...cum, m] }])) { cum.push(m); continue; }
+      if (cum.length) dang.push({ loai: "van", mau: cum });
+      if (dang.length) { trang.push(dang); dang = []; }
+      cum = [m];
+      if (tran([{ loai: "van", mau: cum }])) {
+        trang.push([{ loai: "van", mau: cum }]);
+        cum = [];
+      }
+    }
+    if (cum.length) dang.push({ loai: "van", mau: cum });
   }
   if (dang.length) trang.push(dang);
 
   dongToDo();
   return trang.length ? trang : [[]];
-}
-
-/**
- * Dựng HTML các đoạn văn, mỗi mẩu ghi bọc trong một thẻ mang id riêng.
- * @param {Array<Array<{id:number, chu:string}>>} doan
- * @returns {string}
- */
-function veCacDoan(doan) {
-  return doan.map((cum) =>
-    `<p>` + cum.map((m) =>
-      `<span class="mau-chu" data-id="${m.id}">${thoat(m.chu)}</span>`
-    ).join(" ") + `</p>`
-  ).join("");
 }
 
 /** Tờ giấy ẩn dùng để đo, dựng một lần rồi dùng lại cho cả cuốn sổ. */
@@ -4119,66 +4149,17 @@ function veSach() {
 
 /**
  * Dựng danh sách trang cho cả cuốn sổ.
- *
- * Gọi khi khung giấy đã hiện và đo được thật. Một ngày có thể chiếm
- * nhiều trang; ảnh của ngày dồn xuống trang cuối của ngày ấy, và nếu
- * trang cuối không còn chỗ thì ảnh được cho hẳn một trang riêng.
+ * Gọi khi khung giấy đã hiện và đo được thật.
  */
 function dungCacTrang() {
   const nhom = nhomTheoNgay();
   cacTrang = [];
-
   for (const ma of [...nhom.keys()].sort()) {
-    const ds = nhom.get(ma);
-    const cac = catTrang(nguyenLoiCoDau(ds));
-    const anh = ds.filter((g) => urlCuaAnh(g));
-
-    cac.forEach((doan, i) => {
-      cacTrang.push({ ma, doan, phan: i + 1, tong: cac.length, anh: [] });
+    const cac = catTrang(dungKhoi(nhom.get(ma)));
+    cac.forEach((khoi, i) => {
+      cacTrang.push({ ma, khoi, phan: i + 1, tong: cac.length });
     });
-
-    if (anh.length) {
-      // Thử dán ảnh vào trang cuối của ngày. Không vừa thì cho ảnh
-      // một trang riêng — thà thêm trang còn hơn cắt cụt tấm ảnh.
-      const cuoi = cacTrang[cacTrang.length - 1];
-      if (cuoi && cuoi.ma === ma && vuaTrang(cuoi.doan, anh)) {
-        cuoi.anh = anh;
-      } else {
-        cacTrang.push({ ma, doan: [], phan: cac.length + 1, tong: cac.length + 1, anh });
-      }
-    }
-
-    // Đánh lại tổng số trang của ngày cho đúng.
-    const cuaNgay = cacTrang.filter((t) => t.ma === ma);
-    cuaNgay.forEach((t, i) => { t.phan = i + 1; t.tong = cuaNgay.length; });
   }
-}
-
-/**
- * Thử xem chữ và ảnh có cùng lọt một trang không.
- * @param {Array} doan Các đoạn chữ.
- * @param {Array} anh Các mẩu có ảnh.
- * @returns {boolean}
- */
-function vuaTrang(doan, anh) {
-  const o = moToDo();
-  if (!o) return false;
-  o.innerHTML = veCacDoan(doan) + veKhoiAnh(anh);
-  const tran = o.scrollHeight > o.clientHeight + 1;
-  dongToDo();
-  return !tran;
-}
-
-/**
- * Dựng khối ảnh dán ở cuối trang.
- * @param {Array} anh Các mẩu ghi có ảnh.
- * @returns {string}
- */
-function veKhoiAnh(anh) {
-  if (!anh.length) return "";
-  return `<div class="anh-dan">` + anh.map((g) =>
-    `<img src="${urlCuaAnh(g)}" data-anh="${g.id}" alt="" loading="lazy">`
-  ).join("") + `</div>`;
 }
 
 /**
@@ -4224,9 +4205,7 @@ function dungToGiay(i, lop) {
   // các trang sau ghi "tiếp theo" cho khỏi tưởng sang ngày khác.
   const dau = tr.phan === 1;
 
-  let noi = tr.doan.length ? veCacDoan(tr.doan) : "";
-
-  noi += veKhoiAnh(tr.anh);
+  let noi = (tr.khoi && tr.khoi.length) ? veCacKhoi(tr.khoi) : "";
   if (!noi) noi = `<p class="trong-trang">Ngày này chỉ có im lặng.</p>`;
 
   return `<article class="to-giay ${lop}" data-trang="${i}">
@@ -4244,7 +4223,7 @@ function dungToGiay(i, lop) {
         <path d="M3.4 16.7l4.4-4.2a2 2 0 0 1 2.7-.05l3.4 3.05a2 2 0 0 0 2.6.03l1.9-1.6a2 2 0 0 1 2.6.02l1.6 1.4"/>
       </svg>
     </button>
-    ${tr.doan.length ? `<button class="nut-sua-trang nut-sua-chu" data-sua-trang aria-label="Sửa chữ trên trang này" title="Sửa chữ">
+    ${(tr.khoi && tr.khoi.length) ? `<button class="nut-sua-trang nut-sua-chu" data-sua-trang aria-label="Sửa chữ trên trang này" title="Sửa chữ">
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M16.4 3.9a2.1 2.1 0 0 1 3 3L8.6 17.7l-4 1 1-4z"/>
         <path d="M14.6 5.7l3.7 3.7"/>
@@ -4307,7 +4286,9 @@ async function dongSuaTrang(luu) {
   // nghĩa là anh đã xoá nó đi.
   const tr = cacTrang[trangDangMo];
   const cuaTrang = new Set();
-  for (const cum of (tr ? tr.doan : [])) for (const m of cum) cuaTrang.add(m.id);
+  for (const k of (tr && tr.khoi ? tr.khoi : [])) {
+    if (k.loai !== "anh") for (const m of k.mau) cuaTrang.add(m.id);
+  }
 
   const moi = new Map();
   o.querySelectorAll(".mau-chu").forEach((e) => {
@@ -4324,7 +4305,10 @@ async function dongSuaTrang(luu) {
   o.querySelectorAll("img[data-anh]").forEach((e) => anhConLai.add(Number(e.dataset.anh)));
 
   // Ảnh của trang này, theo dữ liệu trước khi sửa.
-  const anhCuaTrang = new Set((tr ? tr.anh : []).map((g) => g.id));
+  const anhCuaTrang = new Set();
+  for (const k of (tr && tr.khoi ? tr.khoi : [])) {
+    if (k.loai === "anh") anhCuaTrang.add(k.mau[0].id);
+  }
 
   let doi = 0;
   for (const id of cuaTrang) {
@@ -4378,8 +4362,9 @@ async function dongSuaTrang(luu) {
 /**
  * Đưa một tấm ảnh vào ngày đang mở trong sổ.
  *
- * Ảnh thành một mẩu ghi riêng, đặt mốc giờ ngay sau mẩu cuối cùng của
- * ngày ấy — để nó nằm đúng cuối trang chứ không chen vào giữa bài.
+ * Đang sửa mà con trỏ đứng giữa bài thì ảnh chèn ngay chỗ ấy; còn không
+ * thì ảnh xuống cuối ngày. Mốc giờ quyết định vị trí, nên chỉ cần đặt
+ * giờ ảnh ngay sau mẩu đứng trước là nó nằm đúng chỗ.
  *
  * @param {File} tep Ảnh anh vừa chọn.
  */
@@ -4388,31 +4373,79 @@ async function themAnhVaoSo(tep) {
   if (!tr || !tep) return;
 
   const ds = soGhi.filter((g) => g.ngay === tr.ma);
-  let luc;
-  if (ds.length) {
-    // Ngay sau mẩu cuối, cách một phút cho khỏi trùng mốc.
-    luc = new Date(new Date(ds[ds.length - 1].luc).getTime() + 60000);
-    // Sang ngày khác thì kéo về cuối ngày cũ.
-    if (maNgay(luc) !== tr.ma) {
-      const [n, t, g] = tr.ma.split("-").map(Number);
-      luc = new Date(n, t - 1, g, 23, 59);
-    }
-  } else {
-    const [n, t, g] = tr.ma.split("-").map(Number);
-    luc = new Date(n, t - 1, g, 12, 0);
+  const sauMau = dangSuaTrang ? mauTaiConTro() : null;
+
+  let luc = null;
+  if (sauMau) {
+    const g = soGhi.find((x) => x.id === sauMau);
+    if (g) luc = new Date(new Date(g.luc).getTime() + 1000);
   }
+  if (!luc) {
+    if (ds.length) {
+      luc = new Date(new Date(ds[ds.length - 1].luc).getTime() + 60000);
+      if (maNgay(luc) !== tr.ma) {
+        const [n, t, g] = tr.ma.split("-").map(Number);
+        luc = new Date(n, t - 1, g, 23, 59);
+      }
+    } else {
+      const [n, t, g] = tr.ma.split("-").map(Number);
+      luc = new Date(n, t - 1, g, 12, 0);
+    }
+  }
+
+  if (dangSuaTrang) await dongSuaTrang(true);
 
   let id = luc.getTime();
   while (soGhi.some((x) => x.id === id)) id++;
 
-  const m = { id, ngay: tr.ma, luc: luc.toISOString(), chu: "", anh: tep };
+  const m = { id, ngay: tr.ma, luc: luc.toISOString(), chu: "", anh: tep, coAnh: 2 };
   await luuMau(m);
   soGhi.push(m);
   soGhi.sort((a, b) => a.id - b.id);
 
   veLaiTrangSach();
   if (navigator.vibrate) { try { navigator.vibrate(12); } catch (e) {} }
-  baoNgan("Đã dán ảnh vào trang này", "", null, 2500);
+  baoNgan(sauMau ? "Đã chèn ảnh vào đúng chỗ" : "Đã dán ảnh vào cuối ngày", "", null, 2500);
+}
+
+/**
+ * Tìm mẩu ghi mà con trỏ đang đứng trong, hoặc mẩu cuối cùng đứng trước nó.
+ * @returns {number|null} Mã mẩu, hoặc null nếu không xác định được.
+ */
+function mauTaiConTro() {
+  const chon = window.getSelection();
+  if (!chon || !chon.rangeCount) return null;
+
+  let n = chon.getRangeAt(0).startContainer;
+  if (n.nodeType === 3) n = n.parentNode;
+  if (!n || !n.closest) return null;
+
+  const trong = n.closest(".mau-chu");
+  if (trong) return Number(trong.dataset.id);
+
+  // Con trỏ nằm giữa hai đoạn: lấy mẩu cuối cùng đứng phía trước.
+  const o = $("giay").querySelector(".to-giay.tren .trang-noi");
+  if (!o) return null;
+  let cuoi = null;
+  for (const e of o.querySelectorAll(".mau-chu")) {
+    if (e.compareDocumentPosition(n) & Node.DOCUMENT_POSITION_FOLLOWING) cuoi = e;
+  }
+  return cuoi ? Number(cuoi.dataset.id) : null;
+}
+
+/**
+ * Đổi cỡ một tấm ảnh trên trang sổ, xoay vòng ba cỡ.
+ * @param {number} id Mã mẩu ghi mang ảnh.
+ */
+async function doiCoAnh(id) {
+  const g = soGhi.find((x) => x.id === id);
+  if (!g) return;
+  g.coAnh = ((g.coAnh || 2) % 3) + 1;
+  await luuMau(g);
+
+  // Đổi ngay trên giấy, khỏi dựng lại cả trang cho anh khỏi mất chỗ đang sửa.
+  const anh = $("giay").querySelector(`img[data-anh="${id}"]`);
+  if (anh && anh.parentElement) anh.parentElement.dataset.co = g.coAnh;
 }
 
 /** Dựng lại cuốn sổ nhưng giữ người đọc ở đúng trang đang mở. */
@@ -5375,6 +5408,10 @@ function ganSuKien() {
   $("sua-xong").addEventListener("click", () => dongSuaTrang(true));
   $("sua-thoi").addEventListener("click", () => dongSuaTrang(false));
   $("giay").addEventListener("click", (e) => {
+    // Đang sửa mà chạm vào ảnh: đổi cỡ, xoay vòng nhỏ - vừa - rộng.
+    const anh = e.target.closest("img[data-anh]");
+    if (anh && dangSuaTrang) { doiCoAnh(Number(anh.dataset.anh)); return; }
+
     if (e.target.closest("[data-sua-trang]")) {
       dangSuaTrang ? dongSuaTrang(true) : moSuaTrang();
       return;
