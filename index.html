@@ -2762,10 +2762,10 @@ function maNgay(d) {
 /** Đổi mốc Date thành chuỗi HH:mm 24 giờ. */
 function maGio(d) {
   return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+}
 /** Đổi mốc Date thành chuỗi giờ ngắn kiểu 08h00, để ghi đầu mỗi dòng sổ. */
 function gioNgan(d) {
   return `${String(d.getHours()).padStart(2, "0")}h${String(d.getMinutes()).padStart(2, "0")}`;
-}
 }
 /** Tách mã ngày thành các mảnh để hiển thị. */
 function doiNgay(ma) {
@@ -4385,6 +4385,24 @@ function moToDo() {
 /** Cất tờ giấy đo đi sau khi dùng xong. */
 function dongToDo() {
   if (toDo && toDo.parentNode) toDo.parentNode.removeChild(toDo);
+}
+
+/**
+ * Vào thẻ "Nhật ký nhỏ": đọc lại kho rồi mới dựng bìa.
+ *
+ * Phải đọc lại thật, vì mẩu vừa ghi ở thẻ Viết có thể chưa kịp vào `soGhi`
+ * của màn này — anh từng gặp cảnh bấm sang sổ thì thiếu đoạn mới, một lúc
+ * sau mới thấy. Kho hỏng hay bị chặn thì cứ dùng bản đang có, thà sổ cũ
+ * một nhịp còn hơn không mở được.
+ *
+ * @returns {Promise<void>}
+ */
+async function moSoTay() {
+  try {
+    const tuKho = await docHet();
+    if (tuKho.length) soGhi = tuKho;
+  } catch (e) { /* không đọc được thì dùng bản trong bộ nhớ */ }
+  veSach();
 }
 
 /**
