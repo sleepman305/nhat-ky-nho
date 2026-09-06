@@ -1390,7 +1390,21 @@ button.lich-o:active { transform: scale(.88); }
   flex: 1 1 auto; min-height: 0; overflow: hidden;
   font-family: var(--de); font-size: .97rem;
   line-height: 1.62rem;   /* khớp đúng khoảng dòng kẻ của tờ giấy */
-  text-align: justify; hyphens: auto;
+
+  /* KHÔNG căn đều hai bên.
+
+     Cột chữ trên điện thoại chỉ rộng chừng 34 ký tự. Căn đều hai bên trên
+     một cột hẹp thế thì trình duyệt phải kéo giãn khe chữ để dồn cho kín
+     mép phải — đo thật trên máy: khe rộng nhất gấp 2,68 lần khe hẹp nhất
+     (3,11 lên 8,34 điểm ảnh). Đó chính là cái "chỗ thừa chỗ khít".
+
+     Nhà in giải quyết bằng cách gạch nối cuối dòng, nhưng tiếng Việt
+     không có bộ luật gạch nối trong trình duyệt nên đường ấy cụt.
+
+     Bỏ căn đều thì mọi khe chữ đều tăm tắp (lệch 0,01 điểm ảnh) mà VẪN
+     đúng bấy nhiêu dòng — đo rồi, không mất một dòng nào. `text-wrap:
+     pretty` lo cho mép phải khỏi so le quá đáng. */
+  text-align: left;
 }
 .trang-noi p {
   /* KHÔNG hở giữa các dòng ghi. Giấy có dòng kẻ cách nhau 1.62rem, hở
@@ -5021,10 +5035,10 @@ function veLaiTrangSach() {
 function capNhatDieuSach() {
   $("lat-lui").disabled = trangDangMo <= 0;
   $("lat-toi").disabled = trangDangMo >= cacTrang.length - 1;
-  const tr = cacTrang[trangDangMo];
-  // Ngay dai chiem nhieu trang thi ghi them "2/3" cho biet dang o khuc nao.
-  const phan = tr && tr.tong > 1 ? ` · ${tr.phan}/${tr.tong}` : "";
-  $("so-trang").textContent = `${trangDangMo + 1} / ${cacTrang.length}${phan}`;
+  // Chỉ một con số duy nhất: trang thứ mấy trên tổng số trang của cả sổ.
+  // Trước còn ghi thêm "2/3" cho biết đang ở khúc nào của ngày dài, nhưng
+  // hai cặp số đứng cạnh nhau chỉ tổ rối mắt.
+  $("so-trang").textContent = `${trangDangMo + 1} / ${cacTrang.length}`;
 }
 
 /**
