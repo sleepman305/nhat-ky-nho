@@ -954,6 +954,7 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
   font-family: var(--de); font-size: 1rem; line-height: 1.7;
   margin: 0; overflow-wrap: anywhere;
   text-align: justify; hyphens: auto;
+  white-space: pre-wrap;
 }
 .mau img {
   display: block; width: 100%; max-width: 15rem;
@@ -1386,7 +1387,13 @@ button.lich-o:active { transform: scale(.88); }
   line-height: 1.62rem;   /* khớp đúng khoảng dòng kẻ của tờ giấy */
   text-align: justify; hyphens: auto;
 }
-.trang-noi p { margin: 0 0 1.62rem; text-wrap: pretty; }
+.trang-noi p {
+  margin: 0 0 1.62rem;
+  text-wrap: pretty;
+  /* Giữ chỗ xuống dòng anh tự gõ. Thiếu dòng này thì HTML gộp hết
+     lại thành một dòng liền, và chỗ ngắt anh vừa đặt biến mất. */
+  white-space: pre-wrap;
+}
 .trang-noi p:last-of-type { margin-bottom: 0; }
 /* Thụt đầu dòng từ đoạn thứ hai, như sách in */
 .trang-noi p + p { text-indent: 1.4em; }
@@ -4291,12 +4298,35 @@ async function dongSuaTrang(luu) {
   }
 
   const moi = new Map();
+  let mauCuoi = null;
+
   o.querySelectorAll(".mau-chu").forEach((e) => {
     const id = Number(e.dataset.id);
     if (!id) return;
-    const chu = (e.textContent || "").trim();
+    // innerText chứ không phải textContent: khi anh nhấn Enter, trình
+    // duyệt chèn thẻ <br>, mà textContent coi thẻ ấy là rỗng nên nuốt
+    // mất chỗ xuống dòng. innerText đọc đúng như mắt nhìn thấy.
+    const chu = (e.innerText || e.textContent || "").replace(/ /g, " ").trim();
     moi.set(id, moi.has(id) ? (moi.get(id) + " " + chu).trim() : chu);
+    mauCuoi = id;
   });
+
+  /* Chữ gõ thêm có thể rơi ra ngoài mọi thẻ mang mã — hay gặp khi nhấn
+     Enter ở cuối đoạn, trình duyệt tạo dòng mới nằm ngoài. Nhặt hết chỗ
+     chữ lạc ấy nối vào mẩu đứng ngay trước nó, kẻo lưu xong là mất. */
+  const soat = document.createTreeWalker(o, NodeFilter.SHOW_TEXT);
+  let mocHienTai = null;
+  for (let n = soat.nextNode(); n; n = soat.nextNode()) {
+    const trong = n.parentElement && n.parentElement.closest(".mau-chu");
+    if (trong) { mocHienTai = Number(trong.dataset.id); continue; }
+
+    const lac = (n.nodeValue || "").replace(/ /g, " ").trim();
+    if (!lac) continue;
+
+    const dich = mocHienTai || mauCuoi;
+    if (!dich) continue;
+    moi.set(dich, ((moi.get(dich) || "") + " " + lac).trim());
+  }
 
   // Ảnh nào còn trên giấy sau khi anh sửa. Ảnh vắng mặt nghĩa là anh
   // đã xoá nó đi — trước đây em không ngó tới đây nên vẽ lại từ dữ liệu
