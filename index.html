@@ -1293,7 +1293,7 @@ button.lich-o:active { transform: scale(.88); }
       var(--mat) 8%, var(--mat) 100%);
   border: 1px solid var(--vien-mo);
   box-shadow: var(--bong-2);
-  padding: 1.6rem 1.4rem 1.3rem 1.7rem;
+  padding: 1.6rem 1.4rem 1rem 1.7rem;
   overflow: hidden;
   transform-origin: left center;
   backface-visibility: hidden;
@@ -1373,6 +1373,9 @@ button.lich-o:active { transform: scale(.88); }
   font-family: var(--may); font-size: .62rem; letter-spacing: .18em;
   text-transform: uppercase; color: var(--nhan);
   margin: 0 0 .2rem;
+  /* Chừa chỗ cho hai nút tròn nép góc phải, kẻo dòng "TIẾP THEO"
+     chui xuống dưới chúng. */
+  padding-right: 4.6rem;
 }
 .trang-tieu {
   font-family: var(--de); font-weight: 700;
@@ -1408,29 +1411,32 @@ button.lich-o:active { transform: scale(.88); }
 .trang-noi .trong-trang { text-indent: 0; }
 /* ẢNH TRONG BÀI
 
-   Chỗ này từng làm mất ảnh, và nguyên do không nằm ở CSS trình bày mà ở
-   PHÉP ĐO. App cắt trang bằng cách rót nội dung vào một tờ giấy ẩn rồi
-   xem có tràn không. Lúc đo, tấm ảnh chưa tải xong nên trình duyệt tính
-   nó cao 0 — trang nào cũng "vừa". Đến khi vẽ ra thật, ảnh nở ra chiều
-   cao thật thì đã quá muộn, `overflow: hidden` của vùng chữ xén phăng
-   đi. Nhìn từ phía anh: chữ còn, ảnh biến mất.
+   Hai bài học đã trả giá ở đây.
 
-   Cách chữa: KHÔNG để chiều cao ảnh phụ thuộc vào việc ảnh đã tải hay
-   chưa. App đo tỷ lệ ngang/dọc của từng tấm một lần lúc mở sổ, rồi ghi
-   vào biến `--ngang`; cùng với `aspect-ratio`, trình duyệt biết ngay
-   ảnh chiếm bao nhiêu dòng ngay cả khi chưa thấy một điểm ảnh nào.
+   MỘT — ảnh mất hình là lỗi PHÉP ĐO, không phải lỗi trình bày. App cắt
+   trang bằng cách rót nội dung vào một tờ giấy ẩn rồi xem có tràn không.
+   Lúc đo, tấm ảnh chưa tải xong nên trình duyệt tính nó cao 0, trang nào
+   cũng "vừa"; đến khi vẽ ra thật thì ảnh nở đúng chiều cao và bị
+   `overflow: hidden` xén phăng. Chữa bằng cách đo tỷ lệ ngang/dọc từng
+   tấm một lần lúc mở sổ rồi đặt vào `--ngang`: cùng với `aspect-ratio`,
+   chiều cao biết trước cả khi chưa tải một điểm ảnh nào.
 
-     --ngang   tỷ lệ ngang chia dọc (1.33 là ảnh ngang thường)
-     --rong    bề ngang anh chọn, tính theo phần trăm bề ngang trang
-     --cao-max trần chiều cao, để ảnh dọc không nuốt trọn một trang
+   HAI — nút phóng to thu nhỏ "không ăn thua". Bản trước lấy
+   `min(--rong, --cao-max * --ngang)`. Với ảnh dọc (tỷ lệ 0.75) thì vế
+   sau chỉ có 9rem, mà 45% bề ngang trang đã hơn thế rồi — nên từ 45%
+   đến 100% ảnh y hệt nhau, bấm cộng trừ chẳng thấy gì nhúc nhích.
+   Nay trần chiều cao chỉ định nghĩa CỠ GỐC (cỡ lớn nhất vừa trang), còn
+   hệ số `--phong` nhân vào cỡ gốc ấy. Mọi nấc đều đổi thật.
 
-   Bề ngang lấy `min` của hai thứ ấy nên ảnh dọc tự thu hẹp lại cho vừa
-   trần chiều cao, thay vì bị đóng khung rồi hụt mất. Ảnh không bao giờ
-   bị cắt: không dùng `object-fit: cover` nữa. */
+     --ngang    tỷ lệ ngang chia dọc (1.33 là ảnh ngang thường)
+     --phong    hệ số phóng, 0.2 đến 1
+     --cao-nen  chiều cao ảnh khi để hết cỡ
+
+   Ảnh không bao giờ bị cắt: không dùng `object-fit: cover` nữa. */
 .trang-noi .anh-trong-bai {
   --ngang: 1.33;
-  --rong: 78%;
-  --cao-max: 12rem;
+  --phong: .78;
+  --cao-nen: 13rem;
   margin: .9rem 0;
   display: flex; justify-content: center;
   position: relative;
@@ -1438,7 +1444,8 @@ button.lich-o:active { transform: scale(.88); }
 }
 .trang-noi .anh-trong-bai img {
   display: block;
-  width: min(var(--rong), calc(var(--cao-max) * var(--ngang)));
+  /* Cỡ gốc = tấm ảnh lớn nhất còn vừa trang, rồi nhân hệ số phóng. */
+  width: calc(var(--phong) * min(100%, calc(var(--cao-nen) * var(--ngang))));
   aspect-ratio: var(--ngang);
   height: auto;
   object-fit: contain;
@@ -1446,6 +1453,7 @@ button.lich-o:active { transform: scale(.88); }
   border: 4px solid var(--mat);
   box-shadow: 0 1px 4px rgba(0,0,0,.24);
   transform: rotate(-.8deg);
+  transition: width .18s var(--muot);
 }
 /* Ảnh rộng gần hết trang thì để thẳng, nghiêng đi trông cẩu thả. */
 .trang-noi .anh-trong-bai[data-thang] img { transform: rotate(0); }
@@ -1475,7 +1483,9 @@ button.lich-o:active { transform: scale(.88); }
 
 /* Nút sửa nép ở góc tờ giấy, mờ đi cho khỏi chiếm mắt lúc đang đọc */
 .nut-sua-trang {
-  position: absolute; top: .7rem; left: .7rem;
+  /* Cả hai nút đều nép góc phải. Trước kia nút ảnh đứng góc trái, đè
+     lên dòng "tiếp theo" của những trang nối tiếp một ngày dài. */
+  position: absolute; top: .7rem; right: 3.3rem;
   width: 1.9rem; height: 1.9rem; border-radius: 50%;
   display: grid; place-items: center;
   background: var(--mat-2);
@@ -1487,7 +1497,7 @@ button.lich-o:active { transform: scale(.88); }
   fill: none; stroke: var(--chu-nhat);
   stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
 }
-.nut-sua-trang.nut-sua-chu { left: auto; right: .7rem; }
+.nut-sua-trang.nut-sua-chu { right: .7rem; }
 .nut-sua-trang:hover { opacity: 1; background: var(--nhan-nen); }
 .nut-sua-trang:active { transform: scale(.88); }
 
@@ -4157,7 +4167,7 @@ function veCacKhoi(khoi) {
       // chữ nhặt luôn vào bài. Nút chỉnh ảnh nay nằm ở thanh dưới sổ.
       // loading="lazy" từng làm ảnh không tải trong tờ giấy đo, nên bỏ.
       return `<div class="anh-trong-bai"${pc >= 92 ? " data-thang" : ""}
-        style="--rong:${pc}%;--ngang:${ng.toFixed(3)}">
+        style="--phong:${(pc / 100).toFixed(3)};--ngang:${ng.toFixed(3)}">
         <img src="${urlCuaAnh(g)}" data-anh="${g.id}" alt="">
       </div>`;
     }
@@ -4451,6 +4461,59 @@ function dungToGiay(i, lop) {
 /** Đang mở chế độ sửa trên trang sổ hay không. */
 let dangSuaTrang = false;
 
+/**
+ * Chèn một dấu xuống dòng ngay tại con trỏ, trong vùng chữ đang sửa.
+ *
+ * Ép dấu ngắt nằm BÊN TRONG thẻ mang mã của mẩu ghi, nên cấu trúc sau khi
+ * nhấn Enter luôn là một thứ duy nhất, biết trước, đọc lại được. Nếu để
+ * trình duyệt tự làm thì mỗi máy một kiểu — chỗ chèn `<br>`, chỗ xẻ đoạn
+ * ra làm hai, chỗ bọc dòng mới vào `<div>` nằm ngoài thẻ — và đó là lý do
+ * dấu xuống dòng từng ba lần biến mất sau khi lưu.
+ *
+ * @param {HTMLElement} o Vùng chữ của trang (`.trang-noi`).
+ */
+function chenXuongDong(o) {
+  const chon = window.getSelection();
+  if (!chon || !chon.rangeCount) return;
+  const vung = chon.getRangeAt(0);
+  vung.deleteContents();
+
+  // Con trỏ đang ở ngoài mọi thẻ mang mã (hay gặp khi gõ ở mép đoạn):
+  // kéo nó vào thẻ gần nhất, kẻo dấu ngắt rơi ra ngoài rồi thất lạc.
+  let noi = vung.startContainer;
+  if (noi.nodeType === 1) {
+    const con = noi.childNodes[vung.startOffset] || noi.lastChild;
+    if (con) noi = con;
+  }
+  const trong = noi.nodeType === 1 ? noi : noi.parentElement;
+  if (trong && !trong.closest(".mau-chu")) {
+    const cac = o.querySelectorAll(".mau-chu");
+    const gan = cac.length ? cac[cac.length - 1] : null;
+    if (gan) { vung.selectNodeContents(gan); vung.collapse(false); }
+  }
+
+  const nut = document.createTextNode("\n");
+  vung.insertNode(nut);
+
+  // Đặt con trỏ ngay sau chỗ ngắt. Sau đó không còn gì thì thêm một ký tự
+  // vô hình làm chỗ đậu, để dòng mới hiện ra ngay chứ không phải chờ anh
+  // gõ chữ đầu tiên. Ký tự này bị lượt gom chữ bỏ đi lúc lưu.
+  let sau = nut.nextSibling, tuThem = false;
+  if (!sau || sau.nodeType !== 3) {
+    sau = document.createTextNode("\u200B");
+    nut.parentNode.insertBefore(sau, nut.nextSibling);
+    tuThem = true;
+  }
+  // Chỗ đậu do mình tự thêm thì con trỏ đứng SAU ký tự vô hình; còn chữ
+  // sẵn có thì đứng ngay TRƯỚC chữ đầu tiên. Lẫn hai chỗ ấy là nhấn
+  // Enter lần thứ hai lại ngắt vào giữa chữ.
+  const moi = document.createRange();
+  moi.setStart(sau, tuThem ? 1 : 0);
+  moi.collapse(true);
+  chon.removeAllRanges();
+  chon.addRange(moi);
+}
+
 /** Bật chế độ sửa cho tờ giấy đang mở. */
 function moSuaTrang() {
   const to = $("giay").querySelector(".to-giay.tren");
@@ -4466,46 +4529,116 @@ function moSuaTrang() {
   o.setAttribute("contenteditable", "plaintext-only");
   if (o.contentEditable !== "plaintext-only") o.setAttribute("contenteditable", "true");
 
-  /* Tự tay chèn dấu xuống dòng thay vì để trình duyệt làm.
+  /* Tự tay chèn dấu xuống dòng, KHÔNG nhờ trình duyệt.
 
-     Đây là chỗ đã sửa hụt hai lần. Mỗi trình duyệt hiểu phím Enter một
-     kiểu: chỗ thì chèn thẻ <br>, chỗ thì xẻ đoạn ra làm hai <p>, chỗ thì
-     bọc dòng mới vào một <div> nằm NGOÀI thẻ mang mã của mẩu ghi. Cả ba
-     kiểu ấy đều làm lượt gom chữ lúc lưu nhìn không ra, nên bấm Xong là
-     dấu xuống dòng bốc hơi.
+     Đây là chỗ đã sửa hụt ba lần. Mỗi lần trước em đều đi đoán xem trình
+     duyệt làm gì khi nhấn Enter — chèn thẻ <br>? xẻ đoạn ra làm hai <p>?
+     bọc dòng mới vào một <div> nằm ngoài thẻ mang mã? — rồi cố đọc lại
+     cho đúng cả ba kiểu. Sai đường: `execCommand` cũng để WebKit tự quyết,
+     nên vẫn còn cửa cho nó dựng ra thứ mình không lường.
 
-     Chặn Enter rồi tự chèn ký tự "\n" ngay tại con trỏ thì dấu xuống dòng
-     luôn nằm GỌN TRONG thẻ mang mã — lúc lưu chỉ việc đọc ra, không còn
-     phải đoán ý trình duyệt. `insertText` tuy đã cũ nhưng chạy đúng trên
-     mọi máy, kể cả Safari trên iPhone.
+     Nay không nhờ ai cả. Chặn phím, tự đặt ký tự xuống dòng ngay tại con
+     trỏ, và ép nó nằm BÊN TRONG thẻ mang mã của mẩu ghi. Cấu trúc sau khi
+     nhấn Enter vì thế luôn là một thứ duy nhất, biết trước, đo được — lúc
+     lưu chỉ việc đọc ra.
 
-     Vùng chữ đã có `white-space: pre-wrap` nên ký tự ấy hiện ra thành
-     dòng mới thật, chứ không bị gộp lại. */
+     Vùng chữ đã có `white-space: pre-wrap` nên ký tự ấy hiện thành dòng
+     mới thật. Ký tự vô hình cuối cùng là để Safari chịu vẽ dòng trống ở
+     cuối đoạn: thiếu nó, xuống dòng ở cuối bài trông như không có gì. */
+  // Bắt cả hai lối. Bàn phím thường phát `keydown`, nhưng đọc chính tả,
+  // gợi ý từ và vài kiểu bàn phím trên iPhone chỉ phát `beforeinput` —
+  // bỏ sót lối ấy là Enter lại rơi vào tay trình duyệt như cũ.
   o.addEventListener("keydown", (e) => {
     if (e.key !== "Enter" || e.isComposing) return;
     e.preventDefault();
-    let xong = false;
-    try { xong = document.execCommand("insertText", false, "\n"); } catch (loi) { xong = false; }
-    if (xong) return;
-
-    // Máy nào không nhận execCommand thì chèn tay bằng Range.
-    const chon = window.getSelection();
-    if (!chon || !chon.rangeCount) return;
-    const vung = chon.getRangeAt(0);
-    vung.deleteContents();
-    const nut = document.createTextNode("\n");
-    vung.insertNode(nut);
-    vung.setStartAfter(nut);
-    vung.collapse(true);
-    chon.removeAllRanges();
-    chon.addRange(vung);
+    chenXuongDong(o);
+  });
+  o.addEventListener("beforeinput", (e) => {
+    if (e.inputType !== "insertParagraph" && e.inputType !== "insertLineBreak") return;
+    e.preventDefault();
+    chenXuongDong(o);
   });
 
   o.focus();
   $("dieu-sach").hidden = true;
   $("thanh-sua").hidden = false;
   boChonAnh();
+
+  // Trang có ảnh thì nhắc một câu: không ai đoán ra là chạm được vào ảnh.
+  if (o.querySelector("img[data-anh]")) {
+    baoNgan("Chạm vào ảnh để đổi cỡ hoặc xoá", "", null, 2600);
+  }
 }
+
+/**
+ * Gom chữ trên một trang sổ đang sửa, trả về chữ mới của từng mẩu ghi.
+ *
+ * Đi MỘT lượt qua cả trang theo đúng thứ tự mắt đọc, nhặt cả chữ lẫn chỗ
+ * ngắt dòng. Phải ngó cả thẻ chứ không riêng nút chữ, vì nhấn Enter có
+ * khi không sinh ra chữ nào: trình duyệt chèn thẻ `<br>`, hoặc xẻ đoạn ra
+ * làm hai `<p>`, hoặc bọc dòng mới vào một `<div>` nằm ngoài thẻ mang mã.
+ * Lượt soát chỉ nhận `SHOW_TEXT` đi qua cả ba kiểu ấy mà không thấy gì —
+ * đó là chỗ dấu xuống dòng từng bốc hơi.
+ *
+ * @param {HTMLElement} o Vùng chữ của trang (`.trang-noi`).
+ * @returns {Map<number, string>} Mã mẩu ghi → chữ mới, xuống dòng còn nguyên.
+ */
+function gomChuTrang(o) {
+  const moi = new Map();
+  let dangGom = null, khoiTruoc = null;
+
+  /** Khối (đoạn văn) chứa một nút, dùng để biết chữ có sang dòng mới không. */
+  const khoiCua = (n) => {
+    const e = n.nodeType === 1 ? n : n.parentElement;
+    return e ? e.closest("p, div, li, .trang-noi") : null;
+  };
+  const themVao = (id, s) => { if (id) moi.set(id, (moi.get(id) || "") + s); };
+
+  // Chữ gõ thêm ở ngay đầu trang thì chưa có mẩu nào đứng trước để bám
+  // vào — cho nó bám vào mẩu đầu tiên của trang.
+  const theDau = o.querySelector(".mau-chu");
+  const maDau = theDau ? Number(theDau.dataset.id) : 0;
+
+  const soat = document.createTreeWalker(o, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT);
+  for (let n = soat.nextNode(); n; n = soat.nextNode()) {
+    if (n.nodeType === 1) {
+      if (n.tagName === "BR") { themVao(dangGom || maDau, "\n"); continue; }
+      if (!n.classList || !n.classList.contains("mau-chu")) continue;
+      const id = Number(n.dataset.id);
+      if (!id) continue;
+      // Cùng một mẩu mà lại thấy lần nữa ở khối khác: anh vừa nhấn Enter
+      // giữa đoạn, trình duyệt xẻ đôi thẻ ấy ra. Nối lại bằng xuống dòng.
+      if (moi.has(id) && khoiCua(n) !== khoiTruoc) themVao(id, "\n");
+      if (!moi.has(id)) moi.set(id, "");
+      dangGom = id;
+      khoiTruoc = khoiCua(n);
+      continue;
+    }
+
+    // Bỏ ký tự vô hình (chỗ đậu con trỏ sau khi xuống dòng) và đổi dấu
+    // cách cứng thành dấu cách thường, kẻo chúng lặng lẽ tích vào bài.
+    const chu = (n.nodeValue || "").replace(/\u200B/g, "").replace(/\u00A0/g, " ");
+    const trong = n.parentElement && n.parentElement.closest(".mau-chu");
+    if (trong) { themVao(Number(trong.dataset.id), chu); continue; }
+
+    // Chữ rơi ra ngoài mọi thẻ mang mã: nối vào mẩu đứng ngay trước nó,
+    // kẻo lưu xong là mất. Khác khối nghĩa là dòng mới.
+    const dich = dangGom || maDau;
+    if (!dich) continue;
+    if (!chu.trim()) {
+      // Không có chữ nào, nhưng CÓ dấu xuống dòng: đây chính là dòng
+      // trống anh vừa tạo bằng Enter. Bỏ qua nó là mất chỗ ngắt.
+      if (chu.indexOf("\n") >= 0) themVao(dich, "\n");
+      continue;
+    }
+    // Gọn dấu cách hai đầu mà GIỮ dấu xuống dòng ở giữa.
+    const sach = chu.replace(/^[^\S\n]+|[^\S\n]+$/g, "");
+    themVao(dich, (khoiCua(n) === khoiTruoc ? " " : "\n") + sach);
+    khoiTruoc = khoiCua(n);
+  }
+  return moi;
+}
+
 
 /**
  * Đóng chế độ sửa.
@@ -4535,68 +4668,7 @@ async function dongSuaTrang(luu) {
     if (k.loai !== "anh") for (const m of k.mau) cuaTrang.add(m.id);
   }
 
-  /* Gom chữ mới bằng MỘT lượt đi qua cả trang, theo đúng thứ tự mắt đọc.
-
-     Vì sao phải ngó cả thẻ chứ không riêng nút chữ: nhấn Enter trong ô
-     sửa thì trình duyệt không tạo ra chữ nào cả — nó chèn một thẻ <br>,
-     hoặc xẻ đoạn ra làm hai <p>. Cả hai đều KHÔNG phải nút chữ, nên lượt
-     soát cũ (chỉ nhận `SHOW_TEXT`) đi qua mà không thấy gì. Đó chính là
-     chỗ dấu xuống dòng bốc hơi: sửa thì thấy xuống dòng, bấm Xong là về
-     như cũ.
-
-     Nay lượt soát nhận cả thẻ: gặp <br> thì ghi một dấu xuống dòng, gặp
-     thẻ mang mã ở khối khác thì cũng vậy. */
-  const moi = new Map();
-  let dangGom = null, khoiTruoc = null;
-
-  /** Khối (đoạn văn) chứa một nút, dùng để biết chữ có sang dòng mới không. */
-  const khoiCua = (n) => {
-    const e = n.nodeType === 1 ? n : n.parentElement;
-    return e ? e.closest("p, div, li, .trang-noi") : null;
-  };
-  const themVao = (id, s) => { if (id) moi.set(id, (moi.get(id) || "") + s); };
-
-  // Chữ gõ thêm ở ngay đầu trang thì chưa có mẩu nào đứng trước để bám
-  // vào — cho nó bám vào mẩu đầu tiên của trang.
-  const theDau = o.querySelector(".mau-chu");
-  const maDau = theDau ? Number(theDau.dataset.id) : 0;
-
-  const soat = document.createTreeWalker(o, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT);
-  for (let n = soat.nextNode(); n; n = soat.nextNode()) {
-    if (n.nodeType === Node.ELEMENT_NODE) {
-      if (n.tagName === "BR") { themVao(dangGom || maDau, "\n"); continue; }
-      if (!n.classList || !n.classList.contains("mau-chu")) continue;
-      const id = Number(n.dataset.id);
-      if (!id) continue;
-      // Cùng một mẩu mà lại thấy lần nữa ở khối khác: anh vừa nhấn Enter
-      // giữa đoạn, trình duyệt xẻ đôi thẻ ấy ra. Nối lại bằng xuống dòng.
-      if (moi.has(id) && khoiCua(n) !== khoiTruoc) themVao(id, "\n");
-      if (!moi.has(id)) moi.set(id, "");
-      dangGom = id;
-      khoiTruoc = khoiCua(n);
-      continue;
-    }
-
-    const chu = (n.nodeValue || "").replace(/\u00A0/g, " ");
-    const trong = n.parentElement && n.parentElement.closest(".mau-chu");
-    if (trong) { themVao(Number(trong.dataset.id), chu); continue; }
-
-    // Chữ rơi ra ngoài mọi thẻ mang mã: nối vào mẩu đứng ngay trước nó,
-    // kẻo lưu xong là mất. Khác khối nghĩa là dòng mới.
-    const dich = dangGom || maDau;
-    if (!dich) continue;
-    if (!chu.trim()) {
-      // Không có chữ nào, nhưng CÓ dấu xuống dòng: đây chính là dòng
-      // trống anh vừa tạo bằng Enter. Bỏ qua nó là mất chỗ ngắt — lỗi
-      // "sửa thì xuống dòng được, lưu lại thì về chỗ cũ" nằm ở đây.
-      if (chu.indexOf("\n") >= 0) themVao(dich, "\n");
-      continue;
-    }
-    // Gọn dấu cách hai đầu mà GIỮ dấu xuống dòng ở giữa.
-    const sach = chu.replace(/^[^\S\n]+|[^\S\n]+$/g, "");
-    themVao(dich, (khoiCua(n) === khoiTruoc ? " " : "\n") + sach);
-    khoiTruoc = khoiCua(n);
-  }
+  const moi = gomChuTrang(o);
 
   // Ảnh nào còn trên giấy sau khi anh sửa. Ảnh vắng mặt nghĩa là anh
   // đã xoá nó đi — trước đây em không ngó tới đây nên vẽ lại từ dữ liệu
@@ -4818,7 +4890,7 @@ async function chinhCoAnh(buoc) {
   const im = $("giay").querySelector(`img[data-anh="${g.id}"]`);
   const o = im && im.parentElement;
   if (o) {
-    o.style.setProperty("--rong", moi + "%");
+    o.style.setProperty("--phong", (moi / 100).toFixed(3));
     if (moi >= 92) o.setAttribute("data-thang", "");
     else o.removeAttribute("data-thang");
   }
@@ -6242,6 +6314,55 @@ function ganSuKien() {
   });
 }
 
+/* ------------------------------------------------------------
+   DỌN RÁC MỘT LẦN
+
+   Có một bản đã lỡ đặt cụm nút chỉnh cỡ ảnh ("− 78% +") ngay trong vùng
+   sửa chữ. Vùng ấy là contenteditable, nên lúc lưu, lượt gom chữ nhặt
+   luôn nhãn của nút vào giữa bài văn — anh mở sổ ra thấy một dòng
+   "− 84% +." chẳng hiểu ở đâu ra. Bản mới đã bỏ hẳn nút khỏi trang giấy,
+   nhưng chữ đã trót nằm trong kho thì phải đi dọn.
+
+   Chỉ chạy đúng một lần, có dấu trong localStorage để lần sau khỏi quét.
+   ------------------------------------------------------------ */
+
+/** Dấu ghi trong localStorage cho biết đã dọn rồi. */
+const DAU_DON_RAC = "nkn-da-don-nhan-nut";
+
+/**
+ * Bỏ những mẩu nhãn nút lọt vào bài.
+ *
+ * Nhận cả dấu trừ thường (-), dấu trừ toán học (−) lẫn gạch ngang (–),
+ * vì nút cũ dùng ký tự `&minus;` mà bàn phím lại hay tự đổi.
+ *
+ * @param {string} s Chữ gốc.
+ * @returns {string} Chữ đã bỏ nhãn nút, khoảng trắng thừa dọn theo.
+ */
+function donRacNhanNut(s) {
+  return String(s || "")
+    .replace(/[-\u2010-\u2015\u2212]\s*\d{1,3}\s*%\s*\+\.?/g, "")
+    .replace(/[^\S\n]{2,}/g, " ")
+    .replace(/[^\S\n]+\n/g, "\n");
+}
+
+/**
+ * Quét kho một lần, gỡ nhãn nút khỏi mọi mẩu ghi.
+ * @returns {Promise<number>} Số mẩu đã sửa.
+ */
+async function donKhoMotLan() {
+  try {
+    if (localStorage.getItem(DAU_DON_RAC)) return 0;
+  } catch (e) { /* chặn localStorage thì cứ dọn, không sao */ }
+
+  let doi = 0;
+  for (const g of soGhi) {
+    const sach = donDong(donRacNhanNut(g.chu));
+    if (sach !== (g.chu || "")) { g.chu = sach; await luuMau(g); doi++; }
+  }
+  try { localStorage.setItem(DAU_DON_RAC, "1"); } catch (e) { }
+  return doi;
+}
+
 /* ============================================================
    KHỞI ĐỘNG
    ============================================================ */
@@ -6254,6 +6375,7 @@ ganSuKien();
 
 (async () => {
   soGhi = await docHet();
+  await donKhoMotLan();
   await napAnhBia();
   if (ch.kieuKhoa !== "khong" && ch.bamKhoa) hienManKhoa();
   else diToi("ghi");
