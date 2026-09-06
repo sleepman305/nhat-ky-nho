@@ -1395,47 +1395,87 @@ button.lich-o:active { transform: scale(.88); }
   /* Giữ chỗ xuống dòng anh tự gõ. Thiếu dòng này thì HTML gộp hết
      lại thành một dòng liền, và chỗ ngắt anh vừa đặt biến mất. */
   white-space: pre-wrap;
+  /* Thụt đầu dòng cho MỌI đoạn, kể cả đoạn đầu tiên. Trước dùng
+     `p + p` nên đoạn đầu không thụt còn các đoạn sau thì có — nhìn ra
+     đúng cái cảnh "chỗ thụt lề chỗ không". Đều tay thì mới ra dáng
+     trang sách. Dòng anh tự xuống bằng Enter không thụt, đúng lối
+     nhà in: chỉ đầu đoạn mới lùi vào. */
+  text-indent: 1.4em;
 }
 .trang-noi p:last-of-type { margin-bottom: 0; }
-/* Không thụt đầu dòng: nhật ký viết tự do, đoạn dài đoạn ngắn xen nhau
-   nên thụt lề chỗ có chỗ không, nhìn rối hơn là đẹp. */
+.trang-noi .trong-trang { text-indent: 0; }
+/* ẢNH TRONG BÀI
 
-/* Ảnh nằm giữa mạch bài, đúng chỗ anh chụp nó.
-   Ba cỡ để chọn: nhỏ nép bên, vừa, và rộng hết trang. */
+   Chỗ này từng làm mất ảnh, và nguyên do không nằm ở CSS trình bày mà ở
+   PHÉP ĐO. App cắt trang bằng cách rót nội dung vào một tờ giấy ẩn rồi
+   xem có tràn không. Lúc đo, tấm ảnh chưa tải xong nên trình duyệt tính
+   nó cao 0 — trang nào cũng "vừa". Đến khi vẽ ra thật, ảnh nở ra chiều
+   cao thật thì đã quá muộn, `overflow: hidden` của vùng chữ xén phăng
+   đi. Nhìn từ phía anh: chữ còn, ảnh biến mất.
+
+   Cách chữa: KHÔNG để chiều cao ảnh phụ thuộc vào việc ảnh đã tải hay
+   chưa. App đo tỷ lệ ngang/dọc của từng tấm một lần lúc mở sổ, rồi ghi
+   vào biến `--ngang`; cùng với `aspect-ratio`, trình duyệt biết ngay
+   ảnh chiếm bao nhiêu dòng ngay cả khi chưa thấy một điểm ảnh nào.
+
+     --ngang   tỷ lệ ngang chia dọc (1.33 là ảnh ngang thường)
+     --rong    bề ngang anh chọn, tính theo phần trăm bề ngang trang
+     --cao-max trần chiều cao, để ảnh dọc không nuốt trọn một trang
+
+   Bề ngang lấy `min` của hai thứ ấy nên ảnh dọc tự thu hẹp lại cho vừa
+   trần chiều cao, thay vì bị đóng khung rồi hụt mất. Ảnh không bao giờ
+   bị cắt: không dùng `object-fit: cover` nữa. */
 .trang-noi .anh-trong-bai {
+  --ngang: 1.33;
+  --rong: 78%;
+  --cao-max: 12rem;
   margin: .9rem 0;
   display: flex; justify-content: center;
   position: relative;
+  text-indent: 0;
 }
 .trang-noi .anh-trong-bai img {
   display: block;
-  /* Để ảnh tự giữ tỷ lệ của nó: chỉ chặn bề ngang và chiều cao, không
-     ép vào khuôn. Trước đây em cắt ảnh cho vừa khung nên mất đầu mất
-     đuôi — tấm ảnh kỷ niệm mà bị xén thì còn gì là kỷ niệm. */
-  width: auto; height: auto;
-  max-width: 100%;
+  width: min(var(--rong), calc(var(--cao-max) * var(--ngang)));
+  aspect-ratio: var(--ngang);
+  height: auto;
+  object-fit: contain;
   border-radius: 3px;
   border: 4px solid var(--mat);
   box-shadow: 0 1px 4px rgba(0,0,0,.24);
   transform: rotate(-.8deg);
 }
-.trang-noi .anh-trong-bai[data-co="1"] img { max-width: 52%;  max-height: 7rem; }
-.trang-noi .anh-trong-bai[data-co="2"] img { max-width: 78%;  max-height: 11rem; }
-.trang-noi .anh-trong-bai[data-co="3"] img { max-width: 100%; max-height: 15rem; transform: rotate(0); }
+/* Ảnh rộng gần hết trang thì để thẳng, nghiêng đi trông cẩu thả. */
+.trang-noi .anh-trong-bai[data-thang] img { transform: rotate(0); }
 
-/* Đang sửa: chạm vào ảnh để đổi cỡ */
+/* Đang sửa: hiện hai nút tăng giảm cỡ ngay dưới ảnh.
+   Cả cụm nút nằm ngoài dòng chảy (position: absolute) nên không hề
+   động tới phép đo cắt trang ở trên. */
+.co-anh { display: none; }
 .trang-noi[contenteditable] .anh-trong-bai img {
-  cursor: pointer;
   outline: 2px dashed color-mix(in srgb, var(--nhan) 55%, transparent);
   outline-offset: 3px;
 }
-.trang-noi[contenteditable] .anh-trong-bai::after {
-  content: "chạm để đổi cỡ";
-  position: absolute; left: 50%; bottom: -.2rem;
+.trang-noi[contenteditable] .co-anh {
+  display: flex; align-items: center; gap: .3rem;
+  position: absolute; left: 50%; bottom: -.55rem;
   transform: translateX(-50%);
-  font-family: var(--than); font-size: .56rem;
-  color: var(--nhan); background: var(--mat);
-  padding: .05rem .4rem; border-radius: 999px;
+  background: var(--mat); border: 1px solid var(--vien);
+  border-radius: 999px; padding: .1rem .25rem;
+  box-shadow: var(--bong-1);
+  z-index: 2;
+}
+.co-anh button {
+  -webkit-appearance: none; appearance: none;
+  border: 0; background: transparent; cursor: pointer;
+  color: var(--nhan); font: 600 .8rem/1 var(--than);
+  width: 1.35rem; height: 1.35rem; border-radius: 50%;
+  display: grid; place-items: center;
+}
+.co-anh button:active { background: var(--nhan-nen); }
+.co-anh .so {
+  font: 500 .56rem/1 var(--than); color: var(--chu-mo);
+  min-width: 2.1rem; text-align: center;
   pointer-events: none; white-space: nowrap;
 }
 
@@ -4023,6 +4063,59 @@ function dungKhoi(ds) {
   chotVan();
   return khoi;
 }
+/* ------------------------------------------------------------
+   TỶ LỆ ẢNH
+
+   App cần biết ảnh ngang hay dọc TRƯỚC khi cắt trang, chứ đợi ảnh tải
+   xong mới biết thì đã đo hụt mất rồi. Đo một lượt lúc mở sổ, nhớ vào
+   đây, những lần vẽ lại sau lấy ra dùng ngay.
+   ------------------------------------------------------------ */
+
+/** Mã mẩu → tỷ lệ ngang chia dọc của tấm ảnh. */
+const tyLeAnh = new Map();
+
+/**
+ * Đo tỷ lệ một tấm ảnh, nhớ lại để lần sau khỏi đo.
+ * @param {object} g Mẩu ghi có mang ảnh.
+ * @returns {Promise<void>} Ảnh hỏng thì bỏ qua, vẫn dùng tỷ lệ mặc định.
+ */
+function doTyLe(g) {
+  if (!g || !g.anh || tyLeAnh.has(g.id)) return Promise.resolve();
+  return new Promise((xong) => {
+    const a = new Image();
+    a.onload = () => {
+      if (a.naturalWidth && a.naturalHeight) {
+        tyLeAnh.set(g.id, a.naturalWidth / a.naturalHeight);
+      }
+      xong();
+    };
+    a.onerror = () => xong();
+    a.src = urlCuaAnh(g);
+  });
+}
+
+/** Đo trước tỷ lệ mọi tấm ảnh trong sổ. Gọi trước khi cắt trang. */
+function napTyLeAnh() {
+  return Promise.all(soGhi.filter((g) => g.anh).map(doTyLe));
+}
+
+/**
+ * Bề ngang ảnh anh đã chọn, tính theo phần trăm bề ngang trang.
+ *
+ * Bản cũ chỉ có ba cỡ đánh số 1, 2, 3. Nay lưu thẳng số phần trăm, nên
+ * ba số cũ được dịch lại cho khớp; sổ cũ mở lên vẫn đúng như trước.
+ *
+ * @param {object} g Mẩu ghi có mang ảnh.
+ * @returns {number} Phần trăm, trong khoảng 20 đến 100.
+ */
+function coAnhPhanTram(g) {
+  const c = Number(g && g.coAnh);
+  if (!c) return 78;
+  if (c === 1) return 52;
+  if (c === 2) return 78;
+  if (c === 3) return 100;
+  return Math.max(20, Math.min(100, Math.round(c)));
+}
 
 /**
  * Dựng HTML cho một dãy khối.
@@ -4033,8 +4126,17 @@ function veCacKhoi(khoi) {
   return khoi.map((k) => {
     if (k.loai === "anh") {
       const g = k.mau[0].g;
-      return `<div class="anh-trong-bai" data-co="${g.coAnh || 2}">
-        <img src="${urlCuaAnh(g)}" data-anh="${g.id}" alt="" loading="lazy">
+      const pc = coAnhPhanTram(g);
+      const ng = tyLeAnh.get(g.id) || 1.33;
+      // loading="lazy" từng làm ảnh không tải trong tờ giấy đo, nên bỏ.
+      return `<div class="anh-trong-bai"${pc >= 92 ? " data-thang" : ""}
+        style="--rong:${pc}%;--ngang:${ng.toFixed(3)}">
+        <img src="${urlCuaAnh(g)}" data-anh="${g.id}" alt="">
+        <span class="co-anh" contenteditable="false">
+          <button type="button" data-co-anh="-6" aria-label="Thu nhỏ ảnh">&minus;</button>
+          <span class="so">${pc}%</span>
+          <button type="button" data-co-anh="6" aria-label="Phóng to ảnh">+</button>
+        </span>
       </div>`;
     }
     return `<p>` + k.mau.map((m) =>
@@ -4206,7 +4308,10 @@ function moSo() {
   $("quyen").hidden = false;
   $("giay").innerHTML = "";
 
-  requestAnimationFrame(() => requestAnimationFrame(() => {
+  requestAnimationFrame(() => requestAnimationFrame(async () => {
+    // Đo tỷ lệ ảnh TRƯỚC khi cắt trang. Đo sau thì trang nào có ảnh cũng
+    // bị tính hụt chiều cao, ảnh rơi ra ngoài mép giấy rồi bị xén mất.
+    await napTyLeAnh();
     dungCacTrang();
     if (!cacTrang.length) { gapSo(); return; }
     trangDangMo = cacTrang.length - 1;
@@ -4321,51 +4426,59 @@ async function dongSuaTrang(luu) {
     if (k.loai !== "anh") for (const m of k.mau) cuaTrang.add(m.id);
   }
 
+  /* Gom chữ mới bằng MỘT lượt đi qua cả trang, theo đúng thứ tự mắt đọc.
+
+     Vì sao phải ngó cả thẻ chứ không riêng nút chữ: nhấn Enter trong ô
+     sửa thì trình duyệt không tạo ra chữ nào cả — nó chèn một thẻ <br>,
+     hoặc xẻ đoạn ra làm hai <p>. Cả hai đều KHÔNG phải nút chữ, nên lượt
+     soát cũ (chỉ nhận `SHOW_TEXT`) đi qua mà không thấy gì. Đó chính là
+     chỗ dấu xuống dòng bốc hơi: sửa thì thấy xuống dòng, bấm Xong là về
+     như cũ.
+
+     Nay lượt soát nhận cả thẻ: gặp <br> thì ghi một dấu xuống dòng, gặp
+     thẻ mang mã ở khối khác thì cũng vậy. */
   const moi = new Map();
-  let mauCuoi = null;
+  let dangGom = null, khoiTruoc = null;
 
-  o.querySelectorAll(".mau-chu").forEach((e) => {
-    const id = Number(e.dataset.id);
-    if (!id) return;
-    // innerText chứ không phải textContent: khi anh nhấn Enter, trình
-    // duyệt chèn thẻ <br>, mà textContent coi thẻ ấy là rỗng nên nuốt
-    // mất chỗ xuống dòng. innerText đọc đúng như mắt nhìn thấy.
-    const chu = (e.innerText || e.textContent || "").replace(/ /g, " ").trim();
-    // Mỗi mẩu chỉ được vẽ ra ĐÚNG MỘT thẻ. Gặp thẻ thứ hai mang cùng mã
-    // nghĩa là anh vừa nhấn Enter giữa đoạn: trình duyệt xẻ đôi thẻ ấy ra
-    // làm hai nửa. Nối lại bằng DẤU XUỐNG DÒNG — trước nối bằng dấu cách
-    // nên đúng chỗ anh vừa ngắt lại dính liền như cũ, "lưu xong là mất".
-    moi.set(id, moi.has(id) ? moi.get(id) + "\n" + chu : chu);
-    mauCuoi = id;
-  });
-
-  /* Chữ gõ thêm có thể rơi ra ngoài mọi thẻ mang mã — hay gặp khi nhấn
-     Enter ở cuối đoạn, trình duyệt tạo dòng mới nằm ngoài. Nhặt hết chỗ
-     chữ lạc ấy nối vào mẩu đứng ngay trước nó, kẻo lưu xong là mất. */
   /** Khối (đoạn văn) chứa một nút, dùng để biết chữ có sang dòng mới không. */
   const khoiCua = (n) => {
     const e = n.nodeType === 1 ? n : n.parentElement;
     return e ? e.closest("p, div, li, .trang-noi") : null;
   };
-  const soat = document.createTreeWalker(o, NodeFilter.SHOW_TEXT);
-  let mocHienTai = null, khoiMoc = null;
+  const themVao = (id, s) => { if (id) moi.set(id, (moi.get(id) || "") + s); };
+
+  // Chữ gõ thêm ở ngay đầu trang thì chưa có mẩu nào đứng trước để bám
+  // vào — cho nó bám vào mẩu đầu tiên của trang.
+  const theDau = o.querySelector(".mau-chu");
+  const maDau = theDau ? Number(theDau.dataset.id) : 0;
+
+  const soat = document.createTreeWalker(o, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT);
   for (let n = soat.nextNode(); n; n = soat.nextNode()) {
-    const trong = n.parentElement && n.parentElement.closest(".mau-chu");
-    if (trong) {
-      mocHienTai = Number(trong.dataset.id);
-      khoiMoc = khoiCua(trong);
+    if (n.nodeType === Node.ELEMENT_NODE) {
+      if (n.tagName === "BR") { themVao(dangGom || maDau, "\n"); continue; }
+      if (!n.classList || !n.classList.contains("mau-chu")) continue;
+      const id = Number(n.dataset.id);
+      if (!id) continue;
+      // Cùng một mẩu mà lại thấy lần nữa ở khối khác: anh vừa nhấn Enter
+      // giữa đoạn, trình duyệt xẻ đôi thẻ ấy ra. Nối lại bằng xuống dòng.
+      if (moi.has(id) && khoiCua(n) !== khoiTruoc) themVao(id, "\n");
+      if (!moi.has(id)) moi.set(id, "");
+      dangGom = id;
+      khoiTruoc = khoiCua(n);
       continue;
     }
 
-    const lac = (n.nodeValue || "").replace(/\u00A0/g, " ").trim();
-    if (!lac) continue;
+    const chu = (n.nodeValue || "").replace(/\u00A0/g, " ");
+    const trong = n.parentElement && n.parentElement.closest(".mau-chu");
+    if (trong) { themVao(Number(trong.dataset.id), chu); continue; }
 
-    const dich = mocHienTai || mauCuoi;
+    // Chữ rơi ra ngoài mọi thẻ mang mã: nối vào mẩu đứng ngay trước nó,
+    // kẻo lưu xong là mất. Khác khối nghĩa là dòng mới.
+    if (!chu.trim()) continue;
+    const dich = dangGom || maDau;
     if (!dich) continue;
-    // Chữ lạc nằm ở khối khác với mẩu đứng ngay trước nó: ấy là dòng mới
-    // anh vừa tạo bằng Enter, nối bằng dấu xuống dòng. Còn cùng một khối
-    // thì chỉ là chữ gõ thêm ngay cạnh, nối bằng dấu cách như cũ.
-    moi.set(dich, (moi.get(dich) || "") + (khoiCua(n) === khoiMoc ? " " : "\n") + lac);
+    themVao(dich, (khoiCua(n) === khoiTruoc ? " " : "\n") + chu.trim());
+    khoiTruoc = khoiCua(n);
   }
 
   // Ảnh nào còn trên giấy sau khi anh sửa. Ảnh vắng mặt nghĩa là anh
@@ -4468,11 +4581,13 @@ async function themAnhVaoSo(tep) {
   let id = luc.getTime();
   while (soGhi.some((x) => x.id === id)) id++;
 
-  const m = { id, ngay: tr.ma, luc: luc.toISOString(), chu: "", anh: tep, coAnh: 2 };
+  const m = { id, ngay: tr.ma, luc: luc.toISOString(), chu: "", anh: tep, coAnh: 78 };
   await luuMau(m);
   soGhi.push(m);
   soGhi.sort((a, b) => a.id - b.id);
 
+  // Biết tỷ lệ tấm ảnh rồi mới dựng lại trang, kẻo lần vẽ đầu tiên đo hụt.
+  await doTyLe(m);
   veLaiTrangSach();
   if (navigator.vibrate) { try { navigator.vibrate(12); } catch (e) {} }
   baoNgan(sauMau ? "Đã chèn ảnh vào đúng chỗ" : "Đã dán ảnh vào cuối ngày", "", null, 2500);
@@ -4504,18 +4619,36 @@ function mauTaiConTro() {
 }
 
 /**
- * Đổi cỡ một tấm ảnh trên trang sổ, xoay vòng ba cỡ.
+ * Tăng hoặc giảm cỡ một tấm ảnh trên trang sổ, mỗi lần một nấc nhỏ.
+ *
+ * Trước đây chạm vào ảnh là xoay vòng ba cỡ cố định, muốn nhích thêm
+ * một tí cũng không được. Nay hai nút cộng trừ ngay dưới ảnh, mỗi lần
+ * 6 phần trăm, chặn trong khoảng 20 đến 100.
+ *
  * @param {number} id Mã mẩu ghi mang ảnh.
+ * @param {number} buoc Số phần trăm cộng thêm; số âm là thu nhỏ.
  */
-async function doiCoAnh(id) {
+async function chinhCoAnh(id, buoc) {
   const g = soGhi.find((x) => x.id === id);
   if (!g) return;
-  g.coAnh = ((g.coAnh || 2) % 3) + 1;
+
+  const cu = coAnhPhanTram(g);
+  const moi = Math.max(20, Math.min(100, cu + buoc));
+  if (moi === cu) return;
+  g.coAnh = moi;
   await luuMau(g);
 
   // Đổi ngay trên giấy, khỏi dựng lại cả trang cho anh khỏi mất chỗ đang sửa.
   const anh = $("giay").querySelector(`img[data-anh="${id}"]`);
-  if (anh && anh.parentElement) anh.parentElement.dataset.co = g.coAnh;
+  const khung = anh && anh.parentElement;
+  if (khung) {
+    khung.style.setProperty("--rong", moi + "%");
+    if (moi >= 92) khung.setAttribute("data-thang", "");
+    else khung.removeAttribute("data-thang");
+    const so = khung.querySelector(".co-anh .so");
+    if (so) so.textContent = moi + "%";
+  }
+  if (navigator.vibrate) { try { navigator.vibrate(6); } catch (e) {} }
 }
 
 /** Dựng lại cuốn sổ nhưng giữ người đọc ở đúng trang đang mở. */
@@ -5478,9 +5611,15 @@ function ganSuKien() {
   $("sua-xong").addEventListener("click", () => dongSuaTrang(true));
   $("sua-thoi").addEventListener("click", () => dongSuaTrang(false));
   $("giay").addEventListener("click", (e) => {
-    // Đang sửa mà chạm vào ảnh: đổi cỡ, xoay vòng nhỏ - vừa - rộng.
-    const anh = e.target.closest("img[data-anh]");
-    if (anh && dangSuaTrang) { doiCoAnh(Number(anh.dataset.anh)); return; }
+    // Đang sửa mà bấm nút cộng trừ dưới ảnh: nhích cỡ từng nấc nhỏ.
+    const nutCo = e.target.closest("[data-co-anh]");
+    if (nutCo) {
+      e.preventDefault();
+      const khung = nutCo.closest(".anh-trong-bai");
+      const im = khung && khung.querySelector("img[data-anh]");
+      if (im) chinhCoAnh(Number(im.dataset.anh), Number(nutCo.dataset.coAnh));
+      return;
+    }
 
     if (e.target.closest("[data-sua-trang]")) {
       dangSuaTrang ? dongSuaTrang(true) : moSuaTrang();
